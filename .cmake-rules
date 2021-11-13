@@ -1,0 +1,12 @@
+if (MSVC)
+    add_compile_options(/std:c++latest /W4 /Zc:__cplusplus)
+else ()
+    add_compile_options(
+            -std=c++20
+            -Wall -Wextra -Wpedantic -Wshadow -Wshadow -Wnon-virtual-dtor
+            -Wold-style-cast -Wcast-align -Woverloaded-virtual
+            -Wconversion -Wsign-conversion
+            -Wredundant-decls -Wuninitialized -Wfloat-equal -Wfloat-conversion)
+endif ()
+
+find_package(fmt CONFIG REQUIRED)
