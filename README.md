@@ -1,3 +1,3 @@
-# cerberus-proejct
+# cerberus-project
 
-ceerberus-project consists of own library and lexical analyzer
+cerberus-project consists of own library and lexical analyzer
