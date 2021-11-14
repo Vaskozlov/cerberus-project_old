@@ -5,7 +5,6 @@
 #include <fmt/color.h>
 #include <fmt/format.h>
 #include <iostream>
-#include <source_location>
 #include <string_view>
 
 #define CERBLIB_LOCATION cerb::test::location(__FILE__, __LINE__)
