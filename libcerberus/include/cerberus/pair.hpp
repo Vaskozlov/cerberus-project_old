@@ -45,28 +45,6 @@ namespace cerb {
             }
         }
 
-        constexpr friend auto operator==(const Pair &pair, const auto &other) -> bool
-        {
-            static_assert(Compare != PairComparisonRule::DEFAULT);
-
-            if constexpr (Compare == PairComparisonRule::BY_FIRST_VALUE) {
-                return pair.first == other;
-            } else {
-                return pair.second == other;
-            }
-        }
-
-        constexpr auto operator<=>(const auto &other) const
-        {
-            static_assert(Compare != PairComparisonRule::DEFAULT);
-
-            if constexpr (Compare == PairComparisonRule::BY_FIRST_VALUE) {
-                return first <=> other;
-            } else {
-                return second <=> other;
-            }
-        }
-
         constexpr auto operator=(const Pair &pair) -> Pair & = default;
         constexpr auto operator=(Pair &&pair) noexcept -> Pair & = default;
 
