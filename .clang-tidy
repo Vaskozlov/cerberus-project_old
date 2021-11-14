@@ -1,5 +1,13 @@
 ---
-Checks:          '*,-fuchsia-*,-google-*,-zircon-*,-abseil-*,-llvm*'
+Checks: >-
+    -*,
+  -fuchsia-*,
+  -google-*,
+  -zircon-*,
+  -abseil-*,
+  -llvm*,
+  -cppcoreguidelines-non-private-member-variables-in-classes,
+  -misc-non-private-member-variables-in-classes
 WarningsAsErrors: '*'
 HeaderFilterRegex: ''
 FormatStyle:     none

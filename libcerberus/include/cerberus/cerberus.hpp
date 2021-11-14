@@ -67,9 +67,9 @@
 
 #ifndef CERBLIB_UNROLL
 #    if defined(__clang__)
-#        define CERBLIB_UNROLL CERBLIB_DO_PRAGMA(CERBLIB_STR(unroll))
+#        define CERBLIB_UNROLL _Pragma(CERBLIB_STR(unroll))
 #    elif (__GNUC__)
-#        define CERBLIB_UNROLL CERBLIB_DO_PRAGMA(CERBLIB_STR(GCC unroll))
+#        define CERBLIB_UNROLL _Pragma(CERBLIB_STR(GCC unroll))
 #    else
 #        define CERBLIB_UNROLL
 #    endif
@@ -77,9 +77,9 @@
 
 #ifndef CERBLIB_UNROLL_N
 #    if defined(__clang__)
-#        define CERBLIB_UNROLL_N(N) CERBLIB_DO_PRAGMA(CERBLIB_STR(unroll N))
+#        define CERBLIB_UNROLL_N(N) _Pragma(CERBLIB_STR(unroll N))
 #    elif (__GNUC__)
-#        define CERBLIB_UNROLL_N(N) CERBLIB_DO_PRAGMA(CERBLIB_STR(GCC unroll N))
+#        define CERBLIB_UNROLL_N(N) _Pragma(CERBLIB_STR(GCC unroll N))
 #    else
 #        define CERBLIB_UNROLL_N(N)
 #    endif
@@ -127,6 +127,9 @@ namespace cerb {
     constexpr auto endl = '\n';
 #endif
 
+    /**
+     * Just empty type. It's used to show that value is passed just to be passed
+     */
     class EmptyType
     {
         u8 empty{};
@@ -158,12 +161,12 @@ namespace cerb {
      * @return
      */
     template<typename F, typename... Ts>
-    constexpr auto call(F &&function, Ts... args) -> decltype(auto)
+    constexpr auto call(F &&function, Ts &&...args) -> decltype(auto)
     {
         if constexpr (std::is_same_v<F, EmptyType>) {
             return;
         } else {
-            return function(args...);
+            return function(std::forward<Ts...>(args)...);
         }
     }
 
@@ -196,7 +199,23 @@ namespace cerb {
     }
 
     /**
-     * short for of condition ? on_true : on_false
+     * iterates through parameter pack
+     * @tparam Ts
+     * @param function
+     * @param args
+     * @return
+     */
+    template<typename F, typename... Ts>
+    CERBLIB_DECL auto for_each(F &&function, Ts &&...args)
+    {
+        [[maybe_unused]] auto iterator = { ([&function]<typename T>(T &&value) {
+            call(std::forward<F>(function), std::forward<T>(value));
+            return 0;
+        })(std::forward<Ts...>(args)...) };
+    }
+
+    /**
+     * short form of: condition ? on_true : on_false
      * @tparam T
      * @param condition
      * @param on_true
