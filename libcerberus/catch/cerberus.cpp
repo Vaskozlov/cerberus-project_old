@@ -4,7 +4,7 @@
 auto main() -> int
 {
     cerb::test::pair_test();
-    cerb::test::byte_mask_test();
+    cerb::test::bit_test();
 
     return 0;
 }

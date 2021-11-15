@@ -211,7 +211,7 @@ namespace cerb {
         [[maybe_unused]] auto iterator = { ([&function]<typename T>(T &&value) {
             call(std::forward<F>(function), std::forward<T>(value));
             return 0;
-        })(std::forward<Ts...>(args)...) };
+        })(args)... };
     }
 
     /**

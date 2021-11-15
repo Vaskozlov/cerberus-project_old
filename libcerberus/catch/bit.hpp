@@ -6,7 +6,7 @@
 
 namespace cerb::test
 {
-    auto byte_mask_test() -> int;
+    auto bit_test() -> int;
 }
 
 #endif /* CERBERUS_CATCH_BIT_HPP */

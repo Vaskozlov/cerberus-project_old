@@ -17,31 +17,27 @@ namespace cerb {
         std::array<u32, sizeof(T) / sizeof(u32)> mask_32;
         std::array<u64, sizeof(T) / sizeof(u64)> mask_64;
 
-        /**
-         * returns stored value as integer. If it's not possible returns array of bytes
-         * @return
-         */
-        CERBLIB_DECL auto getAsInt() -> decltype(auto)
+        CERBLIB_DECL static auto canBeGetAsInt() -> bool
         {
-            if constexpr (sizeof(T) == sizeof(u8)) {
-                return mask_8[0];
-            } else if constexpr (sizeof(T) == sizeof(u16)) {
-                return mask_16[0];
-            } else if constexpr (sizeof(T) == sizeof(u32)) {
-                return mask_32[0];
-            } else if constexpr (sizeof(T) == sizeof(u64)) {
-                return mask_64[0];
-            } else {
-                return mask_8;
+            switch (sizeof(T)) {
+            case sizeof(u8):
+            case sizeof(u16):
+            case sizeof(u32):
+            case sizeof(u64):
+                return true;
+            default:
+                return false;
             }
         }
 
         /**
-         * returns stored value as integer. If it's not possible returns array of bytes
+         * returns stored value as integer.
          * @return
          */
-        CERBLIB_DECL auto getAsInt() const -> decltype(auto)
+        CERBLIB_DECL auto getAsInt() -> decltype(auto)
         {
+            static_assert(canBeGetAsInt());
+
             if constexpr (sizeof(T) == sizeof(u8)) {
                 return mask_8[0];
             } else if constexpr (sizeof(T) == sizeof(u16)) {
@@ -50,8 +46,25 @@ namespace cerb {
                 return mask_32[0];
             } else if constexpr (sizeof(T) == sizeof(u64)) {
                 return mask_64[0];
-            } else {
-                return mask_8;
+            }
+        }
+
+        /**
+         * returns stored value as integer.
+         * @return
+         */
+        CERBLIB_DECL auto getAsInt() const -> decltype(auto)
+        {
+            static_assert(canBeGetAsInt());
+
+            if constexpr (sizeof(T) == sizeof(u8)) {
+                return mask_8[0];
+            } else if constexpr (sizeof(T) == sizeof(u16)) {
+                return mask_16[0];
+            } else if constexpr (sizeof(T) == sizeof(u32)) {
+                return mask_32[0];
+            } else if constexpr (sizeof(T) == sizeof(u64)) {
+                return mask_64[0];
             }
         }
 
@@ -118,7 +131,7 @@ namespace cerb {
         if constexpr (sizeof...(args) == 0) {
             return lhs;
         } else {
-            T rhs = max<T>(std::forward<Ts...>(args)...);
+            T rhs = max<T>(args...);
             return lhs > rhs ? lhs : rhs;
         }
     }
@@ -136,7 +149,7 @@ namespace cerb {
         if constexpr (sizeof...(args) == 0) {
             return lhs;
         } else {
-            T rhs = max<T>(std::forward<Ts...>(args)...);
+            T rhs = min<T>(args...);
             return lhs < rhs ? lhs : rhs;
         }
     }
@@ -197,7 +210,7 @@ namespace cerb {
             if constexpr (sizeof(T) == sizeof(u32)) {
                 mask.getAsInt() &= std::numeric_limits<i32>::max();
             } else {
-                mask.getAsInt() |= std::numeric_limits<i64>::max();
+                mask.getAsInt() &= std::numeric_limits<i64>::max();
             }
 
             if constexpr (std::is_same_v<ResultType, EmptyType>) {

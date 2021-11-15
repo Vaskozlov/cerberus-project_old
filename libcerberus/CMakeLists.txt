@@ -16,3 +16,5 @@ target_link_libraries(
         catch
         fmt::fmt
 )
+
+add_test(LIBCERBERUS_TEST catch)
