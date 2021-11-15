@@ -65,6 +65,16 @@
 #    endif
 #endif /* CERBLIB_DO_PRAGMA */
 
+#ifndef CERBLIB_PRAGMA
+#    ifdef _MSC_VER
+#        define CERBLIB_DO_PRAGMA(x) __pragma(#        x)
+#        define CERBLIB_PRAGMA(compiler, x) CERBLIB_DO_PRAGMA(warning(x))
+#    else
+#        define CERBLIB_DO_PRAGMA(x) _Pragma(#        x)
+#        define CERBLIB_PRAGMA(compiler, x) CERBLIB_DO_PRAGMA(compiler diagnostic x)
+#    endif
+#endif /* CERBLIB_PRAGMA */
+
 #ifndef CERBLIB_UNROLL
 #    if defined(__clang__)
 #        define CERBLIB_UNROLL _Pragma(CERBLIB_STR(unroll))
@@ -132,7 +142,9 @@ namespace cerb {
      */
     class EmptyType
     {
+        CERBLIB_CLANG_DISABLE_WARNING("-Wunused-private-field")
         u8 empty{};
+        CERBLIB_CLANG_ENABLE_WARNING
 
     public:
         constexpr EmptyType()  = default;
