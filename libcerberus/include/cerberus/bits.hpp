@@ -174,7 +174,7 @@ namespace cerb {
 
             if constexpr (sizeof(T) == sizeof(u32)) {
                 constexpr u32 float32_power_bit = 1UL << 23;
-                mask.getAsInt() += float32_power_bit * power;
+                mask.getAsInt() += static_cast<u32>(float32_power_bit * power);
             } else {
                 constexpr u64 float64_power_bit = 1ULL << 52;
                 mask.getAsInt() += float64_power_bit * power;
@@ -208,9 +208,9 @@ namespace cerb {
             ByteMask<T> mask{ value };
 
             if constexpr (sizeof(T) == sizeof(u32)) {
-                mask.getAsInt() &= std::numeric_limits<i32>::max();
+                mask.getAsInt() &= static_cast<u32>(std::numeric_limits<i32>::max());
             } else {
-                mask.getAsInt() &= std::numeric_limits<i64>::max();
+                mask.getAsInt() &= static_cast<u64>(std::numeric_limits<i64>::max());
             }
 
             if constexpr (std::is_same_v<ResultType, EmptyType>) {
@@ -224,6 +224,40 @@ namespace cerb {
         } else {
             // cast if user wants to do this
             return static_cast<ResultType>(cmov(value < 0, -value, value));
+        }
+    }
+
+    /**
+     * Safely compare floating point numbers
+     * @tparam T
+     * @param lhs
+     * @param rhs
+     * @return
+     */
+    template<typename T>
+    CERBLIB_DECL auto equal(T lhs, T rhs) -> bool
+    {
+        if constexpr (std::is_floating_point_v<T>) {
+            return abs(lhs - rhs) <= std::numeric_limits<T>::epsilon();
+        } else {
+            return lhs == rhs;
+        }
+    }
+
+    /**
+     * Safely compare floating point numbers
+     * @tparam T
+     * @param lhs
+     * @param rhs
+     * @return
+     */
+    template<typename T>
+    CERBLIB_DECL auto not_equal(T lhs, T rhs) -> bool
+    {
+        if constexpr (std::is_floating_point_v<T>) {
+            return abs(lhs - rhs) > std::numeric_limits<T>::epsilon();
+        } else {
+            return lhs != rhs;
         }
     }
 }// namespace cerb

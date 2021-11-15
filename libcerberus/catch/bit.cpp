@@ -55,53 +55,53 @@ namespace cerb::test {
 
     auto test_pow2() -> void
     {
-        test([]() { return cerb::pow2<u32>(0U) != 1U; }, CERBLIB_LOCATION);
-        test([]() { return cerb::pow2<u32>(2U) != 4U; }, CERBLIB_LOCATION);
-        test([]() { return cerb::pow2<u32>(10U) != 1024U; }, CERBLIB_LOCATION);
-        test(
-            []() { return cerb::pow2<u64>(54ULL) != (1ULL << 54ULL); }, CERBLIB_LOCATION);
+        test([]() { return pow2<u32>(0U) != 1U; }, CERBLIB_LOCATION);
+        test([]() { return pow2<u32>(2U) != 4U; }, CERBLIB_LOCATION);
+        test([]() { return pow2<u32>(10U) != 1024U; }, CERBLIB_LOCATION);
+        test([]() { return pow2<u64>(54ULL) != (1ULL << 54ULL); }, CERBLIB_LOCATION);
 
-        test([]() { return cerb::pow2<float>(0U) != 1.0f; }, CERBLIB_LOCATION);
-        test([]() { return cerb::pow2<float>(2U) != 4.0f; }, CERBLIB_LOCATION);
-        test([]() { return cerb::pow2<float>(10U) != 1024.0f; }, CERBLIB_LOCATION);
+        test([]() { return not_equal(pow2<float>(0U), 1.0f); }, CERBLIB_LOCATION);
+        test([]() { return not_equal(pow2<float>(2U), 4.0f); }, CERBLIB_LOCATION);
+        test([]() { return not_equal(pow2<float>(10U), 1024.0f); }, CERBLIB_LOCATION);
         test(
             []() {
-                return cerb::pow2<float>(54ULL) != static_cast<float>((1ULL << 54ULL));
+                return not_equal(pow2<float>(54ULL), static_cast<float>((1ULL << 54ULL)));
             },
             CERBLIB_LOCATION);
 
-        test([]() { return cerb::pow2<double>(0U) != 1.0; }, CERBLIB_LOCATION);
-        test([]() { return cerb::pow2<double>(2U) != 4.0; }, CERBLIB_LOCATION);
-        test([]() { return cerb::pow2<double>(10U) != 1024.0; }, CERBLIB_LOCATION);
+        test([]() { return not_equal(pow2<double>(0U), 1.0); }, CERBLIB_LOCATION);
+        test([]() { return not_equal(pow2<double>(2U), 4.0); }, CERBLIB_LOCATION);
+        test([]() { return not_equal(pow2<double>(10U), 1024.0); }, CERBLIB_LOCATION);
         test(
             []() {
-                return cerb::pow2<double>(54ULL) != static_cast<double>((1ULL << 54ULL));
+                return not_equal(
+                    pow2<double>(54ULL), static_cast<double>((1ULL << 54ULL)));
             },
             CERBLIB_LOCATION);
     }
 
     auto test_abs() -> void
     {
-        test([]() { return cerb::abs(0) != 0; }, CERBLIB_LOCATION);
-        test([]() { return cerb::abs(10) != 10; }, CERBLIB_LOCATION);
+        test([]() { return abs(0) != 0; }, CERBLIB_LOCATION);
+        test([]() { return abs(10) != 10; }, CERBLIB_LOCATION);
 
-        test([]() { return cerb::abs(-10) != 10; }, CERBLIB_LOCATION);
-        test([]() { return cerb::abs<u32>(-10) != 10U; }, CERBLIB_LOCATION);
+        test([]() { return abs(-10) != 10; }, CERBLIB_LOCATION);
+        test([]() { return abs<u32>(-10) != 10U; }, CERBLIB_LOCATION);
         test(
-            []() { return !std::is_same_v<decltype(cerb::abs<u32>(-10)), u32>; },
+            []() { return !std::is_same_v<decltype(abs<u32>(-10)), u32>; },
             CERBLIB_LOCATION);
 
-        test([]() { return cerb::abs(0.0f) != 0.0f; }, CERBLIB_LOCATION);
-        test([]() { return cerb::abs(10.0f) != 10.0f; }, CERBLIB_LOCATION);
+        test([]() { return not_equal(abs(0.0f), 0.0f); }, CERBLIB_LOCATION);
+        test([]() { return not_equal(abs(10.0f), 10.0f); }, CERBLIB_LOCATION);
 
-        test([]() { return  cerb::abs(-0.0f) != 0.0f; }, CERBLIB_LOCATION);
-        test([]() { return cerb::abs(-10.0f) != 10.0f; }, CERBLIB_LOCATION);
+        test([]() { return not_equal(abs(-0.0f), 0.0f); }, CERBLIB_LOCATION);
+        test([]() { return not_equal(abs(-10.0f), 10.0f); }, CERBLIB_LOCATION);
 
-        test([]() { return cerb::abs(0.0f) != 0.0f; }, CERBLIB_LOCATION);
-        test([]() { return cerb::abs(10.0f) != 10.0f; }, CERBLIB_LOCATION);
+        test([]() { return not_equal(abs(0.0f), 0.0f); }, CERBLIB_LOCATION);
+        test([]() { return not_equal(abs(10.0f), 10.0f); }, CERBLIB_LOCATION);
 
-        test([]() { return  cerb::abs(-0.0) != 0.0; }, CERBLIB_LOCATION);
-        test([]() { return cerb::abs(-10.0) != 10.0; }, CERBLIB_LOCATION);
+        test([]() { return not_equal(abs(-0.0), 0.0); }, CERBLIB_LOCATION);
+        test([]() { return not_equal(abs(-10.0), 10.0); }, CERBLIB_LOCATION);
     }
 
     auto bit_test() -> int

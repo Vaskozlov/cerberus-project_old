@@ -4,8 +4,7 @@
 #include "catch.hpp"
 #include <cerberus/bits.hpp>
 
-namespace cerb::test
-{
+namespace cerb::test {
     auto bit_test() -> int;
 }
 
