@@ -4,6 +4,13 @@
 #include <cerberus/cerberus.hpp>
 
 namespace cerb {
+    enum struct AlignRule
+    {
+        DEFAULT,
+        TRUNK,
+        CEIL
+    };
+
     /**
      * Union which holds target class and provides access to it's bytes
      * @tparam T
@@ -260,6 +267,79 @@ namespace cerb {
             return lhs != rhs;
         }
     }
+
+    template<u64 power, AlignRule rule = AlignRule::DEFAULT, typename T>
+    CERBLIB_DECL auto align(T value) -> T
+    {
+        static_assert(std::is_integral_v<T>);
+
+        if constexpr (rule == AlignRule::TRUNK) {
+            // if we need to trunk the value, we just set bits under power to 0
+            return value & ~(pow2<T>(power) - 1);
+        } else if constexpr (rule == AlignRule::CEIL) {
+            // if we need to ceil the number we add something to it, so it can become
+            // aligned
+            return value + (pow2<T>(power) - value % pow2<T>(power));
+        } else if constexpr (rule == AlignRule::DEFAULT) {
+            // in normal mode we check that the number is aligned, and if it is not, we
+            // ceil it
+            return value % pow2<T>(power) == 0 ? value
+                                               : align<power, AlignRule::CEIL>(value);
+        }
+    }
+
+    //#if defined(_MSC_VER)
+    namespace private_ {
+        template<unsigned BitValue, typename T>
+        CERBLIB_DECL auto findBitForward(T value) -> u64
+        {
+            static_assert(std::is_unsigned_v<T>);
+            static_assert(BitValue == 0 || BitValue == 1);
+
+            if constexpr (BitValue == 0) {
+                value = ~value;
+            }
+
+            u64 bit_index = 0;
+            constexpr T mask = 0b1;
+
+            CERBLIB_UNROLL_N(2)
+            for (; value > 0; ++bit_index) {
+                if ((value & mask) == mask) {
+                    return bit_index;
+                }
+                value >>= 1;
+            }
+
+            return bitsizeof(uintmax_t);
+        }
+
+        template<unsigned BitValue, typename T>
+        CERBLIB_DECL auto findBitReverse(T value) -> u64
+        {
+            static_assert(std::is_unsigned_v<T>);
+            static_assert(BitValue == 0 || BitValue == 1);
+
+            if constexpr (BitValue == 0) {
+                value = ~value;
+            }
+
+            u64 bit_index = bitsizeof(T) - 1;
+            constexpr T mask = static_cast<T>(1) << (bitsizeof(T) - 1);
+
+            CERBLIB_UNROLL_N(2)
+            for (; value > 0; --bit_index) {
+                if ((value & mask) == mask) {
+                    return bit_index;
+                }
+                value <<= 1;
+            }
+
+            return bitsizeof(uintmax_t);
+        }
+    }// namespace private_
+    //#endif /* _MSC_VER */
+
 }// namespace cerb
 
 #endif /* CERBERUS_BITS_HPP */
