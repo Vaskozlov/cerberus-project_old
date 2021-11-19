@@ -377,7 +377,7 @@ namespace cerb {
 
 #ifdef _MSC_VER
         if (std::is_constant_evaluated()) {
-            return private_::findBitForward<BitValue>(value);
+            return private_::bitScanForward<BitValue>(value);
         }
 
         unsigned long bit_index;
@@ -411,7 +411,7 @@ namespace cerb {
 
 #ifdef _MSC_VER
         if (std::is_constant_evaluated()) {
-            return private_::bitScanReverse<BitValue>(value);
+            return private_::bitScanForward<BitValue>(value);
         }
 
         unsigned long bit_index;
