@@ -289,7 +289,7 @@ namespace cerb {
         }
     }
 
-#if defined(_MSC_VER)
+#ifdef _MSC_VER
     namespace private_ {
         /**
          * Finds position of target bit in the number (right to left order)
@@ -377,7 +377,7 @@ namespace cerb {
 
 #ifdef _MSC_VER
         if (std::is_constant_evaluated()) {
-            return private_::findBitForward<BitValue, T>(value);
+            return private_::findBitForward<BitValue>(value);
         }
 
         unsigned long bit_index;
@@ -411,7 +411,7 @@ namespace cerb {
 
 #ifdef _MSC_VER
         if (std::is_constant_evaluated()) {
-            return private_::bitScanReverse<BitValue, T>(value);
+            return private_::bitScanReverse<BitValue>(value);
         }
 
         unsigned long bit_index;
