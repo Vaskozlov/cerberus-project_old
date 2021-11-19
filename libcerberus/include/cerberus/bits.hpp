@@ -418,7 +418,7 @@ namespace cerb {
 
         retrun static_cast<u64>(bitsizeof(unsigned long) - 1ULL - bit_index);
 #else
-        return bitsizeof(unsigned long) - 1UL - __builtin_clzl(static_cast<u64>(value));
+        return bitsizeof(unsigned long) - 1UL - static_cast<u64>(__builtin_clzl(static_cast<u64>(value)));
 #endif
     }
 
