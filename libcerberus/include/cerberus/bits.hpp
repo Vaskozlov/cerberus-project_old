@@ -1,6 +1,7 @@
 #ifndef CERBERUS_BITS_HPP
 #define CERBERUS_BITS_HPP
 
+#include <bit>
 #include <cerberus/cerberus.hpp>
 
 namespace cerb {
@@ -382,7 +383,7 @@ namespace cerb {
         unsigned long bit_index;
         _BitScanForward64(&bit_index, static_cast<u64>(value));
 
-        retrun static_cast<u64>(bit_index);
+        return static_cast<u64>(bit_index);
 #else
         return static_cast<u64>(__builtin_ctzl(static_cast<u64>(value)));
 #endif
@@ -416,7 +417,7 @@ namespace cerb {
         unsigned long bit_index;
         _BitScanReverse64(&bit_index, static_cast<u64>(value));
 
-        retrun static_cast<u64>(bitsizeof(unsigned long) - 1ULL - bit_index);
+        return static_cast<u64>(bitsizeof(unsigned long) - 1ULL - bit_index);
 #else
         return bitsizeof(unsigned long) - 1UL - static_cast<u64>(__builtin_clzl(static_cast<u64>(value)));
 #endif
