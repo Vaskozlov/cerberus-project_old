@@ -288,10 +288,17 @@ namespace cerb {
         }
     }
 
-    //#if defined(_MSC_VER)
+#if defined(_MSC_VER)
     namespace private_ {
+        /**
+         * Finds position of target bit in the number (right to left order)
+         * @tparam BitValue target bit. Must be 0 or 1.
+         * @tparam T unsigned integer
+         * @param value, where we need to find the position of target bit
+         * @return
+         */
         template<unsigned BitValue, typename T>
-        CERBLIB_DECL auto findBitForward(T value) -> u64
+        CERBLIB_DECL auto bitScanForward(T value) -> u64
         {
             static_assert(std::is_unsigned_v<T>);
             static_assert(BitValue == 0 || BitValue == 1);
@@ -300,7 +307,7 @@ namespace cerb {
                 value = ~value;
             }
 
-            u64 bit_index = 0;
+            u64 bit_index    = 0;
             constexpr T mask = 0b1;
 
             CERBLIB_UNROLL_N(2)
@@ -314,8 +321,15 @@ namespace cerb {
             return bitsizeof(uintmax_t);
         }
 
+        /**
+         * Finds position of target bit in the number (left to right order)
+         * @tparam BitValue target bit. Must be 0 or 1.
+         * @tparam T unsigned integer
+         * @param value, where we need to find the position of target bit
+         * @return
+         */
         template<unsigned BitValue, typename T>
-        CERBLIB_DECL auto findBitReverse(T value) -> u64
+        CERBLIB_DECL auto bitScanReverse(T value) -> u64
         {
             static_assert(std::is_unsigned_v<T>);
             static_assert(BitValue == 0 || BitValue == 1);
@@ -324,7 +338,7 @@ namespace cerb {
                 value = ~value;
             }
 
-            u64 bit_index = bitsizeof(T) - 1;
+            u64 bit_index    = bitsizeof(T) - 1;
             constexpr T mask = static_cast<T>(1) << (bitsizeof(T) - 1);
 
             CERBLIB_UNROLL_N(2)
@@ -337,9 +351,122 @@ namespace cerb {
 
             return bitsizeof(uintmax_t);
         }
-    }// namespace private_
-    //#endif /* _MSC_VER */
+    }  // namespace private_
+#endif /* _MSC_VER */
 
+    /**
+     * Finds position of target bit in the number (right to left order)
+     * @tparam BitValue target bit. Must be 0 or 1.
+     * @tparam T unsigned integer
+     * @param value, where we need to find the position of target bit
+     * @return
+     */
+    template<unsigned BitValue, typename T>
+    CERBLIB_DECL auto bitScanForward(T value) -> u64
+    {
+        static_assert(std::is_unsigned_v<T>);
+        static_assert(BitValue == 0 || BitValue == 1);
+
+        if constexpr (BitValue == 0) {
+            value = ~value;
+        }
+        if (value == 0) {
+            return bitsizeof(uintmax_t);
+        }
+
+#ifdef _MSC_VER
+        if (std::is_constant_evaluated()) {
+            return private_::findBitForward<BitValue, T>(value);
+        }
+
+        unsigned long bit_index;
+        _BitScanForward64(&bit_index, static_cast<u64>(value));
+
+        retrun static_cast<u64>(bit_index);
+#else
+        return static_cast<u64>(__builtin_ctzl(static_cast<u64>(value)));
+#endif
+    }
+
+    /**
+     * Finds position of target bit in the number (left to right order)
+     * @tparam BitValue target bit. Must be 0 or 1.
+     * @tparam T unsigned integer
+     * @param value, where we need to find the position of target bit
+     * @return
+     */
+    template<unsigned BitValue, typename T>
+    CERBLIB_DECL auto bitScanReverse(T value) -> u64
+    {
+        static_assert(std::is_unsigned_v<T>);
+        static_assert(BitValue == 0 || BitValue == 1);
+
+        if constexpr (BitValue == 0) {
+            value = ~value;
+        }
+        if (value == 0) {
+            return bitsizeof(uintmax_t);
+        }
+
+#ifdef _MSC_VER
+        if (std::is_constant_evaluated()) {
+            return private_::bitScanReverse<BitValue, T>(value);
+        }
+
+        unsigned long bit_index;
+        _BitScanReverse64(&bit_index, static_cast<u64>(value));
+
+        retrun static_cast<u64>(bitsizeof(unsigned long) - 1ULL - bit_index);
+#else
+        return bitsizeof(unsigned long) - 1UL - __builtin_clzl(static_cast<u64>(value));
+#endif
+    }
+
+    /**
+     * Finds log2 for integer and floating point numbers (returning value is trunked to
+     * integer).
+     * @tparam T
+     * @param value
+     * @return
+     */
+    template<typename T>
+    CERBLIB_DECL auto log2(T value) -> decltype(auto)
+    {
+        static_assert(
+            ((std::is_integral_v<T> && std::is_unsigned_v<T>) ||
+             std::is_floating_point_v<T>));
+
+        if constexpr (std::is_integral_v<T>) {
+            return bitScanForward<1>(value);
+        } else {
+            static_assert(sizeof(T) <= sizeof(u64));
+            if (value <= static_cast<T>(0.0)) {
+                return static_cast<i64>(-1);
+            }
+
+            if constexpr (sizeof(T) == sizeof(u32)) {
+                const u32 mask = std::bit_cast<u32>(value);
+
+                // float32_zero_power - is 2^0 for 32 bit floating point number
+                constexpr i32 float32_zero_power = 0x7fU;
+                constexpr u32 float32_power_bit  = 23;
+                constexpr u32 float32_power_mask = 0xFF80'0000;
+                return static_cast<i64>(
+                           (mask & float32_power_mask) >> float32_power_bit) -
+                       float32_zero_power;
+            } else {
+                const u64 mask = std::bit_cast<u32>(value);
+
+                // float64_zero_power - is 2^0 for 64 bit floating point number
+                constexpr i64 float64_zero_power = 0x3ffU;
+                constexpr u64 float64_power_bit  = 52;
+                constexpr u64 float64_power_mask = 0xFFF0'0000'0000'0000;
+                return static_cast<i64>(
+                           (mask & float64_power_mask) >> float64_power_bit) -
+                       float64_zero_power;
+            }
+        }
+    }
 }// namespace cerb
 
 #endif /* CERBERUS_BITS_HPP */

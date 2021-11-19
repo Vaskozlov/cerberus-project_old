@@ -2,7 +2,7 @@
 
 namespace cerb::test {
 
-    auto test_mask() -> void
+    auto maskTest() -> void
     {
         ByteMask<i64> mask{ 0 };
         mask.mask_8[0] = 255;
@@ -15,7 +15,7 @@ namespace cerb::test {
         test([&mask]() { return mask() != 0xFFFFFF; }, CERBLIB_LOCATION);
     }
 
-    auto test_min_max() -> void
+    auto minMaxTest() -> void
     {
         test(
             []() {
@@ -53,7 +53,7 @@ namespace cerb::test {
             CERBLIB_LOCATION);
     }
 
-    auto test_pow2() -> void
+    auto pow2Test() -> void
     {
         test([]() { return pow2<u32>(0U) != 1U; }, CERBLIB_LOCATION);
         test([]() { return pow2<u32>(2U) != 4U; }, CERBLIB_LOCATION);
@@ -80,7 +80,7 @@ namespace cerb::test {
             CERBLIB_LOCATION);
     }
 
-    auto test_abs() -> void
+    auto absTest() -> void
     {
         test([]() { return abs(0) != 0; }, CERBLIB_LOCATION);
         test([]() { return abs(10) != 10; }, CERBLIB_LOCATION);
@@ -104,12 +104,104 @@ namespace cerb::test {
         test([]() { return not_equal(abs(-10.0), 10.0); }, CERBLIB_LOCATION);
     }
 
-    auto bit_test() -> int
+    auto findBitTest(u32 argc) -> void
     {
-        test_mask();
-        test_min_max();
-        test_pow2();
-        test_abs();
+        test(
+            [&argc]() { return cerb::bitScanForward<1>(0b1000U * argc) != 3; },
+            CERBLIB_LOCATION);
+        test(
+            [&argc]() { return cerb::bitScanForward<1>(0b1001U * argc) != 0; },
+            CERBLIB_LOCATION);
+        test(
+            [&argc]() { return cerb::bitScanReverse<1>(0b1000U * argc) != 3; },
+            CERBLIB_LOCATION);
+        test(
+            [&argc]() { return cerb::bitScanReverse<1>(0b1001U * argc) != 3; },
+            CERBLIB_LOCATION);
+
+        test(
+            []() {
+                constexpr auto value = cerb::bitScanForward<1>(0b1000U);
+                return value != 3;
+            },
+            CERBLIB_LOCATION);
+
+        test(
+            []() {
+                constexpr auto value = cerb::bitScanForward<1>(0b1001U);
+                return value != 0;
+            },
+            CERBLIB_LOCATION);
+
+        test(
+            []() {
+                constexpr auto value = cerb::bitScanReverse<1>(0b1000U);
+                return value != 3;
+            },
+            CERBLIB_LOCATION);
+
+        test(
+            []() {
+                constexpr auto value = cerb::bitScanReverse<1>(0b1001U);
+                return value != 3;
+            },
+            CERBLIB_LOCATION);
+    }
+
+    auto logTest(u32 argc) -> void
+    {
+        test([&argc]() { return cerb::log2(8U * argc) != 3; }, CERBLIB_LOCATION);
+        test([&argc]() { return cerb::log2(1U * argc) != 0; }, CERBLIB_LOCATION);
+
+        test(
+            []() {
+                constexpr auto value = cerb::log2(8U);
+                return value != 3;
+            },
+            CERBLIB_LOCATION);
+        test(
+            []() {
+                constexpr auto value = cerb::log2(1U);
+                return value != 0;
+            },
+            CERBLIB_LOCATION);
+
+        test(
+            [&argc]() { return cerb::log2(8.0f * static_cast<float>(argc)) != 3; },
+            CERBLIB_LOCATION);
+        test(
+            [&argc]() { return cerb::log2(1.0f * static_cast<float>(argc)) != 0; },
+            CERBLIB_LOCATION);
+
+        test(
+            []() {
+                constexpr auto value = cerb::log2(8.0f);
+                return value != 3;
+            },
+            CERBLIB_LOCATION);
+        test(
+            []() {
+                constexpr auto value = cerb::log2(1.0f);
+                return value != 0;
+            },
+            CERBLIB_LOCATION);
+
+        test(
+            []() {
+                constexpr auto value = cerb::log2(-8.0f);
+                return value != -1;
+            },
+            CERBLIB_LOCATION);
+    }
+
+    auto bit_test(u32 argc) -> int
+    {
+        maskTest();
+        minMaxTest();
+        pow2Test();
+        absTest();
+        findBitTest(argc);
+        logTest(argc);
         return 0;
     }
 }// namespace cerb::test
