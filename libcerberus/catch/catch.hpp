@@ -5,6 +5,7 @@
 #include <fmt/color.h>
 #include <fmt/format.h>
 #include <iostream>
+#include <random>
 #include <string_view>
 
 #define CERBLIB_LOCATION cerb::test::location(__FILE__, __LINE__)
@@ -47,6 +48,23 @@ namespace cerb::test {
             fmt::print("File: {}, line: {}\n", loc.filename(), loc.line());
             exit(code);
         }
+    }
+
+    template<typename T>
+    auto random_array(size_t size) -> std::unique_ptr<T>
+    {
+        static std::random_device random_device;
+        static std::mt19937 engine(random_device());
+        static std::uniform_int_distribution<T> distribution(
+            std::numeric_limits<T>::min(), std::numeric_limits<T>::max());
+
+        std::unique_ptr<T> data =
+            std::unique_ptr<T>(static_cast<T *>(::operator new(size * sizeof(T))));
+        for (size_t i = 0; i < size; ++i) {
+            data.get()[i] = distribution(engine);
+        }
+
+        return std::move(data);
     }
 }// namespace cerb::test
 
