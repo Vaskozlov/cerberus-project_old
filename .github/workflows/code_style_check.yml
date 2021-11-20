@@ -15,7 +15,7 @@ jobs:
           sudo apt-get install -y clang-format-12
       - name: Setup clang-format
         run: |
-          sudo update-alternatives --install /usr/bin/clang-format clang-format /usr/bin/clang-format-13 200
-          sudo update-alternatives --install /usr/bin/clang-format-diff clang-format-diff /usr/bin/clang-format-diff-13 200
+          sudo update-alternatives --install /usr/bin/clang-format clang-format /usr/bin/clang-format-12 200
+          sudo update-alternatives --install /usr/bin/clang-format-diff clang-format-diff /usr/bin/clang-format-diff-12 200
       - name: Run clang-format-diff
         run: bash ./scripts/tools/check_code_format.sh
