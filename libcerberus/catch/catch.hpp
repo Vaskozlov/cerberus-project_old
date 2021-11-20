@@ -41,12 +41,28 @@ namespace cerb::test {
         {}
     };
 
-    auto test(auto &&function, const location &loc = CERBLIB_LOCATION, auto &&...args)
+    template<typename... Ts>
+    auto
+        expect_true(auto &&function, const location &loc = CERBLIB_LOCATION, Ts &&...args)
+            -> void
     {
-        if (auto code = function(args...); code != 0) {
-            fmt::print(fmt::fg(fmt::color::red), "Cerberus test failure! ");
+        if (auto code = function(std::forward<Ts...>(args)...); code != 1) {
+            fmt::print(
+                fmt::fg(fmt::color::red), "Cerberus test failure with code: {}! ", code);
             fmt::print("File: {}, line: {}\n", loc.filename(), loc.line());
-            exit(code);
+            exit(1);
+        }
+    }
+
+    template<typename... Ts>
+    auto expect_false(
+        auto &&function, const location &loc = CERBLIB_LOCATION, Ts &&...args) -> void
+    {
+        if (auto code = function(std::forward<Ts...>(args)...); code != 0) {
+            fmt::print(
+                fmt::fg(fmt::color::red), "Cerberus test failure with code: {}! ", code);
+            fmt::print("File: {}, line: {}\n", loc.filename(), loc.line());
+            exit(1);
         }
     }
 
