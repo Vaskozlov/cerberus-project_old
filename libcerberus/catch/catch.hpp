@@ -45,8 +45,7 @@ namespace cerb::test {
         expect_true(auto &&function, const location &loc = CERBLIB_LOCATION, Ts &&...args)
             -> void
     {
-        if (auto code = function(std::forward<Ts...>(args)...);
-            code != 1) {
+        if (auto code = function(std::forward<Ts...>(args)...); code != 1) {
             fmt::print(
                 fmt::fg(fmt::color::red), "Cerberus test failure with code: {}! ", code);
             fmt::print("File: {}, line: {}\n", loc.filename(), loc.line());
@@ -56,7 +55,9 @@ namespace cerb::test {
 
     template<typename... Ts>
     auto expect_false(
-        auto &&function, const location &loc = CERBLIB_LOCATION, Ts &&...args) -> void
+        auto &&function,
+        const location &loc = CERBLIB_LOCATION,
+        Ts &&...args) -> void
     {
         if (auto code = function(std::forward<Ts...>(args)...); code != 0) {
             fmt::print(
