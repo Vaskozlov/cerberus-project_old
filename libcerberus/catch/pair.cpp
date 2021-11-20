@@ -7,8 +7,7 @@ namespace cerb::test {
         {
             Pair<int, int> c_pair = cerb::make_pair(10, 10);
 
-            expect_true(
-                [&c_pair] { return c_pair.first == 10 && c_pair.second == 10; },
+            expect_true([&c_pair] { return c_pair.first == 10 && c_pair.second == 10; },
                 CERBLIB_LOCATION);
 
             expect_true(
