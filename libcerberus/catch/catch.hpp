@@ -55,7 +55,9 @@ namespace cerb::test {
 
     template<typename... Ts>
     auto expect_false(
-        auto &&function, const location &loc = CERBLIB_LOCATION, Ts &&...args) -> void
+        auto &&function,
+        const location &loc = CERBLIB_LOCATION,
+        Ts &&...args) -> void
     {
         if (auto code = function(std::forward<Ts...>(args)...); code != 0) {
             fmt::print(
