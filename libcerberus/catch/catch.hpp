@@ -117,7 +117,7 @@ namespace cerb::test {
             data.get()[i] = distribution(engine);
         }
 
-        return std::move(data);
+        return data;
     }
 }// namespace cerb::test
 

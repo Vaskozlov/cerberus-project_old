@@ -13,6 +13,8 @@ namespace cerb {
         template<typename T>
         constexpr auto memset(T *dest, T value, size_t times) -> void
         {
+            static_assert(std::is_trivially_copyable_v<T>);
+
             if constexpr (sizeof(T) == sizeof(u16)) {
                 asm("rep stosw\n" : "+D"(dest), "+c"(times) : "a"(value) : "memory");
             } else if constexpr (sizeof(T) == sizeof(u32)) {
@@ -31,7 +33,7 @@ namespace cerb {
     constexpr auto memset(T *dest, const T &value, size_t times) -> void
     {
 #ifdef __x86_64__
-        if (!std::is_constant_evaluated() && std::is_trivially_copyable_v<T>) {
+        if (!std::is_constant_evaluated() && std::is_trivial_v<T>) {
             private_::memset(dest, value, times);
         }
 #endif
@@ -40,12 +42,12 @@ namespace cerb {
         }
     }
 
-    template<typename T>
-    constexpr auto memset(T &dest, const auto &value) -> void
+    template<typename T, typename U>
+    constexpr auto memset(T &dest, const U &value) -> void
     {
 #ifdef __x86_64__
-        if constexpr (cerb::DataAccessible<T>) {
-            if (!std::is_constant_evaluated() && std::is_trivially_copyable_v<T>) {
+        if constexpr (cerb::DataAccessible<T> && std::is_trivially_copyable_v<U>) {
+            if (!std::is_constant_evaluated()) {
                 private_::memset(dest.data(), value, dest.size());
             }
         }
