@@ -1,6 +1,6 @@
 #include "bit.hpp"
-#include "pair.hpp"
 #include "memory.hpp"
+#include "pair.hpp"
 #include <cerberus/bitmap.hpp>
 
 auto main() -> int
