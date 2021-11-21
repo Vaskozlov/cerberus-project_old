@@ -139,7 +139,7 @@ namespace cerb {
         if constexpr (sizeof...(args) == 0) {
             return lhs;
         } else {
-            T rhs = max<T>(args...);
+            T rhs = max<T>(std::forward<Ts>(args)...);
             return lhs > rhs ? lhs : rhs;
         }
     }
@@ -157,7 +157,7 @@ namespace cerb {
         if constexpr (sizeof...(args) == 0) {
             return lhs;
         } else {
-            T rhs = min<T>(args...);
+            T rhs = min<T>(std::forward<Ts>(args)...);
             return lhs < rhs ? lhs : rhs;
         }
     }
