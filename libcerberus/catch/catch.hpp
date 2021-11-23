@@ -108,7 +108,7 @@ namespace cerb::test {
     {
         static std::random_device random_device;
         static std::mt19937 engine(random_device());
-        static std::uniform_int_distribution<T> distribution(
+        static std::uniform_int_distribution<size_t> distribution(
             std::numeric_limits<T>::min(), std::numeric_limits<T>::max());
 
         std::unique_ptr<T> data =
