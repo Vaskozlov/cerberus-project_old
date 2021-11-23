@@ -108,13 +108,23 @@ namespace cerb::test {
     {
         static std::random_device random_device;
         static std::mt19937 engine(random_device());
-        static std::uniform_int_distribution<size_t> distribution(
-            std::numeric_limits<T>::min(), std::numeric_limits<T>::max());
-
         std::unique_ptr<T> data =
             std::unique_ptr<T>(static_cast<T *>(::operator new(size * sizeof(T))));
-        for (size_t i = 0; i < size; ++i) {
-            data.get()[i] = distribution(engine);
+
+        if constexpr (std::is_unsigned_v<T>) {
+            static std::uniform_int_distribution<size_t> distribution(
+                std::numeric_limits<T>::min(), std::numeric_limits<T>::max());
+
+            for (size_t i = 0; i < size; ++i) {
+                data.get()[i] = static_cast<T>(distribution(engine));
+            }
+        } else {
+            static std::uniform_int_distribution<int64_t> distribution(
+                std::numeric_limits<T>::min(), std::numeric_limits<T>::max());
+
+            for (size_t i = 0; i < size; ++i) {
+                data.get()[i] = static_cast<T>(distribution(engine));
+            }
         }
 
         return data;
