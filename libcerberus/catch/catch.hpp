@@ -40,12 +40,12 @@ namespace cerb::test {
         size_t m_line{};
 
     public:
-        [[nodiscard]] auto line() const -> size_t
+        CERBLIB_DECL auto line() const -> size_t
         {
             return m_line;
         }
 
-        [[nodiscard]] auto filename() const -> std::string_view
+        CERBLIB_DECL auto filename() const -> std::string_view
         {
             return m_filename;
         }
