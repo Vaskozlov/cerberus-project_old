@@ -6,7 +6,6 @@
 #include <iterator>
 
 namespace cerb {
-
 #ifdef __x86_64__
     namespace private_ {
 
@@ -50,9 +49,10 @@ namespace cerb {
     constexpr auto memset(T *dest, const T &value, size_t times) -> void
     {
 #ifdef __x86_64__
-        if (!std::is_constant_evaluated() && std::is_trivially_copy_constructible_v<T> &&
-            sizeof(T) <= sizeof(u64)) {
-            return private_::memset(dest, value, times);
+        if constexpr (FastCopiable<T>) {
+            if (!std::is_constant_evaluated()) {
+                return private_::memset(dest, value, times);
+            }
         }
 #endif
         for (const T *end_of_dest = dest + times; dest != end_of_dest; ++dest) {
@@ -63,16 +63,16 @@ namespace cerb {
     template<typename T, typename U>
     constexpr auto memset(T &dest, const U &value) -> void
     {
+        static_assert(std::is_same_v<U, typename T::value_type>);
+
 #ifdef __x86_64__
-        if constexpr (
-            cerb::DataAccessible<T> && std::is_trivially_constructible_v<U, const U &> &&
-            sizeof(U) <= sizeof(U)) {
+        if constexpr (ClassValueFastCopiable<T>) {
             if (!std::is_constant_evaluated()) {
                 return private_::memset(dest.data(), value, dest.size());
             }
         }
 #endif
-        static_assert(cerb::Iterable<T>);
+        static_assert(cerb::RawAccessible<T>);
 
         for (auto &elem : dest) {
             elem = value;
@@ -83,8 +83,7 @@ namespace cerb {
     constexpr auto memcpy(T *dest, const T *src, size_t times) -> void
     {
 #ifdef __x86_64__
-        if constexpr (
-            std::is_trivially_constructible_v<T, const T &> && sizeof(T) <= sizeof(u64)) {
+        if constexpr (FastCopiable<T>) {
             if (!std::is_constant_evaluated()) {
                 return private_::memcpy(dest, src, times);
             }
@@ -108,16 +107,13 @@ namespace cerb {
         static_assert(std::is_same_v<value_type, value_type2>);
 
 #ifdef __x86_64__
-        if constexpr (
-            cerb::DataAccessible<T> &&
-            std::is_trivially_constructible_v<value_type, const value_type &> &&
-            sizeof(value_type) <= sizeof(u64)) {
+        if constexpr (ClassValueFastCopiable<T>) {
             if (!std::is_constant_evaluated()) {
                 return private_::memcpy(dest.data(), src.data(), length);
             }
         }
 #endif
-        static_assert(cerb::Iterable<T>);
+        static_assert(cerb::RawAccessible<T>);
 
         const auto src_begin  = std::begin(src);
         const auto dest_begin = std::begin(dest);

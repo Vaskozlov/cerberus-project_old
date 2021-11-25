@@ -64,6 +64,19 @@ namespace cerb::test {
         {}
     };
 
+    struct ComplexValue
+    {
+        i64 m_int;
+        double m_float;
+
+        constexpr auto operator<=>(const ComplexValue &) const = default;
+
+        constexpr ComplexValue() = default;
+        constexpr ComplexValue(i64 int_, double float_)
+          : m_int(int_), m_float(float_)
+        {}
+    };
+
     template<typename... Ts>
     constexpr auto
         expect_true(auto &&function, const location &loc = CERBLIB_LOCATION, Ts &&...args)
