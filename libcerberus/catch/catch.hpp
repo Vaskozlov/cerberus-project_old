@@ -69,11 +69,12 @@ namespace cerb::test {
         i64 m_int;
         double m_float;
 
+        CERBLIB_CLANG_DISABLE_WARNING("-Wfloat-equal")
         constexpr auto operator<=>(const ComplexValue &) const = default;
+        CERBLIB_CLANG_ENABLE_WARNING
 
         constexpr ComplexValue() = default;
-        constexpr ComplexValue(i64 int_, double float_)
-          : m_int(int_), m_float(float_)
+        constexpr ComplexValue(i64 int_, double float_) : m_int(int_), m_float(float_)
         {}
     };
 
