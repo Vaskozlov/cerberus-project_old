@@ -106,7 +106,6 @@ namespace cerb::test {
         expect_true(
             buffer_check_function, CERBLIB_LOCATION, data_complex, testComplexValue);
 
-        std::cout << cerb::ClassValueFastCopiable<i32> << std::endl;
         cerb::memset(array_32, CheckValueI32);
         array_check_function(array_32, CheckValueI32);
 
@@ -124,12 +123,13 @@ namespace cerb::test {
 
     auto memcpy_test() -> void
     {
-        constexpr u32 buffer_size = 512;
-        // constexpr u32 complex_buffer_size    = 128;
+        constexpr u32 buffer_size            = 512;
+        constexpr u32 complex_buffer_size    = 128;
         static const std::string long_string = "Hello, world! It's a long string!";
 
-        auto &&buffer_check_function = [](const auto pointer, const auto expected) {
-            for (size_t i = 0; i < buffer_size; ++i) {
+        auto &&buffer_check_function = [](const auto pointer, const auto expected,
+                                          u32 size_of_buffer) {
+            for (size_t i = 0; i < size_of_buffer; ++i) {
                 if (pointer[i] != expected[i]) {
                     return 0;
                 }
@@ -137,42 +137,79 @@ namespace cerb::test {
             return 1;
         };
 
-        /*
-        auto &&array_check_function = [](const auto &array, const auto &expected) {
-            for (size_t i = 0; i < array.size(); ++i) {
-                if (array[i] != expected[i]) {
-                    return 0;
-                }
-            }
-            return 1;
-        };*/
+        auto random_complex_data =
+            std::unique_ptr<ComplexValue>(static_cast<ComplexValue *>(
+                ::operator new(complex_buffer_size * sizeof(ComplexValue))));
 
-        auto data = std::unique_ptr<u64>(
-            static_cast<u64 *>(::operator new(buffer_size * sizeof(u64))));
+        for (i64 i = 0; i < complex_buffer_size; ++i) {
+            random_complex_data.get()[i] = { i * 10, static_cast<double>(i) * -10.0 };
+        }
+
         std::unique_ptr<u8> random_data_8   = random_array<u8>(buffer_size);
         std::unique_ptr<u16> random_data_16 = random_array<u16>(buffer_size);
         std::unique_ptr<u32> random_data_32 = random_array<u32>(buffer_size);
         std::unique_ptr<u64> random_data_64 = random_array<u64>(buffer_size);
 
-        auto *data_8  = static_cast<u8 *>(static_cast<void *>((data.get())));
-        auto *data_16 = static_cast<u16 *>(static_cast<void *>((data.get())));
-        auto *data_32 = static_cast<u32 *>(static_cast<void *>((data.get())));
-        auto *data_64 = static_cast<u64 *>(static_cast<void *>((data.get())));
+        std::array<u8, buffer_size> array_u8{};
+        std::array<u8, buffer_size> array2_u8{};
+        std::array<u16, buffer_size> array_u16{};
+        std::array<u16, buffer_size> array2_u16{};
+        std::array<u32, buffer_size> array_u32{};
+        std::array<u32, buffer_size> array2_u32{};
+        std::array<u64, buffer_size> array_u64{};
+        std::array<u64, buffer_size> array2_u64{};
+        std::array<ComplexValue, complex_buffer_size> array_complex{};
+        std::array<ComplexValue, complex_buffer_size> array2_complex{};
 
-        cerb::memcpy(data_8, random_data_8.get(), buffer_size);
-        expect_true(buffer_check_function, CERBLIB_LOCATION, data_8, random_data_8.get());
-
-        cerb::memcpy(data_16, random_data_16.get(), buffer_size);
+        memcpy(array_u8.data(), random_data_8.get(), buffer_size);
         expect_true(
-            buffer_check_function, CERBLIB_LOCATION, data_16, random_data_16.get());
+            buffer_check_function, CERBLIB_LOCATION, array_u8.data(), random_data_8.get(),
+            buffer_size);
 
-        cerb::memcpy(data_32, random_data_32.get(), buffer_size);
+        memcpy(array2_u8, array_u8);
         expect_true(
-            buffer_check_function, CERBLIB_LOCATION, data_32, random_data_32.get());
+            buffer_check_function, CERBLIB_LOCATION, array_u8.data(), array2_u8.data(),
+            buffer_size);
 
-        cerb::memcpy(data_64, random_data_64.get(), buffer_size);
+        memcpy(array_u16.data(), random_data_16.get(), buffer_size);
         expect_true(
-            buffer_check_function, CERBLIB_LOCATION, data_64, random_data_64.get());
+            buffer_check_function, CERBLIB_LOCATION, array_u16.data(),
+            random_data_16.get(), buffer_size);
+
+        memcpy(array2_u16, array_u16);
+        expect_true(
+            buffer_check_function, CERBLIB_LOCATION, array_u16.data(), array2_u16.data(),
+            buffer_size);
+
+        memcpy(array_u32.data(), random_data_32.get(), buffer_size);
+        expect_true(
+            buffer_check_function, CERBLIB_LOCATION, array_u32.data(),
+            random_data_32.get(), buffer_size);
+
+        memcpy(array2_u32, array_u32);
+        expect_true(
+            buffer_check_function, CERBLIB_LOCATION, array_u32.data(), array2_u32.data(),
+            buffer_size);
+
+        memcpy(array_u64.data(), random_data_64.get(), buffer_size);
+        expect_true(
+            buffer_check_function, CERBLIB_LOCATION, array_u64.data(),
+            random_data_64.get(), buffer_size);
+
+        memcpy(array2_u64, array_u64);
+        expect_true(
+            buffer_check_function, CERBLIB_LOCATION, array_u64.data(), array2_u64.data(),
+            buffer_size);
+
+        memcpy(array_complex.data(), random_complex_data.get(), complex_buffer_size);
+        expect_true(
+            buffer_check_function, CERBLIB_LOCATION, array_complex.data(),
+            random_complex_data.get(), complex_buffer_size);
+
+        memcpy(array2_complex, array_complex);
+        expect_true(
+            buffer_check_function, CERBLIB_LOCATION, array_complex.data(),
+            array2_complex.data(), complex_buffer_size);
     }
 
     auto memory_test(u32 argc) -> int

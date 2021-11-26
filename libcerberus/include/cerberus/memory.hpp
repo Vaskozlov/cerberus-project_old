@@ -1,7 +1,7 @@
 #ifndef CERBERUS_MEMORY_HPP
 #define CERBERUS_MEMORY_HPP
 
-#include <cerberus/cerberus.hpp>
+#include <cerberus/bits.hpp>
 #include <cerberus/type.hpp>
 #include <iterator>
 
@@ -12,17 +12,17 @@ namespace cerb {
         template<typename T>
         constexpr auto memset(T *dest, T value, size_t times) -> void
         {
-            static_assert(std::is_trivially_copy_constructible_v<T>);
+            static_assert(
+                sizeof(T) <= sizeof(u64) && std::is_trivially_copy_constructible_v<T>);
 
-            if constexpr (sizeof(T) == sizeof(u16)) {
+            if constexpr (sizeof(T) == sizeof(u8)) {
+                asm("rep stosb\n" : "+D"(dest), "+c"(times) : "a"(value) : "memory");
+            } else if constexpr (sizeof(T) == sizeof(u16)) {
                 asm("rep stosw\n" : "+D"(dest), "+c"(times) : "a"(value) : "memory");
             } else if constexpr (sizeof(T) == sizeof(u32)) {
                 asm("rep stosl\n" : "+D"(dest), "+c"(times) : "a"(value) : "memory");
             } else if constexpr (sizeof(T) == sizeof(u64)) {
                 asm("rep stosq\n" : "+D"(dest), "+c"(times) : "a"(value) : "memory");
-            } else {
-                times *= sizeof(T);
-                asm("rep stosb\n" : "+D"(dest), "+c"(times) : "a"(value) : "memory");
             }
         }
 
@@ -115,8 +115,8 @@ namespace cerb {
 #endif
         static_assert(cerb::RawAccessible<T>);
 
-        const auto src_begin  = std::begin(src);
-        const auto dest_begin = std::begin(dest);
+        auto src_begin  = std::begin(src);
+        auto dest_begin = std::begin(dest);
 
         CERBLIB_UNROLL_N(4)
         for (size_t counter = 0; counter != length;
