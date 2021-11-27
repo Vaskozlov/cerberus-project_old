@@ -131,6 +131,8 @@ namespace cerb {
     using i32 = int32_t;
     using i64 = int64_t;
 
+    using size_t = std::size_t;
+
 #if defined(__WINDOWS__) || defined(__WIN32__)
     constexpr auto endl = "\n\r";
 #else
@@ -147,14 +149,7 @@ namespace cerb {
         CERBLIB_CLANG_ENABLE_WARNING
 
     public:
-        constexpr EmptyType()  = default;
-        constexpr ~EmptyType() = default;
-
-        constexpr EmptyType(EmptyType &&) noexcept      = default;
-        constexpr EmptyType(const EmptyType &) noexcept = default;
-
-        constexpr auto operator=(EmptyType &&) noexcept -> EmptyType & = default;
-        constexpr auto operator=(const EmptyType &) noexcept -> EmptyType & = default;
+        constexpr EmptyType() noexcept = default;
 
         constexpr auto operator()() const -> EmptyType
         {
@@ -223,7 +218,7 @@ namespace cerb {
         [[maybe_unused]] auto iterator = { ([&function]<typename T>(T &&value) {
             call(std::forward<F>(function), std::forward<T>(value));
             return 0;
-        })(args)... };
+        })(std::forward<Ts>(args))... };
     }
 
     /**

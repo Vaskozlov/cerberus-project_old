@@ -139,7 +139,7 @@ namespace cerb {
         if constexpr (sizeof...(args) == 0) {
             return lhs;
         } else {
-            T rhs = max<T>(args...);
+            T rhs = max<T>(std::forward<Ts>(args)...);
             return lhs > rhs ? lhs : rhs;
         }
     }
@@ -157,7 +157,7 @@ namespace cerb {
         if constexpr (sizeof...(args) == 0) {
             return lhs;
         } else {
-            T rhs = min<T>(args...);
+            T rhs = min<T>(std::forward<Ts>(args)...);
             return lhs < rhs ? lhs : rhs;
         }
     }
@@ -411,7 +411,7 @@ namespace cerb {
 
 #ifdef _MSC_VER
         if (std::is_constant_evaluated()) {
-            return private_::bitScanForward<BitValue>(value);
+            return private_::bitScanReverse<BitValue>(value);
         }
 
         unsigned long bit_index;
