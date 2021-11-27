@@ -216,6 +216,7 @@ namespace cerb::test {
     {
         memset_test(argc);
         memcpy_test();
+        string_test(argc);
         return 0;
     }
 }// namespace cerb::test
