@@ -34,16 +34,15 @@ namespace cerb {
     concept ClassValueFastCopiable = RawAccessible<T> &&
         std::is_trivially_copy_assignable_v<typename T::value_type> && requires(T value)
     {
-        std::make_unique<int>(new int
-                                  [static_cast<int64_t>(sizeof(u64)) -
-                                   static_cast<int64_t>(sizeof(typename T::value_type))]);
+        new int
+            [static_cast<int64_t>(sizeof(u64)) -
+             static_cast<int64_t>(sizeof(typename T::value_type))];
     };
 
     template<typename T>
     concept FastCopiable = std::is_trivially_copy_assignable_v<T> && requires(T value)
     {
-        std::make_unique<int>(
-            new int[static_cast<int64_t>(sizeof(u64)) - static_cast<int64_t>(sizeof(T))]);
+        new int[static_cast<int64_t>(sizeof(u64)) - static_cast<int64_t>(sizeof(T))];
     };
 }// namespace cerb
 
