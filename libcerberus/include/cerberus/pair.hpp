@@ -78,7 +78,7 @@ namespace cerb {
         typename T2>
     constexpr auto make_pair(T1 &&first, T2 &&second) -> Pair<T1, T2, Compare>
     {
-        return { std::forward<T1&&>(first), std::forward<T2&&>(second) };
+        return { std::forward<T1 &&>(first), std::forward<T2 &&>(second) };
     }
 
     template<
