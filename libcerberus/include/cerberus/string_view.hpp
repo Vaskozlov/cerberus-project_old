@@ -9,6 +9,6 @@ namespace cerb {
     class basic_string_view
     {
     };
-}
+}// namespace cerb
 
 #endif /* CERBERUS_STRING_VIEW_HPP */
