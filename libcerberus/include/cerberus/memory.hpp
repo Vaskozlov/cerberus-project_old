@@ -6,9 +6,17 @@
 #include <iterator>
 
 namespace cerb {
-#ifdef __x86_64__
+#ifdef CERBLIB_AMD64
     namespace private_ {
 
+        /**
+         * Sets memory with given values. Must not be called directly.
+         * @tparam T
+         * @param dest
+         * @param value
+         * @param times
+         * @return
+         */
         template<typename T>
         constexpr auto memset(T *dest, T value, size_t times) -> void
         {
@@ -26,23 +34,42 @@ namespace cerb {
             }
         }
 
+        /**
+         * Copies bytes from src to dest. Must not be called directly.
+         * @tparam T
+         * @param dest
+         * @param src
+         * @param times
+         * @return
+         */
         template<typename T>
         constexpr auto memcpy(T *dest, const T *src, size_t times) -> void
         {
             static_assert(std::is_trivially_copyable_v<T>);
 
-            if constexpr (sizeof(T) == sizeof(u16)) {
-                asm("rep movsw" : "+D"(dest), "+S"(src), "+c"(times) : : "memory");
-            } else if constexpr (sizeof(T) == sizeof(u32)) {
-                asm("rep movsl" : "+D"(dest), "+S"(src), "+c"(times) : : "memory");
-            } else if constexpr (sizeof(T) == sizeof(u64)) {
+            if constexpr (sizeof(T) % sizeof(u64) == 0) {
+                times *= sizeof(T) / sizeof(u64);
                 asm("rep movsq" : "+D"(dest), "+S"(src), "+c"(times) : : "memory");
+            } else if constexpr (sizeof(T) % sizeof(u32) == 0) {
+                times *= sizeof(T) / sizeof(u32);
+                asm("rep movsl" : "+D"(dest), "+S"(src), "+c"(times) : : "memory");
+            } else if constexpr (sizeof(T) % sizeof(u16) == 0) {
+                times *= sizeof(T) / sizeof(u16);
+                asm("rep movsw" : "+D"(dest), "+S"(src), "+c"(times) : : "memory");
             } else {
                 times *= sizeof(T);
                 asm("rep movsb" : "+D"(dest), "+S"(src), "+c"(times) : : "memory");
             }
         }
 
+        /**
+         * Finds first occurrence of the value in the location. Must not be called
+         * directly.
+         * @tparam T
+         * @param location
+         * @param value
+         * @return index of the value
+         */
         template<typename T>
         constexpr auto find(const T *location, u64 value) -> size_t
         {
@@ -75,13 +102,60 @@ namespace cerb {
 
             return rax;
         }
+
+        /**
+         * Compares to arrays with the size of @length. Must not be called directly.
+         * @tparam T
+         * @param dest
+         * @param src
+         * @param length
+         * @return true if they are equal, false otherwise
+         */
+        template<typename T>
+        constexpr auto memcmp(const T *dest, const T *src, size_t length) -> bool
+        {
+            ++length;
+
+            if constexpr (sizeof(T) % sizeof(u64) == 0) {
+                length *= sizeof(T) / sizeof(u64);
+                asm("repe cmpsq; shr $3, $2;"
+                    : "+D"(dest), "+S"(src), "+c"(length)
+                    :
+                    : "memory");
+            } else if constexpr (sizeof(T) == sizeof(u32)) {
+                length *= sizeof(T) / sizeof(u32);
+                asm("repe cmpsl; shr $2, $2;"
+                    : "+D"(dest), "+S"(src), "+c"(length)
+                    :
+                    : "memory");
+            } else if constexpr (sizeof(T) == sizeof(u16)) {
+                length *= sizeof(T) / sizeof(u16);
+                asm("repe cmpsw; shr $2, $2;"
+                    : "+D"(dest), "+S"(src), "+c"(length)
+                    :
+                    : "memory");
+            } else {
+                length *= sizeof(T);
+                asm("repe cmpsb;" : "+D"(dest), "+S"(src), "+c"(length) : : "memory");
+            }
+
+            return length == 0;
+        }
     }// namespace private_
 #endif
 
+    /**
+     * Sets memory region N times with given value.
+     * @tparam T
+     * @param dest
+     * @param value
+     * @param times
+     * @return
+     */
     template<typename T>
     constexpr auto memset(T *dest, const T &value, size_t times) -> void
     {
-#ifdef __x86_64__
+#ifdef CERBLIB_AMD64
         if constexpr (FastCopiable<T>) {
             if (!std::is_constant_evaluated()) {
                 return private_::memset(dest, value, times);
@@ -93,20 +167,24 @@ namespace cerb {
         }
     }
 
-    template<typename T, typename U>
-    constexpr auto memset(T &dest, const U &value) -> void
+    /**
+     * Sets class/struct with given value.
+     * @tparam T
+     * @tparam U
+     * @param dest
+     * @param value
+     * @return
+     */
+    template<typename T>
+    constexpr auto memset(T &dest, const typename T::value_type &value) -> void
     {
-        static_assert(std::is_same_v<U, typename T::value_type>);
-
-#ifdef __x86_64__
+#ifdef CERBLIB_AMD64
         if constexpr (ClassValueFastCopiable<T>) {
             if (!std::is_constant_evaluated()) {
                 return private_::memset(dest.data(), value, dest.size());
             }
         }
 #endif
-        static_assert(cerb::RawAccessible<T>);
-
         for (auto &elem : dest) {
             elem = value;
         }
@@ -115,8 +193,8 @@ namespace cerb {
     template<typename T>
     constexpr auto memcpy(T *dest, const T *src, size_t times) -> void
     {
-#ifdef __x86_64__
-        if constexpr (FastCopiable<T>) {
+#ifdef CERBLIB_AMD64
+        if constexpr (std::is_trivially_copy_assignable_v<T>) {
             if (!std::is_constant_evaluated()) {
                 return private_::memcpy(dest, src, times);
             }
@@ -135,18 +213,21 @@ namespace cerb {
     {
         using value_type  = typename T::value_type;
         using value_type2 = typename U::value_type;
-        const auto length = min(dest.size(), src.size());
 
         static_assert(std::is_same_v<value_type, value_type2>);
+        static_assert(cerb::Iterable<T> && cerb::Iterable<U>);
 
-#ifdef __x86_64__
-        if constexpr (ClassValueFastCopiable<T>) {
+        const auto length = min(std::size(dest), std::size(src));
+
+#ifdef CERBLIB_AMD64
+        if constexpr (
+            RawAccessible<T> && RawAccessible<U> &&
+            std::is_trivially_copy_assignable_v<value_type>) {
             if (!std::is_constant_evaluated()) {
                 return private_::memcpy(dest.data(), src.data(), length);
             }
         }
 #endif
-        static_assert(cerb::RawAccessible<T>);
 
         auto src_begin  = std::begin(src);
         auto dest_begin = std::begin(dest);
@@ -161,7 +242,7 @@ namespace cerb {
     template<typename T>
     constexpr auto find(const T *location, const T &value) -> size_t
     {
-#ifdef __x86_64__
+#ifdef CERBLIB_AMD64
         if constexpr (sizeof(T) <= sizeof(u64)) {
             u64 value2find;
 
@@ -177,9 +258,29 @@ namespace cerb {
         const T *location_ptr = location;
 
         CERBLIB_UNROLL_N(4)
-        for (; *location != value; ++location) {}
+        for (; *location != value; ++location) {
+            // empty block
+        }
 
         return static_cast<size_t>(static_cast<ptrdiff_t>(location - location_ptr));
+    }
+
+    template<CharType CharT>
+    constexpr auto strlen(const CharT *str) -> size_t
+    {
+        return find(str, static_cast<CharT>(0));
+    }
+
+    template<RawAccessible T>
+    constexpr auto equal(const T &lhs, const T &rhs) -> bool
+    {
+        return private_::memcmp(std::data(lhs), std::data(rhs), std::size(lhs));
+    }
+
+    template<RawAccessible T>
+    constexpr auto not_equal(const T &lhs, const T &rhs) -> bool
+    {
+        return !equal<T>(lhs, rhs);
     }
 }// namespace cerb
 

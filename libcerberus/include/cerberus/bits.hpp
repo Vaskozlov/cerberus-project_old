@@ -242,14 +242,10 @@ namespace cerb {
      * @param rhs
      * @return
      */
-    template<typename T>
+    template<std::floating_point T>
     CERBLIB_DECL auto equal(T lhs, T rhs) -> bool
     {
-        if constexpr (std::is_floating_point_v<T>) {
-            return abs(lhs - rhs) <= std::numeric_limits<T>::epsilon();
-        } else {
-            return lhs == rhs;
-        }
+        return abs(lhs - rhs) <= std::numeric_limits<T>::epsilon();
     }
 
     /**

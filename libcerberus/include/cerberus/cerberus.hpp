@@ -23,9 +23,9 @@
 
 #ifndef CERBLIB_AMD64
 #    ifdef __x86_64__
-#        define CERBLIB_AMD64 true
+#        define CERBLIB_AMD64 1
 #    else
-#        define CERBLIB_AMD64 false
+#        define CERBLIB_AMD64 0
 #    endif
 #endif /* CERBLIB_AMD64 */
 
