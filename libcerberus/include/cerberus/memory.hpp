@@ -6,7 +6,7 @@
 #include <iterator>
 
 namespace cerb {
-#ifdef CERBLIB_AMD64
+#if CERBLIB_AMD64
     namespace private_ {
 
         /**
@@ -155,7 +155,7 @@ namespace cerb {
     template<typename T>
     constexpr auto memset(T *dest, const T &value, size_t times) -> void
     {
-#ifdef CERBLIB_AMD64
+#if CERBLIB_AMD64
         if constexpr (FastCopiable<T>) {
             if (!std::is_constant_evaluated()) {
                 return private_::memset(dest, value, times);
@@ -178,7 +178,7 @@ namespace cerb {
     template<typename T>
     constexpr auto memset(T &dest, const typename T::value_type &value) -> void
     {
-#ifdef CERBLIB_AMD64
+#if CERBLIB_AMD64
         if constexpr (ClassValueFastCopiable<T>) {
             if (!std::is_constant_evaluated()) {
                 return private_::memset(dest.data(), value, dest.size());
@@ -193,7 +193,7 @@ namespace cerb {
     template<typename T>
     constexpr auto memcpy(T *dest, const T *src, size_t times) -> void
     {
-#ifdef CERBLIB_AMD64
+#if CERBLIB_AMD64
         if constexpr (std::is_trivially_copy_assignable_v<T>) {
             if (!std::is_constant_evaluated()) {
                 return private_::memcpy(dest, src, times);
@@ -219,7 +219,7 @@ namespace cerb {
 
         const auto length = min(std::size(dest), std::size(src));
 
-#ifdef CERBLIB_AMD64
+#if CERBLIB_AMD64
         if constexpr (
             RawAccessible<T> && RawAccessible<U> &&
             std::is_trivially_copy_assignable_v<value_type>) {
@@ -242,7 +242,7 @@ namespace cerb {
     template<typename T>
     constexpr auto find(const T *location, const T &value) -> size_t
     {
-#ifdef CERBLIB_AMD64
+#if CERBLIB_AMD64
         if constexpr (sizeof(T) <= sizeof(u64)) {
             u64 value2find;
 
