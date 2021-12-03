@@ -3,6 +3,7 @@
 
 #include <bit>
 #include <cerberus/cerberus.hpp>
+#include <cerberus/type.hpp>
 
 namespace cerb {
     enum struct AlignRule
@@ -25,26 +26,13 @@ namespace cerb {
         std::array<u32, sizeof(T) / sizeof(u32)> mask_32;
         std::array<u64, sizeof(T) / sizeof(u64)> mask_64;
 
-        CERBLIB_DECL static auto canBeGetAsInt() -> bool
-        {
-            switch (sizeof(T)) {
-            case sizeof(u8):
-            case sizeof(u16):
-            case sizeof(u32):
-            case sizeof(u64):
-                return true;
-            default:
-                return false;
-            }
-        }
-
         /**
          * returns stored value as integer.
          * @return
          */
         CERBLIB_DECL auto getAsInt() -> decltype(auto)
         {
-            static_assert(canBeGetAsInt());
+            static_assert(CanBeStoredInIntegral<T>);
 
             if constexpr (sizeof(T) == sizeof(u8)) {
                 return mask_8[0];
@@ -63,7 +51,7 @@ namespace cerb {
          */
         CERBLIB_DECL auto getAsInt() const -> decltype(auto)
         {
-            static_assert(canBeGetAsInt());
+            static_assert(CanBeStoredInIntegral<T>);
 
             if constexpr (sizeof(T) == sizeof(u8)) {
                 return mask_8[0];

@@ -23,6 +23,22 @@ namespace cerb {
         static constexpr auto value = check<OtherTypes...>();
     };
 
+    template<typename T, typename... Ts>
+    constexpr auto is_one_of(T target_value, Ts &&...suitable_values) -> bool
+    {
+        bool result = false;
+
+        for_each(
+            [&result, &target_value]<typename U>(const U &value) {
+                if constexpr (std::convertible_to<U, T>) {
+                    result = result || (static_cast<T>(value) == target_value);
+                }
+            },
+            std::forward<Ts>(suitable_values)...);
+
+        return result;
+    }
+
     template<typename TargetType, typename... OtherTypes>
     constexpr bool is_any_of_v = is_any_of<TargetType, OtherTypes...>::value;
 
@@ -48,23 +64,16 @@ namespace cerb {
     };
 
     template<typename T>
+    concept CanBeStoredInIntegral =
+        is_one_of(sizeof(T), sizeof(u8), sizeof(u16), sizeof(u32), sizeof(u64));
+
+    template<typename T>
     concept RawAccessible = Iterable<T> && DataAccessible<T> &&
         std::random_access_iterator<typename T::iterator>;
 
     template<typename T>
-    concept ClassValueFastCopiable = RawAccessible<T> &&
-        std::is_trivially_copy_assignable_v<typename T::value_type> && requires(T value)
-    {
-        new int
-            [static_cast<int64_t>(sizeof(u64)) -
-             static_cast<int64_t>(sizeof(typename T::value_type))];
-    };
-
-    template<typename T>
-    concept FastCopiable = std::is_trivially_copy_assignable_v<T> && requires(T value)
-    {
-        new int[static_cast<int64_t>(sizeof(u64)) - static_cast<int64_t>(sizeof(T))];
-    };
+    concept ClassValueFastCopiable =
+        std::is_trivially_copy_assignable_v<typename T::value_type>;
 
     template<typename CharT>
     concept CharType =

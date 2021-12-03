@@ -215,7 +215,7 @@ namespace cerb {
     template<typename F, typename... Ts>
     CERBLIB_DECL auto for_each(F &&function, Ts &&...args)
     {
-        [[maybe_unused]] auto iterator = { ([&function]<typename T>(T &&value) {
+        [[maybe_unused]] const auto iterator = { ([&function]<typename T>(T &&value) {
             call(std::forward<F>(function), std::forward<T>(value));
             return 0;
         })(std::forward<Ts>(args))... };
