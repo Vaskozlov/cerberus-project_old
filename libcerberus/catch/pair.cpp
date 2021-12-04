@@ -42,7 +42,7 @@ namespace cerb::test {
         }
 
         {
-            Pair<int, int, PairComparisonRule::BY_FIRST_VALUE> c_pair = { 10, 10 };
+            Pair<int, int, HowToComparePair::BY_FIRST_VALUE> c_pair = { 10, 10 };
 
             expect_true(
                 [&c_pair] { return c_pair.first == 10 && c_pair.second == 10; },
@@ -51,7 +51,7 @@ namespace cerb::test {
             expect_true(
                 [&c_pair] { return c_pair == std::make_pair(10, 10); }, CERBLIB_LOCATION);
 
-            const Pair<int, int, PairComparisonRule::BY_FIRST_VALUE> c_pair2 = c_pair;
+            const Pair<int, int, HowToComparePair::BY_FIRST_VALUE> c_pair2 = c_pair;
 
             expect_true(
                 [&c_pair, &c_pair2] { return c_pair == c_pair2; }, CERBLIB_LOCATION);
@@ -79,7 +79,7 @@ namespace cerb::test {
         }
 
         {
-            Pair<int, int, PairComparisonRule::BY_SECOND_VALUE> c_pair = { 10, 10 };
+            Pair<int, int, HowToComparePair::BY_SECOND_VALUE> c_pair = { 10, 10 };
 
             expect_true(
                 [&c_pair] { return c_pair.first == 10 && c_pair.second == 10; },
@@ -88,7 +88,7 @@ namespace cerb::test {
             expect_true(
                 [&c_pair] { return c_pair == std::make_pair(10, 10); }, CERBLIB_LOCATION);
 
-            const Pair<int, int, PairComparisonRule::BY_SECOND_VALUE> pr2 = c_pair;
+            const Pair<int, int, HowToComparePair::BY_SECOND_VALUE> pr2 = c_pair;
 
             expect_true([&c_pair, &pr2] { return c_pair == pr2; }, CERBLIB_LOCATION);
 

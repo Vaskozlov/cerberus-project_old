@@ -208,8 +208,8 @@ namespace cerb {
     /**
      * iterates through parameter pack
      * @tparam Ts
-     * @param function
-     * @param args
+     * @param function which will be called for each argument
+     * @param args arguments to iterate throw
      * @return
      */
     template<typename F, typename... Ts>
@@ -230,9 +230,9 @@ namespace cerb {
      * @return
      */
     template<typename T>
-    constexpr auto cmov(bool condition, const T &on_true, const auto &on_false) -> T
+    constexpr auto cmov(bool condition, const T &on_true, const T &on_false) -> T
     {
-        return condition ? on_true : static_cast<T>(on_false);
+        return condition ? on_true : on_false;
     }
 }// namespace cerb
 
