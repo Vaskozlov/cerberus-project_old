@@ -27,13 +27,13 @@ namespace cerb {
                 CanBeStoredInIntegral<T> && std::is_trivially_copy_constructible_v<T>);
 
             if constexpr (sizeof(T) == sizeof(u8)) {
-                asm volatile ("rep stosb" : "+D"(dest), "+c"(times) : "a"(value) : "memory");
+                asm("rep stosb" : "+D"(dest), "+c"(times) : "a"(value) : "memory");
             } else if constexpr (sizeof(T) == sizeof(u16)) {
-                asm volatile("rep stosw" : "+D"(dest), "+c"(times) : "a"(value) : "memory");
+                asm("rep stosw" : "+D"(dest), "+c"(times) : "a"(value) : "memory");
             } else if constexpr (sizeof(T) == sizeof(u32)) {
-                asm volatile("rep stosl" : "+D"(dest), "+c"(times) : "a"(value) : "memory");
+                asm("rep stosl" : "+D"(dest), "+c"(times) : "a"(value) : "memory");
             } else if constexpr (sizeof(T) == sizeof(u64)) {
-                asm volatile("rep stosq" : "+D"(dest), "+c"(times) : "a"(value) : "memory");
+                asm("rep stosq" : "+D"(dest), "+c"(times) : "a"(value) : "memory");
             }
         }
 
@@ -55,16 +55,16 @@ namespace cerb {
              * different parts*/
             if constexpr (sizeof(T) % sizeof(u64) == 0) {
                 times *= sizeof(T) / sizeof(u64);
-                asm volatile("rep movsq" : "+D"(dest), "+S"(src), "+c"(times) : : "memory");
+                asm("rep movsq" : "+D"(dest), "+S"(src), "+c"(times) : : "memory");
             } else if constexpr (sizeof(T) % sizeof(u32) == 0) {
                 times *= sizeof(T) / sizeof(u32);
-                asm volatile("rep movsl" : "+D"(dest), "+S"(src), "+c"(times) : : "memory");
+                asm("rep movsl" : "+D"(dest), "+S"(src), "+c"(times) : : "memory");
             } else if constexpr (sizeof(T) % sizeof(u16) == 0) {
                 times *= sizeof(T) / sizeof(u16);
-                asm volatile("rep movsw" : "+D"(dest), "+S"(src), "+c"(times) : : "memory");
+                asm("rep movsw" : "+D"(dest), "+S"(src), "+c"(times) : : "memory");
             } else {
                 times *= sizeof(T);
-                asm volatile("rep movsb" : "+D"(dest), "+S"(src), "+c"(times) : : "memory");
+                asm("rep movsb" : "+D"(dest), "+S"(src), "+c"(times) : : "memory");
             }
         }
 
@@ -86,22 +86,22 @@ namespace cerb {
             size_t limit = std::numeric_limits<u32>::max();
 
             if constexpr (sizeof(T) == sizeof(u8)) {
-                asm volatile("repnz scasb; sub %1, %0; mov %0, %3; dec %3;"
+                asm("repnz scasb; sub %1, %0; mov %0, %3; dec %3;"
                     : "+D"(location), "+S"(location), "+c"(limit), "+a"(rax)
                     :
                     : "memory");
             } else if constexpr (sizeof(T) == sizeof(u16)) {
-                asm volatile("repnz scasw; sub %1, %0; mov %0, %3; shr $1, %3; dec %3;"
+                asm("repnz scasw; sub %1, %0; mov %0, %3; shr $1, %3; dec %3;"
                     : "+D"(location), "+S"(location), "+c"(limit), "+a"(rax)
                     :
                     : "memory");
             } else if constexpr (sizeof(T) == sizeof(u32)) {
-                asm volatile("repnz scasl; sub %1, %0; mov %0, %3; shr $2, %3; dec %3;"
+                asm("repnz scasl; sub %1, %0; mov %0, %3; shr $2, %3; dec %3;"
                     : "+D"(location), "+S"(location), "+c"(limit), "+a"(rax)
                     :
                     : "memory");
             } else if constexpr (sizeof(T) == sizeof(u64)) {
-                asm volatile("repnz scasq; sub %1, %0; mov %0, %3; shr $3, %3; dec %3;"
+                asm("repnz scasq; sub %1, %0; mov %0, %3; shr $3, %3; dec %3;"
                     : "+D"(location), "+S"(location), "+c"(limit), "+a"(rax)
                     :
                     : "memory");
@@ -125,25 +125,25 @@ namespace cerb {
 
             if constexpr (sizeof(T) % sizeof(u64) == 0) {
                 length *= sizeof(T) / sizeof(u64);
-                asm volatile("repe cmpsq; shr $3, $2;"
+                asm("repe cmpsq; shr $3, $2;"
                     : "+D"(dest), "+S"(src), "+c"(length)
                     :
                     : "memory");
             } else if constexpr (sizeof(T) == sizeof(u32)) {
                 length *= sizeof(T) / sizeof(u32);
-                asm volatile("repe cmpsl; shr $2, $2;"
+                asm("repe cmpsl; shr $2, $2;"
                     : "+D"(dest), "+S"(src), "+c"(length)
                     :
                     : "memory");
             } else if constexpr (sizeof(T) == sizeof(u16)) {
                 length *= sizeof(T) / sizeof(u16);
-                asm volatile("repe cmpsw; shr $1, $2;"
+                asm("repe cmpsw; shr $1, $2;"
                     : "+D"(dest), "+S"(src), "+c"(length)
                     :
                     : "memory");
             } else {
                 length *= sizeof(T);
-                asm volatile("repe cmpsb;" : "+D"(dest), "+S"(src), "+c"(length) : : "memory");
+                asm("repe cmpsb;" : "+D"(dest), "+S"(src), "+c"(length) : : "memory");
             }
 
             return length == 0;
