@@ -23,8 +23,7 @@ namespace cerb {
             /* we need to make sure, that value is can be stored in register,
              * and it is trivially copiable
              */
-            static_assert(
-                CanBeStoredInIntegral<T> && std::is_trivially_copy_constructible_v<T>);
+            static_assert(CanBeStoredInIntegral<T> && std::is_trivially_copy_constructible_v<T>);
 
             if constexpr (sizeof(T) == sizeof(u8)) {
                 asm("rep stosb" : "+D"(dest), "+c"(times) : "a"(value) : "memory");
@@ -125,22 +124,13 @@ namespace cerb {
 
             if constexpr (sizeof(T) % sizeof(u64) == 0) {
                 length *= sizeof(T) / sizeof(u64);
-                asm("repe cmpsq; shr $3, $2;"
-                    : "+D"(dest), "+S"(src), "+c"(length)
-                    :
-                    : "memory");
+                asm("repe cmpsq; shr $3, $2;" : "+D"(dest), "+S"(src), "+c"(length) : : "memory");
             } else if constexpr (sizeof(T) == sizeof(u32)) {
                 length *= sizeof(T) / sizeof(u32);
-                asm("repe cmpsl; shr $2, $2;"
-                    : "+D"(dest), "+S"(src), "+c"(length)
-                    :
-                    : "memory");
+                asm("repe cmpsl; shr $2, $2;" : "+D"(dest), "+S"(src), "+c"(length) : : "memory");
             } else if constexpr (sizeof(T) == sizeof(u16)) {
                 length *= sizeof(T) / sizeof(u16);
-                asm("repe cmpsw; shr $1, $2;"
-                    : "+D"(dest), "+S"(src), "+c"(length)
-                    :
-                    : "memory");
+                asm("repe cmpsw; shr $1, $2;" : "+D"(dest), "+S"(src), "+c"(length) : : "memory");
             } else {
                 length *= sizeof(T);
                 asm("repe cmpsb;" : "+D"(dest), "+S"(src), "+c"(length) : : "memory");
@@ -163,8 +153,7 @@ namespace cerb {
     constexpr auto memset(T *dest, const T &value, size_t times) -> void
     {
 #if CERBLIB_AMD64
-        if constexpr (
-            std::is_trivially_copy_assignable_v<T> && CanBeStoredInIntegral<T>) {
+        if constexpr (std::is_trivially_copy_assignable_v<T> && CanBeStoredInIntegral<T>) {
             if (!std::is_constant_evaluated()) {
                 return private_::memset(dest, value, times);
             }
@@ -187,8 +176,7 @@ namespace cerb {
     constexpr auto memset(T &dest, const typename T::value_type &value) -> void
     {
 #if CERBLIB_AMD64
-        if constexpr (
-            RawAccessible<T> && ClassValueFastCopiable<T> && CanBeStoredInIntegral<T>) {
+        if constexpr (RawAccessible<T> && ClassValueFastCopiable<T> && CanBeStoredInIntegral<T>) {
             if (!std::is_constant_evaluated()) {
                 return private_::memset(dest.data(), value, dest.size());
             }
@@ -271,7 +259,7 @@ namespace cerb {
         return static_cast<size_t>(static_cast<ptrdiff_t>(location - location_ptr));
     }
 
-    template<CharType CharT>
+    template<CharacterLiteral CharT>
     constexpr auto strlen(const CharT *str) -> size_t
     {
         return find(str, static_cast<CharT>(0));

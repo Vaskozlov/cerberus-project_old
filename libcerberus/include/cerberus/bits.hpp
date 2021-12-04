@@ -6,7 +6,7 @@
 #include <cerberus/type.hpp>
 
 namespace cerb {
-    enum struct AlignRule
+    enum struct How2Align
     {
         DEFAULT,
         TRUNK,
@@ -185,13 +185,13 @@ namespace cerb {
 
     /**
      * Returns absolute value of @value
-     * @tparam ResultType return type of the function. By default it's EmptyType, so
+     * @tparam TargetType return type of the function. By default it's EmptyType, so
      * function return value of type T
      * @tparam T
      * @param value
      * @return
      */
-    template<typename ResultType = EmptyType, typename T>
+    template<typename TargetType = EmptyType, typename T>
     CERBLIB_DECL auto abs(T value) -> decltype(auto)
     {
         if constexpr (std::is_unsigned_v<T>) {
@@ -209,17 +209,19 @@ namespace cerb {
                 mask.getAsInt() &= static_cast<u64>(std::numeric_limits<i64>::max());
             }
 
-            if constexpr (std::is_same_v<ResultType, EmptyType>) {
+            if constexpr (std::is_same_v<TargetType, EmptyType>) {
                 return mask.value;
             } else {
-                // cast if user wants to do this
-                return static_cast<ResultType>(mask.value);
+                static_assert(
+                    std::convertible_to<T, TargetType>, "T must be convertable to TargetType");
+                return static_cast<TargetType>(mask.value);
             }
-        } else if constexpr (std::is_same_v<ResultType, EmptyType>) {
+        } else if constexpr (std::is_same_v<TargetType, EmptyType>) {
             return cmov(value < 0, -value, value);
         } else {
-            // cast if user wants to do this
-            return static_cast<ResultType>(cmov(value < 0, -value, value));
+            static_assert(
+                std::convertible_to<T, TargetType>, "T must be convertable to TargetType");
+            return static_cast<TargetType>(cmov(value < 0, -value, value));
         }
     }
 
@@ -230,10 +232,14 @@ namespace cerb {
      * @param rhs
      * @return
      */
-    template<std::floating_point T>
+    template<typename T>
     CERBLIB_DECL auto equal(T lhs, T rhs) -> bool
     {
-        return abs(lhs - rhs) <= std::numeric_limits<T>::epsilon();
+        if constexpr (std::is_floating_point_v<T>) {
+            return abs(lhs - rhs) <= std::numeric_limits<T>::epsilon();
+        } else {
+            return lhs == rhs;
+        }
     }
 
     /**
@@ -253,23 +259,22 @@ namespace cerb {
         }
     }
 
-    template<u64 power, AlignRule rule = AlignRule::DEFAULT, typename T>
+    template<u64 PowerOf2ToAlign, How2Align AlignmentRule = How2Align::DEFAULT, std::integral T>
     CERBLIB_DECL auto align(T value) -> T
     {
-        static_assert(std::is_integral_v<T>);
-
-        if constexpr (rule == AlignRule::TRUNK) {
-            // if we need to trunk the value, we just set bits under power to 0
-            return value & ~(pow2<T>(power) - 1);
-        } else if constexpr (rule == AlignRule::CEIL) {
+        if constexpr (AlignmentRule == How2Align::TRUNK) {
+            // if we need to trunk the value, we just set bits under PowerOf2ToAlign to 0
+            return value & ~(pow2<T>(PowerOf2ToAlign) - 1);
+        } else if constexpr (AlignmentRule == How2Align::CEIL) {
             // if we need to ceil the number we add something to it, so it can become
             // aligned
-            return value + (pow2<T>(power) - value % pow2<T>(power));
-        } else if constexpr (rule == AlignRule::DEFAULT) {
+            return value + (pow2<T>(PowerOf2ToAlign) - value % pow2<T>(PowerOf2ToAlign));
+        } else if constexpr (AlignmentRule == How2Align::DEFAULT) {
             // in normal mode we check that the number is aligned, and if it is not, we
             // ceil it
-            return value % pow2<T>(power) == 0 ? value
-                                               : align<power, AlignRule::CEIL>(value);
+            return value % pow2<T>(PowerOf2ToAlign) == 0
+                       ? value
+                       : align<PowerOf2ToAlign, How2Align::CEIL>(value);
         }
     }
 
@@ -346,10 +351,9 @@ namespace cerb {
      * @param value, where we need to find the position of target bit
      * @return
      */
-    template<unsigned BitValue, typename T>
+    template<unsigned BitValue, std::unsigned_integral T>
     CERBLIB_DECL auto bitScanForward(T value) -> u64
     {
-        static_assert(std::is_unsigned_v<T>);
         static_assert(BitValue == 0 || BitValue == 1);
 
         if constexpr (BitValue == 0) {
@@ -380,10 +384,9 @@ namespace cerb {
      * @param value, where we need to find the position of target bit
      * @return
      */
-    template<unsigned BitValue, typename T>
+    template<unsigned BitValue, std::unsigned_integral T>
     CERBLIB_DECL auto bitScanReverse(T value) -> u64
     {
-        static_assert(std::is_unsigned_v<T>);
         static_assert(BitValue == 0 || BitValue == 1);
 
         if constexpr (BitValue == 0) {
@@ -418,15 +421,14 @@ namespace cerb {
     template<typename T>
     CERBLIB_DECL auto log2(T value) -> decltype(auto)
     {
-        static_assert(
-            ((std::is_integral_v<T> && std::is_unsigned_v<T>) ||
-             std::is_floating_point_v<T>));
+        static_assert(std::unsigned_integral<T> || std::is_floating_point_v<T>);
 
         if constexpr (std::is_integral_v<T>) {
             return bitScanForward<1>(value);
         } else {
-            static_assert(sizeof(T) <= sizeof(u64));
+            static_assert(is_any_of_v<T, float, double>);
             if (value <= static_cast<T>(0.0)) {
+                // we can't calculate log for not positive numbers
                 return static_cast<i64>(-1);
             }
 
@@ -437,8 +439,7 @@ namespace cerb {
                 constexpr i32 float32_zero_power = 0x7fU;
                 constexpr u32 float32_power_bit  = 23;
                 constexpr u32 float32_power_mask = 0xFF80'0000;
-                return static_cast<i64>(
-                           (mask & float32_power_mask) >> float32_power_bit) -
+                return static_cast<i64>((mask & float32_power_mask) >> float32_power_bit) -
                        float32_zero_power;
             } else {
                 const u64 mask = std::bit_cast<u32>(value);
@@ -447,8 +448,7 @@ namespace cerb {
                 constexpr i64 float64_zero_power = 0x3ffU;
                 constexpr u64 float64_power_bit  = 52;
                 constexpr u64 float64_power_mask = 0xFFF0'0000'0000'0000;
-                return static_cast<i64>(
-                           (mask & float64_power_mask) >> float64_power_bit) -
+                return static_cast<i64>((mask & float64_power_mask) >> float64_power_bit) -
                        float64_zero_power;
             }
         }
