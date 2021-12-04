@@ -35,12 +35,9 @@ namespace cerb::test {
 
         expect_true(
             []() {
-                std::array<Pair<i32, i32>, 6> data = { { { -10, 10 },
-                                                         { -20, 30 },
-                                                         { 400, 400 },
-                                                         { 14, 0 },
-                                                         { 1, 0 },
-                                                         { 123, 123 } } };
+                std::array<Pair<i32, i32>, 6> data = {
+                    { { -10, 10 }, { -20, 30 }, { 400, 400 }, { 14, 0 }, { 1, 0 }, { 123, 123 } }
+                };
                 return find(data.data(), { 123, 123 }) == data.size() - 1;
             },
             CERBLIB_LOCATION);
