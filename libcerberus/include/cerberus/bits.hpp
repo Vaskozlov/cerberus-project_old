@@ -47,7 +47,7 @@ namespace cerb {
 
         /**
          * returns stored value as integer.
-         * @return
+         * @return integral representation of stored value.
          */
         CERBLIB_DECL auto getAsInt() const -> decltype(auto)
         {
@@ -64,6 +64,10 @@ namespace cerb {
             }
         }
 
+        /**
+         * returns stored value as integer.
+         * @return integral representation of stored value.
+         */
         CERBLIB_DECL auto operator()() const -> decltype(auto)
         {
             return getAsInt();
@@ -152,14 +156,14 @@ namespace cerb {
 
     /**
      * returns 2 in power of @power (works with integrals and floating point numbers)
-     * @tparam T
+     * @tparam T unsigned integral or floating point number
      * @param power target power of 2
      * @return
      */
     template<typename T>
     CERBLIB_DECL auto pow2(std::unsigned_integral auto power) -> T
     {
-        static_assert(std::is_integral_v<T> || std::is_floating_point_v<T>);
+        static_assert(std::unsigned_integral<T> || std::is_floating_point_v<T>);
 
         if constexpr (std::is_floating_point_v<T>) {
             // we can return power of 2 if value is 32 or 64 bit integral
@@ -176,7 +180,7 @@ namespace cerb {
                 mask.getAsInt() += float64_power_bit * power;
             }
             return mask.value;
-        } else if constexpr (std::is_integral_v<T>) {
+        } else if constexpr (std::unsigned_integral<T>) {
             return static_cast<T>(1) << power;
         } else {
             return 0;
@@ -184,10 +188,10 @@ namespace cerb {
     }
 
     /**
-     * Returns absolute value of @value
+     * Returns absolute value of argument
      * @tparam TargetType return type of the function. By default it's EmptyType, so
      * function return value of type T
-     * @tparam T
+     * @tparam T integer or floating point
      * @param value
      * @return
      */
@@ -414,14 +418,14 @@ namespace cerb {
     /**
      * Finds log2 for integer and floating point numbers (returning value is trunked to
      * integer).
-     * @tparam T
+     * @tparam T unsigned integer or floating point
      * @param value
      * @return
      */
     template<typename T>
     CERBLIB_DECL auto log2(T value) -> decltype(auto)
     {
-        static_assert(std::unsigned_integral<T> || std::is_floating_point_v<T>);
+        static_assert(std::unsigned_integral<T> || std::floating_point<T>);
 
         if constexpr (std::is_integral_v<T>) {
             return bitScanForward<1>(value);

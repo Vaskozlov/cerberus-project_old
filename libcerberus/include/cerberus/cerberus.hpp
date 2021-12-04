@@ -140,7 +140,7 @@ namespace cerb {
 #endif
 
     /**
-     * Just empty type. It's used to show that value is passed just to be passed
+     * Just an empty type.
      */
     class EmptyType
     {

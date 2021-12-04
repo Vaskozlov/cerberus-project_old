@@ -72,7 +72,7 @@ namespace cerb {
     template<HowToComparePair ComparisonRule = HowToComparePair::DEFAULT, typename T1, typename T2>
     constexpr auto make_pair(T1 &&first, T2 &&second) -> Pair<T1, T2, ComparisonRule>
     {
-        return { std::forward<T1 &&>(first), std::forward<T2 &&>(second) };
+        return { std::forward<T1>(first), std::forward<T2>(second) };
     }
 
     template<HowToComparePair ComparisonRule = HowToComparePair::DEFAULT, typename T1, typename T2>
