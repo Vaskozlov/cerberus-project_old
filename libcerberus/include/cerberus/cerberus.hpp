@@ -131,6 +131,12 @@ namespace cerb {
     using i32 = int32_t;
     using i64 = int64_t;
 
+    using f32 = float;
+    using f64 = double;
+
+    using isize = intmax_t;
+    using usize = uintmax_t;
+
     using size_t = std::size_t;
 
 #if defined(__WINDOWS__) || defined(__WIN32__)

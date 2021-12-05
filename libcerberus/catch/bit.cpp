@@ -86,10 +86,7 @@ namespace cerb::test {
         expect_true([]() { return abs(10) == 10; }, CERBLIB_LOCATION);
 
         expect_true([]() { return abs(-10) == 10; }, CERBLIB_LOCATION);
-        expect_true([]() { return abs<u32>(-10) == 10U; }, CERBLIB_LOCATION);
-        expect_true(
-            []() { return std::is_same_v<decltype(abs<u32>(-10)), u32>; },
-            CERBLIB_LOCATION);
+        expect_true([]() { return abs(-10) == 10U; }, CERBLIB_LOCATION);
 
         expect_true([]() { return equal(abs(0.0f), 0.0f); }, CERBLIB_LOCATION);
         expect_true([]() { return equal(abs(10.0f), 10.0f); }, CERBLIB_LOCATION);
