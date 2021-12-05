@@ -303,17 +303,16 @@ namespace cerb {
          * @param value, where we need to find the position of target bit
          * @return
          */
-        template<unsigned BitValue, typename T>
-        CERBLIB_DECL auto bitScanForward(T value) -> u64
+        template<unsigned BitValue, std::unsigned_integral T>
+        CERBLIB_DECL auto bitScanForward(T value) -> usize
         {
-            static_assert(std::is_unsigned_v<T>);
             static_assert(BitValue == 0 || BitValue == 1);
 
             if constexpr (BitValue == 0) {
                 value = ~value;
             }
 
-            u64 bit_index    = 0;
+            usize bit_index  = 0;
             constexpr T mask = 0b1;
 
             CERBLIB_UNROLL_N(2)
@@ -324,7 +323,7 @@ namespace cerb {
                 value >>= 1;
             }
 
-            return bitsizeof(uintmax_t);
+            return bitsizeof(usize);
         }
 
         /**
@@ -334,8 +333,8 @@ namespace cerb {
          * @param value, where we need to find the position of target bit
          * @return
          */
-        template<unsigned BitValue, typename T>
-        CERBLIB_DECL auto bitScanReverse(T value) -> u64
+        template<unsigned BitValue, std::unsigned_integral T>
+        CERBLIB_DECL auto bitScanReverse(T value) -> usize
         {
             static_assert(std::is_unsigned_v<T>);
             static_assert(BitValue == 0 || BitValue == 1);
@@ -344,7 +343,7 @@ namespace cerb {
                 value = ~value;
             }
 
-            u64 bit_index    = bitsizeof(T) - 1;
+            usize bit_index  = bitsizeof(T) - 1;
             constexpr T mask = static_cast<T>(1) << (bitsizeof(T) - 1);
 
             CERBLIB_UNROLL_N(2)
@@ -355,7 +354,7 @@ namespace cerb {
                 value <<= 1;
             }
 
-            return bitsizeof(uintmax_t);
+            return bitsizeof(usize);
         }
     }  // namespace private_
 #endif /* _MSC_VER */
@@ -385,9 +384,14 @@ namespace cerb {
         }
 
         unsigned long bit_index;
-        _BitScanForward64(&bit_index, static_cast<u64>(value));
 
-        return static_cast<u64>(bit_index);
+#if defined(_WIN32) && !defined(_WIN64)
+        _BitScanForward(&bit_index, static_cast<usize>(value));
+#else
+        _BitScanForward64(&bit_index, static_cast<usize>(value));
+#endif
+
+        return static_cast<usize>(bit_index);
 #else
         return static_cast<usize>(__builtin_ctzl(static_cast<usize>(value)));
 #endif
@@ -401,7 +405,7 @@ namespace cerb {
      * @return
      */
     template<unsigned BitValue, std::unsigned_integral T>
-    CERBLIB_DECL auto bitScanReverse(T value) -> u64
+    CERBLIB_DECL auto bitScanReverse(T value) -> usize
     {
         static_assert(BitValue == 0 || BitValue == 1);
 
@@ -409,7 +413,7 @@ namespace cerb {
             value = ~value;
         }
         if (value == 0) {
-            return bitsizeof(uintmax_t);
+            return bitsizeof(usize);
         }
 
 #ifdef _MSC_VER
@@ -418,12 +422,17 @@ namespace cerb {
         }
 
         unsigned long bit_index;
-        _BitScanReverse64(&bit_index, static_cast<u64>(value));
 
-        return static_cast<u64>(bitsizeof(unsigned long) - 1ULL - bit_index);
+#if defined(_WIN32) && !defined(_WIN64)
+        _BitScanReverse(&bit_index, static_cast<usize>(value));
+#else
+        _BitScanReverse64(&bit_index, static_cast<usize>(value));
+#endif
+
+        return bit_index;
 #else
         return bitsizeof(unsigned long) - 1UL -
-               static_cast<u64>(__builtin_clzl(static_cast<u64>(value)));
+               static_cast<usize>(__builtin_clzl(static_cast<usize>(value)));
 #endif
     }
 
