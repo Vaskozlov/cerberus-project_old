@@ -291,8 +291,8 @@ namespace cerb {
          * @param value, where we need to find the position of target bit
          * @return
          */
-        template<unsigned BitValue, std::unsigned_integral T>
-        CERBLIB_DECL auto bitScanForward(T value) -> uintmax_t
+        template<unsigned BitValue, typename T>
+        CERBLIB_DECL auto bitScanForward(T value) -> u64
         {
             static_assert(std::is_unsigned_v<T>);
             static_assert(BitValue == 0 || BitValue == 1);
@@ -322,8 +322,8 @@ namespace cerb {
          * @param value, where we need to find the position of target bit
          * @return
          */
-        template<unsigned BitValue, std::unsigned_integral T>
-        CERBLIB_DECL auto bitScanReverse(T value) -> uintmax_t
+        template<unsigned BitValue, typename T>
+        CERBLIB_DECL auto bitScanReverse(T value) -> u64
         {
             static_assert(std::is_unsigned_v<T>);
             static_assert(BitValue == 0 || BitValue == 1);
@@ -356,7 +356,7 @@ namespace cerb {
      * @return
      */
     template<unsigned BitValue, std::unsigned_integral T>
-    CERBLIB_DECL auto bitScanForward(T value) -> uintmax_t
+    CERBLIB_DECL auto bitScanForward(T value) -> u64
     {
         static_assert(BitValue == 0 || BitValue == 1);
 
@@ -373,16 +373,11 @@ namespace cerb {
         }
 
         unsigned long bit_index;
+        _BitScanForward64(&bit_index, static_cast<u64>(value));
 
-#if !defined(_WIN32)
-        _BitScanForward64(&bit_index, static_cast<uintmax_t>(value));
+        return static_cast<u64>(bit_index);
 #else
-        _BitScanForward(&bit_index, static_cast<uintmax_t>(value));
-#endif
-
-        return static_cast<uintmax_t>(bit_index);
-#else
-        return static_cast<uintmax_t>(__builtin_ctzl(static_cast<uintmax_t>(value)));
+        return static_cast<u64>(__builtin_ctzl(static_cast<u64>(value)));
 #endif
     }
 
@@ -394,7 +389,7 @@ namespace cerb {
      * @return
      */
     template<unsigned BitValue, std::unsigned_integral T>
-    CERBLIB_DECL auto bitScanReverse(T value) -> uintmax_t
+    CERBLIB_DECL auto bitScanReverse(T value) -> u64
     {
         static_assert(BitValue == 0 || BitValue == 1);
 
@@ -411,14 +406,9 @@ namespace cerb {
         }
 
         unsigned long bit_index;
+        _BitScanReverse64(&bit_index, static_cast<u64>(value));
 
-#if !defined(_WIN32)
-        _BitScanReverse64(&bit_index, static_cast<uintmax_t>(value));
-#else
-        _BitScanReverse(&bit_index, static_cast<uintmax_t>(value));
-#endif
-
-        return bit_index;
+        return static_cast<u64>(bitsizeof(unsigned long) - 1ULL - bit_index);
 #else
         return bitsizeof(unsigned long) - 1UL -
                static_cast<u64>(__builtin_clzl(static_cast<u64>(value)));
