@@ -2,7 +2,7 @@
 #define LIBCERBERUS_PAIR_HPP
 
 #include <cerberus/cerberus.hpp>
-#include <cerberus/type.hpp>
+#include <cerberus/bits.hpp>
 
 namespace cerb {
     enum struct HowToComparePair
@@ -32,7 +32,7 @@ namespace cerb {
         constexpr auto operator<=>(const Pairable auto &other) const
         {
             if constexpr (ComparisonRule == HowToComparePair::DEFAULT) {
-                if (equal(first == other.first)) {
+                if (equal(first, other.first)) {
                     return second <=> other.second;
                 }
                 return first <=> other.first;
