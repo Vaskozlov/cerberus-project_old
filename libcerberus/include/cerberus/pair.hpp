@@ -1,8 +1,8 @@
 #ifndef LIBCERBERUS_PAIR_HPP
 #define LIBCERBERUS_PAIR_HPP
 
-#include <cerberus/cerberus.hpp>
 #include <cerberus/bits.hpp>
+#include <cerberus/cerberus.hpp>
 
 namespace cerb {
     enum struct HowToComparePair
