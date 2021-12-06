@@ -385,11 +385,11 @@ namespace cerb {
 
         unsigned long bit_index;
 
-#if defined(_WIN32) && !defined(_WIN64)
+#    if defined(_WIN32) && !defined(_WIN64)
         _BitScanForward(&bit_index, static_cast<usize>(value));
-#else
+#    else
         _BitScanForward64(&bit_index, static_cast<usize>(value));
-#endif
+#    endif
 
         return static_cast<usize>(bit_index);
 #else
@@ -423,11 +423,11 @@ namespace cerb {
 
         unsigned long bit_index;
 
-#if defined(_WIN32) && !defined(_WIN64)
+#    if defined(_WIN32) && !defined(_WIN64)
         _BitScanReverse(&bit_index, static_cast<usize>(value));
-#else
+#    else
         _BitScanReverse64(&bit_index, static_cast<usize>(value));
-#endif
+#    endif
 
         return bit_index;
 #else
