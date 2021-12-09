@@ -75,13 +75,12 @@ namespace cerb {
          * @return index of the value
          */
         template<typename T>
-        constexpr auto find(const T *location, u64 value) -> size_t
+        constexpr auto find(const T *location, u64 value, size_t limit) -> size_t
         {
             /* we can find only types, which can be stored in register */
             static_assert(CanBeStoredInIntegral<T>);
 
             u64 index_of_value = value;
-            size_t limit       = std::numeric_limits<u32>::max();
 
             if constexpr (sizeof(T) == sizeof(u8)) {
                 asm volatile("repnz scasb; sub %1, %0; mov %0, %3; dec %3;"
@@ -264,7 +263,9 @@ namespace cerb {
      * @return
      */
     template<typename T>
-    constexpr auto find(const T *location, const T &value) -> size_t
+    constexpr auto
+        find(const T *location, const T &value, size_t limit = std::numeric_limits<u32>::max())
+            -> size_t
     {
 #if CERBLIB_AMD64
         if constexpr (CanBeStoredInIntegral<T>) {
@@ -276,13 +277,13 @@ namespace cerb {
                 ByteMask<T> mask{ value };
                 value2find = mask();
             }
-            return private_::find(location, value2find);
+            return private_::find(location, value2find, limit);
         }
 #endif
         const T *location_ptr = location;
 
         CERBLIB_UNROLL_N(4)
-        for (; *location != value; ++location) {
+        for (; *location != value && location != (location_ptr + limit); ++location) {
             // empty block
         }
 

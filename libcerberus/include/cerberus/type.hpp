@@ -76,7 +76,7 @@ namespace cerb {
     template<typename CharT>
     concept CharacterLiteral =
         !std::is_array_v<CharT> && std::is_trivial_v<CharT> && std::is_standard_layout_v<CharT> &&
-        cerb::is_any_of_v<CharT, char, unsigned char, char8_t, char16_t, char32_t>;
+        cerb::is_any_of_v<CharT, char, unsigned char, char8_t, char16_t, char32_t, wchar_t>;
 }// namespace cerb
 
 #endif /* LIBCERBERUS_TYPE_HPP */
