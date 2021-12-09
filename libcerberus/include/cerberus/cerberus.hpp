@@ -23,9 +23,9 @@
 
 #ifndef CERBLIB_AMD64
 #    ifdef __x86_64__
-#        define CERBLIB_AMD64 true
+#        define CERBLIB_AMD64 1
 #    else
-#        define CERBLIB_AMD64 false
+#        define CERBLIB_AMD64 0
 #    endif
 #endif /* CERBLIB_AMD64 */
 
@@ -131,6 +131,12 @@ namespace cerb {
     using i32 = int32_t;
     using i64 = int64_t;
 
+    using f32 = float;
+    using f64 = double;
+
+    using isize = intmax_t;
+    using usize = uintmax_t;
+
     using size_t = std::size_t;
 
 #if defined(__WINDOWS__) || defined(__WIN32__)
@@ -140,7 +146,7 @@ namespace cerb {
 #endif
 
     /**
-     * Just empty type. It's used to show that value is passed just to be passed
+     * Just an empty type.
      */
     class EmptyType
     {
@@ -208,14 +214,14 @@ namespace cerb {
     /**
      * iterates through parameter pack
      * @tparam Ts
-     * @param function
-     * @param args
+     * @param function which will be called for each argument
+     * @param args arguments to iterate throw
      * @return
      */
     template<typename F, typename... Ts>
     CERBLIB_DECL auto for_each(F &&function, Ts &&...args)
     {
-        [[maybe_unused]] auto iterator = { ([&function]<typename T>(T &&value) {
+        [[maybe_unused]] const auto iterator = { ([&function]<typename T>(T &&value) {
             call(std::forward<F>(function), std::forward<T>(value));
             return 0;
         })(std::forward<Ts>(args))... };
@@ -230,9 +236,9 @@ namespace cerb {
      * @return
      */
     template<typename T>
-    constexpr auto cmov(bool condition, const T &on_true, const auto &on_false) -> T
+    constexpr auto cmov(bool condition, const T &on_true, const T &on_false) -> T
     {
-        return condition ? on_true : static_cast<T>(on_false);
+        return condition ? on_true : on_false;
     }
 }// namespace cerb
 

@@ -5,7 +5,7 @@ else ()
             -std=c++20
             -Wall -Wextra -Wpedantic -Wshadow -Wshadow -Wnon-virtual-dtor
             -Wold-style-cast -Wcast-align -Woverloaded-virtual
-            -Wconversion -Wsign-conversion
+            -Wconversion -Wsign-conversion -Wformat=2
             -Wredundant-decls -Wuninitialized -Wfloat-equal -Wfloat-conversion)
 endif ()
 

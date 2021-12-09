@@ -3,15 +3,9 @@
 
 #include <bit>
 #include <cerberus/cerberus.hpp>
+#include <cerberus/type.hpp>
 
 namespace cerb {
-    enum struct AlignRule
-    {
-        DEFAULT,
-        TRUNK,
-        CEIL
-    };
-
     /**
      * Union which holds target class and provides access to it's bytes
      * @tparam T
@@ -25,26 +19,13 @@ namespace cerb {
         std::array<u32, sizeof(T) / sizeof(u32)> mask_32;
         std::array<u64, sizeof(T) / sizeof(u64)> mask_64;
 
-        CERBLIB_DECL static auto canBeGetAsInt() -> bool
-        {
-            switch (sizeof(T)) {
-            case sizeof(u8):
-            case sizeof(u16):
-            case sizeof(u32):
-            case sizeof(u64):
-                return true;
-            default:
-                return false;
-            }
-        }
-
         /**
          * returns stored value as integer.
          * @return
          */
         CERBLIB_DECL auto getAsInt() -> decltype(auto)
         {
-            static_assert(canBeGetAsInt());
+            static_assert(CanBeStoredInIntegral<T>);
 
             if constexpr (sizeof(T) == sizeof(u8)) {
                 return mask_8[0];
@@ -59,11 +40,11 @@ namespace cerb {
 
         /**
          * returns stored value as integer.
-         * @return
+         * @return integral representation of stored value.
          */
         CERBLIB_DECL auto getAsInt() const -> decltype(auto)
         {
-            static_assert(canBeGetAsInt());
+            static_assert(CanBeStoredInIntegral<T>);
 
             if constexpr (sizeof(T) == sizeof(u8)) {
                 return mask_8[0];
@@ -76,6 +57,10 @@ namespace cerb {
             }
         }
 
+        /**
+         * returns stored value as integer.
+         * @return integral representation of stored value.
+         */
         CERBLIB_DECL auto operator()() const -> decltype(auto)
         {
             return getAsInt();
@@ -163,76 +148,76 @@ namespace cerb {
     }
 
     /**
-     * returns 2 in power of @power (works with integrals and floating point numbers)
-     * @tparam T
-     * @param power target power of 2
+     * returns 2 in power of @powerOf2 (works with integrals and floating point numbers)
+     * @tparam T unsigned integral
+     * @param powerOf2 target power of 2
      * @return
      */
-    template<typename T>
-    CERBLIB_DECL auto pow2(std::unsigned_integral auto power) -> T
+    template<std::unsigned_integral T, std::unsigned_integral PowerType>
+    CERBLIB_DECL auto pow2(PowerType powerOf2) -> T
     {
-        static_assert(std::is_integral_v<T> || std::is_floating_point_v<T>);
-
-        if constexpr (std::is_floating_point_v<T>) {
-            // we can return power of 2 if value is 32 or 64 bit integral
-            static_assert(sizeof(T) == sizeof(u32) || sizeof(T) == sizeof(u64));
-
-            // ByteMask if used to access bytes of floating point value
-            ByteMask<T> mask{ static_cast<T>(1) };
-
-            if constexpr (sizeof(T) == sizeof(u32)) {
-                constexpr u32 float32_power_bit = 1UL << 23;
-                mask.getAsInt() += static_cast<u32>(float32_power_bit * power);
-            } else {
-                constexpr u64 float64_power_bit = 1ULL << 52;
-                mask.getAsInt() += float64_power_bit * power;
-            }
-            return mask.value;
-        } else if constexpr (std::is_integral_v<T>) {
-            return static_cast<T>(1) << power;
-        } else {
-            return 0;
-        }
+        return static_cast<T>(1) << powerOf2;
     }
 
     /**
-     * Returns absolute value of @value
-     * @tparam ResultType return type of the function. By default it's EmptyType, so
-     * function return value of type T
-     * @tparam T
-     * @param value
+     * returns 2 in power of @powerOf2 (works with integrals and floating point numbers)
+     * @tparam T floating point number
+     * @param powerOf2 target power of 2
      * @return
      */
-    template<typename ResultType = EmptyType, typename T>
-    CERBLIB_DECL auto abs(T value) -> decltype(auto)
+    template<std::floating_point T, std::unsigned_integral PowerType>
+    CERBLIB_DECL auto pow2(PowerType powerOf2) -> T
     {
-        if constexpr (std::is_unsigned_v<T>) {
-            return value;
-        } else if constexpr (std::is_floating_point_v<T>) {
-            // we can return absolute value if value is 32 or 64 bit integral
-            static_assert(sizeof(T) == sizeof(u32) || sizeof(T) == sizeof(u64));
+        static_assert(is_any_of_v<T, f32, f64>, "cerb::pow2 supports only floats and doubles.");
 
-            // ByteMask if used to access bytes of floating point value
-            ByteMask<T> mask{ value };
+        ByteMask<T> mask{ static_cast<T>(1) };
 
-            if constexpr (sizeof(T) == sizeof(u32)) {
-                mask.getAsInt() &= static_cast<u32>(std::numeric_limits<i32>::max());
-            } else {
-                mask.getAsInt() &= static_cast<u64>(std::numeric_limits<i64>::max());
-            }
-
-            if constexpr (std::is_same_v<ResultType, EmptyType>) {
-                return mask.value;
-            } else {
-                // cast if user wants to do this
-                return static_cast<ResultType>(mask.value);
-            }
-        } else if constexpr (std::is_same_v<ResultType, EmptyType>) {
-            return cmov(value < 0, -value, value);
+        if constexpr (sizeof(T) == sizeof(f32)) {
+            constexpr u32 f32_exponent = 1UL << 23;
+            mask.getAsInt() += static_cast<u32>(f32_exponent * powerOf2);
         } else {
-            // cast if user wants to do this
-            return static_cast<ResultType>(cmov(value < 0, -value, value));
+            constexpr u64 f64_exponent = 1ULL << 52;
+            mask.getAsInt() += f64_exponent * powerOf2;
         }
+
+        return mask.value;
+    }
+
+    /**
+     * Returns absolute value of integer.
+     * @tparam T some integer type
+     * @param value
+     * @return absolute value of @value
+     */
+    template<std::integral T>
+    CERBLIB_DECL auto abs(T value) -> T
+    {
+        if constexpr (std::unsigned_integral<T>) {
+            return value;
+        }
+        return value < 0 ? -value : value;
+    }
+
+    /**
+     * Returns absolute value of floating point number.
+     * @tparam T some floating point type
+     * @param value
+     * @return absolute value of @value
+     */
+    template<std::floating_point T>
+    CERBLIB_DECL auto abs(T value) -> T
+    {
+        static_assert(is_any_of_v<T, float, double>, "cerb::abs supports only floats and doubles.");
+
+        ByteMask<T> mask{ value };
+
+        if constexpr (sizeof(T) == sizeof(u32)) {
+            mask.getAsInt() &= static_cast<u32>(std::numeric_limits<i32>::max());
+        } else if constexpr (sizeof(T) == sizeof(u64)) {
+            mask.getAsInt() &= static_cast<u64>(std::numeric_limits<i64>::max());
+        }
+
+        return mask.value;
     }
 
     /**
@@ -269,24 +254,44 @@ namespace cerb {
         }
     }
 
-    template<u64 power, AlignRule rule = AlignRule::DEFAULT, typename T>
+    /**
+     * Trunks integer
+     * @tparam PowerOf2
+     * @tparam T integer type
+     * @param number
+     * @return trunked integer
+     */
+    template<usize PowerOf2, std::integral T>
+    CERBLIB_DECL auto trunk(T number) -> T
+    {
+        return number & ~(pow2<T>(PowerOf2) - 1);
+    }
+
+    /**
+     * Ceils integer to power of 2
+     * @tparam PowerOf2
+     * @tparam T integer type
+     * @param number
+     * @return ceiled integer
+     */
+    template<usize PowerOf2, std::integral T>
+    CERBLIB_DECL auto ceil(T number) -> T
+    {
+        return number + (pow2<T>(PowerOf2) - number % pow2<T>(PowerOf2));
+    }
+
+    /**
+     * Align integer to power of 2
+     * @tparam PowerOf2
+     * @tparam T
+     * @param value
+     * @return
+     */
+    template<u64 PowerOf2, std::integral T>
     CERBLIB_DECL auto align(T value) -> T
     {
-        static_assert(std::is_integral_v<T>);
-
-        if constexpr (rule == AlignRule::TRUNK) {
-            // if we need to trunk the value, we just set bits under power to 0
-            return value & ~(pow2<T>(power) - 1);
-        } else if constexpr (rule == AlignRule::CEIL) {
-            // if we need to ceil the number we add something to it, so it can become
-            // aligned
-            return value + (pow2<T>(power) - value % pow2<T>(power));
-        } else if constexpr (rule == AlignRule::DEFAULT) {
-            // in normal mode we check that the number is aligned, and if it is not, we
-            // ceil it
-            return value % pow2<T>(power) == 0 ? value
-                                               : align<power, AlignRule::CEIL>(value);
-        }
+        const bool need2Align = value % pow2<T>(PowerOf2) == 0;
+        return need2Align ? value : ceil<PowerOf2, T>(value);
     }
 
 #ifdef _MSC_VER
@@ -298,17 +303,16 @@ namespace cerb {
          * @param value, where we need to find the position of target bit
          * @return
          */
-        template<unsigned BitValue, typename T>
-        CERBLIB_DECL auto bitScanForward(T value) -> u64
+        template<unsigned BitValue, std::unsigned_integral T>
+        CERBLIB_DECL auto bitScanForward(T value) -> usize
         {
-            static_assert(std::is_unsigned_v<T>);
             static_assert(BitValue == 0 || BitValue == 1);
 
             if constexpr (BitValue == 0) {
                 value = ~value;
             }
 
-            u64 bit_index    = 0;
+            usize bit_index  = 0;
             constexpr T mask = 0b1;
 
             CERBLIB_UNROLL_N(2)
@@ -319,7 +323,7 @@ namespace cerb {
                 value >>= 1;
             }
 
-            return bitsizeof(uintmax_t);
+            return bitsizeof(usize);
         }
 
         /**
@@ -329,8 +333,8 @@ namespace cerb {
          * @param value, where we need to find the position of target bit
          * @return
          */
-        template<unsigned BitValue, typename T>
-        CERBLIB_DECL auto bitScanReverse(T value) -> u64
+        template<unsigned BitValue, std::unsigned_integral T>
+        CERBLIB_DECL auto bitScanReverse(T value) -> usize
         {
             static_assert(std::is_unsigned_v<T>);
             static_assert(BitValue == 0 || BitValue == 1);
@@ -339,7 +343,7 @@ namespace cerb {
                 value = ~value;
             }
 
-            u64 bit_index    = bitsizeof(T) - 1;
+            usize bit_index  = bitsizeof(T) - 1;
             constexpr T mask = static_cast<T>(1) << (bitsizeof(T) - 1);
 
             CERBLIB_UNROLL_N(2)
@@ -350,7 +354,7 @@ namespace cerb {
                 value <<= 1;
             }
 
-            return bitsizeof(uintmax_t);
+            return bitsizeof(usize);
         }
     }  // namespace private_
 #endif /* _MSC_VER */
@@ -362,17 +366,16 @@ namespace cerb {
      * @param value, where we need to find the position of target bit
      * @return
      */
-    template<unsigned BitValue, typename T>
-    CERBLIB_DECL auto bitScanForward(T value) -> u64
+    template<unsigned BitValue, std::unsigned_integral T>
+    CERBLIB_DECL auto bitScanForward(T value) -> usize
     {
-        static_assert(std::is_unsigned_v<T>);
         static_assert(BitValue == 0 || BitValue == 1);
 
         if constexpr (BitValue == 0) {
             value = ~value;
         }
         if (value == 0) {
-            return bitsizeof(uintmax_t);
+            return bitsizeof(usize);
         }
 
 #ifdef _MSC_VER
@@ -381,11 +384,16 @@ namespace cerb {
         }
 
         unsigned long bit_index;
-        _BitScanForward64(&bit_index, static_cast<u64>(value));
 
-        return static_cast<u64>(bit_index);
+#    if defined(_WIN32) && !defined(_WIN64)
+        _BitScanForward(&bit_index, static_cast<usize>(value));
+#    else
+        _BitScanForward64(&bit_index, static_cast<usize>(value));
+#    endif
+
+        return static_cast<usize>(bit_index);
 #else
-        return static_cast<u64>(__builtin_ctzl(static_cast<u64>(value)));
+        return static_cast<usize>(__builtin_ctzl(static_cast<usize>(value)));
 #endif
     }
 
@@ -396,17 +404,16 @@ namespace cerb {
      * @param value, where we need to find the position of target bit
      * @return
      */
-    template<unsigned BitValue, typename T>
-    CERBLIB_DECL auto bitScanReverse(T value) -> u64
+    template<unsigned BitValue, std::unsigned_integral T>
+    CERBLIB_DECL auto bitScanReverse(T value) -> usize
     {
-        static_assert(std::is_unsigned_v<T>);
         static_assert(BitValue == 0 || BitValue == 1);
 
         if constexpr (BitValue == 0) {
             value = ~value;
         }
         if (value == 0) {
-            return bitsizeof(uintmax_t);
+            return bitsizeof(usize);
         }
 
 #ifdef _MSC_VER
@@ -415,58 +422,63 @@ namespace cerb {
         }
 
         unsigned long bit_index;
-        _BitScanReverse64(&bit_index, static_cast<u64>(value));
 
-        return static_cast<u64>(bitsizeof(unsigned long) - 1ULL - bit_index);
+#    if defined(_WIN32) && !defined(_WIN64)
+        _BitScanReverse(&bit_index, static_cast<usize>(value));
+#    else
+        _BitScanReverse64(&bit_index, static_cast<usize>(value));
+#    endif
+
+        return bit_index;
 #else
         return bitsizeof(unsigned long) - 1UL -
-               static_cast<u64>(__builtin_clzl(static_cast<u64>(value)));
+               static_cast<usize>(__builtin_clzl(static_cast<usize>(value)));
 #endif
     }
 
     /**
      * Finds log2 for integer and floating point numbers (returning value is trunked to
      * integer).
-     * @tparam T
+     * @tparam T unsigned integer or floating point
      * @param value
      * @return
      */
-    template<typename T>
-    CERBLIB_DECL auto log2(T value) -> decltype(auto)
+    template<std::unsigned_integral T>
+    CERBLIB_DECL auto log2(T number) -> usize
     {
-        static_assert(
-            ((std::is_integral_v<T> && std::is_unsigned_v<T>) ||
-             std::is_floating_point_v<T>));
+        return bitScanForward<1>(number);
+    }
 
-        if constexpr (std::is_integral_v<T>) {
-            return bitScanForward<1>(value);
-        } else {
-            static_assert(sizeof(T) <= sizeof(u64));
-            if (value <= static_cast<T>(0.0)) {
-                return static_cast<i64>(-1);
-            }
+    /**
+     * Finds log2 for integer and floating point numbers (returning value is trunked to
+     * integer).
+     * @tparam T unsigned integer or floating point
+     * @param value
+     * @return
+     */
+    template<std::floating_point T>
+    CERBLIB_DECL auto log2(T number) -> isize
+    {
+        static_assert(is_any_of_v<T, f32, f64>, "cerb::log2 supports floats and doubles");
 
-            if constexpr (sizeof(T) == sizeof(u32)) {
-                const u32 mask = std::bit_cast<u32>(value);
+        if (number <= static_cast<T>(0)) {
+            return -1;
+        }
 
-                // float32_zero_power - is 2^0 for 32 bit floating point number
-                constexpr i32 float32_zero_power = 0x7fU;
-                constexpr u32 float32_power_bit  = 23;
-                constexpr u32 float32_power_mask = 0xFF80'0000;
-                return static_cast<i64>(
-                           (mask & float32_power_mask) >> float32_power_bit) -
-                       float32_zero_power;
-            } else {
-                const u64 mask = std::bit_cast<u32>(value);
-
-                // float64_zero_power - is 2^0 for 64 bit floating point number
-                constexpr i64 float64_zero_power = 0x3ffU;
-                constexpr u64 float64_power_bit  = 52;
-                constexpr u64 float64_power_mask = 0xFFF0'0000'0000'0000;
-                return static_cast<i64>(
-                           (mask & float64_power_mask) >> float64_power_bit) -
-                       float64_zero_power;
-            }
+        if constexpr (sizeof(T) == sizeof(f32)) {
+            const u32 mask                            = std::bit_cast<u32>(number);
+            constexpr i32 f32_exponent_bit            = 23;
+            constexpr i32 f32_exponent_for_zero_power = 0x7fU;
+            constexpr u32 f32_exponent_mask           = 0xFF80'0000;
+            return static_cast<isize>((mask & f32_exponent_mask) >> f32_exponent_bit) -
+                   f32_exponent_for_zero_power;
+        } else if constexpr (sizeof(T) == sizeof(f64)) {
+            const u64 mask                            = std::bit_cast<i64>(number);
+            constexpr i64 f64_exponent_bit            = 52;
+            constexpr i64 f64_exponent_for_zero_power = 0x3ffU;
+            constexpr u64 f64_exponent_mask           = 0xFFF0'0000'0000'0000;
+            return static_cast<isize>((mask & f64_exponent_mask) >> f64_exponent_bit) -
+                   f64_exponent_for_zero_power;
         }
     }
 }// namespace cerb
