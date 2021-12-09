@@ -126,23 +126,20 @@ namespace cerb::test {
         EXPECT_TRUE(cerb::log2(8.0f * static_cast<float>(argc)) == 3);
         EXPECT_TRUE(cerb::log2(1.0f * static_cast<float>(argc)) == 0);
 
-        EXPECT_TRUE(
-            []() {
-                constexpr auto value = cerb::log2(8.0f);
-                return value == 3;
-            }());
+        EXPECT_TRUE([]() {
+            constexpr auto value = cerb::log2(8.0f);
+            return value == 3;
+        }());
 
-        EXPECT_TRUE(
-            []() {
-                constexpr auto value = cerb::log2(1.0f);
-                return value == 0;
-            }());
+        EXPECT_TRUE([]() {
+            constexpr auto value = cerb::log2(1.0f);
+            return value == 0;
+        }());
 
-        EXPECT_TRUE(
-            []() {
-                constexpr auto value = cerb::log2(-8.0f);
-                return value == -1;
-            }());
+        EXPECT_TRUE([]() {
+            constexpr auto value = cerb::log2(-8.0f);
+            return value == -1;
+        }());
     }
 
     auto bit_test(u32 argc) -> int
