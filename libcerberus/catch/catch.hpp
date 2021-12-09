@@ -9,6 +9,8 @@
 #include <string_view>
 
 #define CERBLIB_LOCATION cerb::test::location(__FILE__, __LINE__)
+#define EXPECT_TRUE(value) expect_true(value, CERBLIB_LOCATION)
+#define EXPECT_FALSE(value) expect_false(value, CERBLIB_LOCATION)
 
 namespace cerb::test {
     class constexpr_failure final : public std::exception
@@ -16,17 +18,10 @@ namespace cerb::test {
         std::string_view message;
 
     public:
+        constexpr_failure() = default;
+
         explicit constexpr_failure(std::string_view t_message) : message(t_message)
         {}
-
-        constexpr_failure(constexpr_failure &&) noexcept      = default;
-        constexpr_failure(const constexpr_failure &) noexcept = default;
-
-        ~constexpr_failure() override = default;
-
-        auto operator=(constexpr_failure &&) noexcept -> constexpr_failure & = default;
-        auto operator              =(const constexpr_failure &) noexcept
-            -> constexpr_failure & = default;
 
         [[nodiscard]] auto what() const noexcept -> const char * override
         {
@@ -50,15 +45,7 @@ namespace cerb::test {
             return m_filename;
         }
 
-        constexpr auto operator=(const location &) -> location & = default;
-        constexpr auto operator=(location &&) noexcept -> location & = default;
-
-        constexpr location()  = default;
-        constexpr ~location() = default;
-
-        constexpr location(const location &)     = default;
-        constexpr location(location &&) noexcept = default;
-
+        constexpr location() = default;
         constexpr location(std::string_view filename, std::size_t line)
           : m_filename(filename), m_line(line)
         {}
@@ -78,39 +65,28 @@ namespace cerb::test {
         {}
     };
 
-    template<typename... Ts>
-    constexpr auto
-        expect_true(auto &&function, const location &loc = CERBLIB_LOCATION, Ts &&...args)
-            -> void
+    constexpr auto expect_true(bool condition, const location &loc = CERBLIB_LOCATION) -> void
     {
-        if (auto code = function(std::forward<Ts>(args)...); code != 1) {
+        if (!condition) {
             if (std::is_constant_evaluated()) {
                 throw constexpr_failure("Cerberus test failure!");
             } else {
                 fmt::print(
-                    fmt::fg(fmt::color::red),
-                    "Cerberus test failure with code: {}! ",
-                    code);
+                    fmt::fg(fmt::color::red), "Cerberus test failure with code: {}! ", condition);
                 fmt::print("File: {}, line: {}\n", loc.filename(), loc.line());
                 exit(1);
             }
         }
     }
 
-    template<typename... Ts>
-    constexpr auto expect_false(
-        auto &&function,
-        const location &loc = CERBLIB_LOCATION,
-        Ts &&...args) -> void
+    constexpr auto expect_false(bool condition, const location &loc = CERBLIB_LOCATION) -> void
     {
-        if (auto code = function(std::forward<Ts>(args)...); code != 0) {
+        if (condition) {
             if (std::is_constant_evaluated()) {
                 throw constexpr_failure("Cerberus test failure!");
             } else {
                 fmt::print(
-                    fmt::fg(fmt::color::red),
-                    "Cerberus test failure with code: {}! ",
-                    code);
+                    fmt::fg(fmt::color::red), "Cerberus test failure with code: {}! ", condition);
                 fmt::print("File: {}, line: {}\n", loc.filename(), loc.line());
                 exit(1);
             }
