@@ -84,7 +84,7 @@ namespace cerb {
 
         CERBLIB_DECL auto back() const -> CharT
         {
-            return *(end() - 1);
+            return *(begin() + length - 1);
         }
 
         CERBLIB_DECL auto at(size_type index) const -> CharT
