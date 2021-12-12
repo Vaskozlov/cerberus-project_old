@@ -4,8 +4,7 @@
 #include "catch.hpp"
 #include <cerberus/string_view.hpp>
 
-namespace cerb::test
-{
+namespace cerb::test {
     auto stringViewTest(u32 argc = 1) -> int;
 }
 
