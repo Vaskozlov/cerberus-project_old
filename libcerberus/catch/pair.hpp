@@ -5,7 +5,7 @@
 #include <cerberus/pair.hpp>
 
 namespace cerb::test {
-    auto pair_test() -> int;
+    auto pairTest() -> int;
 }
 
 #endif /* LIBCERBERUS_CATCH_PAIR_HPP */

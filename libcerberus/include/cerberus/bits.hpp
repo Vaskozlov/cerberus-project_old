@@ -119,7 +119,7 @@ namespace cerb {
      * @return
      */
     template<typename T, typename... Ts>
-    CERBLIB_DECL auto max(const T &lhs, Ts &&...args) -> T
+    CERBLIB_DECL auto max(AutoCopyType<T> lhs, Ts &&...args) -> T
     {
         if constexpr (sizeof...(args) == 0) {
             return lhs;
@@ -137,7 +137,7 @@ namespace cerb {
      * @return
      */
     template<typename T, typename... Ts>
-    CERBLIB_DECL auto min(const T &lhs, Ts &&...args) -> T
+    CERBLIB_DECL auto min(AutoCopyType<T> lhs, Ts &&...args) -> T
     {
         if constexpr (sizeof...(args) == 0) {
             return lhs;
@@ -228,7 +228,7 @@ namespace cerb {
      * @return
      */
     template<typename T>
-    CERBLIB_DECL auto equal(T lhs, T rhs) -> bool
+    CERBLIB_DECL auto equal(AutoCopyType<T> lhs, AutoCopyType<T> rhs) -> bool
     {
         if constexpr (std::is_floating_point_v<T>) {
             return abs(lhs - rhs) <= std::numeric_limits<T>::epsilon();

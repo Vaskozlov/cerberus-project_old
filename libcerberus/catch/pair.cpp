@@ -2,7 +2,7 @@
 #include <vector>
 
 namespace cerb::test {
-    auto pair_test() -> int
+    auto pairTest() -> int
     {
         {
             Pair<int, int> c_pair = cerb::make_pair(10, 10);

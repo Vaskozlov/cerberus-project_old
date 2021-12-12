@@ -67,8 +67,14 @@ namespace cerb {
         is_one_of(sizeof(T), sizeof(u8), sizeof(u16), sizeof(u32), sizeof(u64));
 
     template<typename T>
+    concept Trivial = std::is_trivial_v<T> &&(sizeof(T) <= sizeof(usize) * 2);
+
+    template<typename T>
+    concept NotTrivial = !Trivial<T>;
+
+    template<typename T>
     concept RawAccessible =
-        Iterable<T> && DataAccessible<T> && std::random_access_iterator<typename T::iterator>;
+        Iterable<T> && DataAccessible<T> && std::contiguous_iterator<typename T::iterator>;
 
     template<typename T>
     concept ClassValueFastCopiable = std::is_trivially_copy_assignable_v<typename T::value_type>;
@@ -77,6 +83,27 @@ namespace cerb {
     concept CharacterLiteral =
         !std::is_array_v<CharT> && std::is_trivial_v<CharT> && std::is_standard_layout_v<CharT> &&
         cerb::is_any_of_v<CharT, char, unsigned char, char8_t, char16_t, char32_t, wchar_t>;
+
+    template<typename T>
+    struct GetType4Copy
+    {
+        template<Trivial U>
+        CERBLIB_DECL static auto check() -> U
+        {
+            return *static_cast<U *>(nullptr);
+        }
+
+        template<NotTrivial U>
+        CERBLIB_DECL static auto check() -> const U &
+        {
+            return *static_cast<const U *>(nullptr);
+        }
+
+        using type = decltype(check<typename std::remove_reference<T>::type>());
+    };
+
+    template<typename T>
+    using AutoCopyType = typename GetType4Copy<T>::type;
 }// namespace cerb
 
 #endif /* LIBCERBERUS_TYPE_HPP */

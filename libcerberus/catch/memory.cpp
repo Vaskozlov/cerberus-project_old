@@ -11,7 +11,7 @@ namespace cerb::test {
 
     constexpr i32 CheckValueI32 = -134;
 
-    consteval auto constexpr_memset_test() -> int
+    consteval auto constexprMemsetTest() -> int
     {
         std::array<u8, 512> data_8{};
         std::array<u16, 512> data_16{};
@@ -48,11 +48,11 @@ namespace cerb::test {
         return 0;
     }
 
-    auto memset_test(u32) -> void
+    auto memsetTest(u32) -> void
     {
         constexpr u32 buffer_size            = 512;
         constexpr u32 complex_buffer_size    = 128;
-        constexpr int const_result           = constexpr_memset_test();
+        constexpr int const_result           = constexprMemsetTest();
         static const std::string long_string = "Hello, world! It's a long string!";
 
         std::array<i32, 512> array_32{};
@@ -119,7 +119,7 @@ namespace cerb::test {
         EXPECT_TRUE(array_check_function(complex_vector, testComplexValue));
     }
 
-    auto memcpy_test() -> void
+    auto memcpyTest() -> void
     {
         constexpr u32 buffer_size            = 512;
         constexpr u32 complex_buffer_size    = 128;
@@ -191,11 +191,11 @@ namespace cerb::test {
             array_complex.data(), array2_complex.data(), complex_buffer_size));
     }
 
-    auto memory_test(u32 argc) -> int
+    auto memoryTest(u32 argc) -> int
     {
-        memset_test(argc);
-        memcpy_test();
-        string_test(argc);
+        memsetTest(argc);
+        memcpyTest();
+        stringTest(argc);
         return 0;
     }
 }// namespace cerb::test
