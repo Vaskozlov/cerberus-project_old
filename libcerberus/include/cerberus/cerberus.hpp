@@ -97,8 +97,8 @@
 
 #ifndef CERBLIB_CLANG_DISABLE_WARNING
 #    ifdef __clang__
-#        define CERBLIB_CLANG_DISABLE_WARNING(clang_option)                              \
-            CERBLIB_PRAGMA(clang, push)                                                  \
+#        define CERBLIB_CLANG_DISABLE_WARNING(clang_option)                                        \
+            CERBLIB_PRAGMA(clang, push)                                                            \
             CERBLIB_PRAGMA(clang, ignored clang_option)
 #    else
 #        define CERBLIB_CLANG_DISABLE_WARNING(clang_option)
