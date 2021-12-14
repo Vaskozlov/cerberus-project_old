@@ -13,7 +13,7 @@
 #define EXPECT_FALSE(value) expectFalse(value, CERBLIB_LOCATION)
 
 namespace cerb::test {
-    class constexpr_failure final : public std::exception
+    class constexpr_failure : public std::exception
     {
         std::string_view message;
 
@@ -93,8 +93,8 @@ namespace cerb::test {
         }
     }
 
-    template<typename T>
-    auto random_array(size_t size) -> std::unique_ptr<T>
+    template<std::integral T>
+    auto createRandomArrayOfInts(size_t size) -> std::unique_ptr<T>
     {
         static std::random_device random_device;
         static std::mt19937 engine(random_device());

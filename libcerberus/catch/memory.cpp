@@ -142,10 +142,10 @@ namespace cerb::test {
             random_complex_data.get()[i] = { i * 10, static_cast<double>(i) * -10.0 };
         }
 
-        std::unique_ptr<u8> random_data_8   = random_array<u8>(buffer_size);
-        std::unique_ptr<u16> random_data_16 = random_array<u16>(buffer_size);
-        std::unique_ptr<u32> random_data_32 = random_array<u32>(buffer_size);
-        std::unique_ptr<u64> random_data_64 = random_array<u64>(buffer_size);
+        std::unique_ptr<u8> random_data_8   = createRandomArrayOfInts<u8>(buffer_size);
+        std::unique_ptr<u16> random_data_16 = createRandomArrayOfInts<u16>(buffer_size);
+        std::unique_ptr<u32> random_data_32 = createRandomArrayOfInts<u32>(buffer_size);
+        std::unique_ptr<u64> random_data_64 = createRandomArrayOfInts<u64>(buffer_size);
 
         std::array<u8, buffer_size> array_u8{};
         std::array<u8, buffer_size> array2_u8{};
