@@ -75,13 +75,13 @@ namespace cerb {
          * @return index of the value
          */
         template<typename T>
-        constexpr auto find(const T *location, u64 value) -> size_t
+        constexpr auto find(const T *location, u64 value, size_t limit) -> size_t
         {
             /* we can find only types, which can be stored in register */
             static_assert(CanBeStoredInIntegral<T>);
 
             u64 index_of_value = value;
-            size_t limit       = std::numeric_limits<u32>::max();
+            ++limit;
 
             if constexpr (sizeof(T) == sizeof(u8)) {
                 asm volatile("repnz scasb; sub %1, %0; mov %0, %3; dec %3;"
@@ -158,7 +158,7 @@ namespace cerb {
      * @return
      */
     template<typename T>
-    constexpr auto memset(T *dest, const T &value, size_t times) -> void
+    constexpr auto memset(T *dest, AutoCopyType<T> value, size_t times) -> void
     {
 #if CERBLIB_AMD64
         if constexpr (std::is_trivially_copy_assignable_v<T> && CanBeStoredInIntegral<T>) {
@@ -180,7 +180,7 @@ namespace cerb {
      * @return
      */
     template<Iterable T>
-    constexpr auto memset(T &dest, const typename T::value_type &value) -> void
+    constexpr auto memset(T &dest, AutoCopyType<typename T::value_type> value) -> void
     {
 #if CERBLIB_AMD64
         if constexpr (RawAccessible<T> && ClassValueFastCopiable<T> && CanBeStoredInIntegral<T>) {
@@ -235,7 +235,7 @@ namespace cerb {
         using value_type2 = typename U::value_type;
         static_assert(std::is_same_v<value_type, value_type2>);
 
-        const auto length = min(std::size(dest), std::size(src));
+        const auto length = min<typename T::size_type>(std::size(dest), std::size(src));
 
 #if CERBLIB_AMD64
         if constexpr (
@@ -264,7 +264,9 @@ namespace cerb {
      * @return
      */
     template<typename T>
-    constexpr auto find(const T *location, const T &value) -> size_t
+    constexpr auto find(
+        const T *location, cerb::AutoCopyType<T> value,
+        size_t limit = std::numeric_limits<u32>::max()) -> size_t
     {
 #if CERBLIB_AMD64
         if constexpr (CanBeStoredInIntegral<T>) {
@@ -276,17 +278,19 @@ namespace cerb {
                 ByteMask<T> mask{ value };
                 value2find = mask();
             }
-            return private_::find(location, value2find);
+            return private_::find(location, value2find, limit);
         }
 #endif
         const T *location_ptr = location;
 
         CERBLIB_UNROLL_N(4)
-        for (; *location != value; ++location) {
-            // empty block
+        for (; location != (location_ptr + limit); ++location) {
+            if (*location == value) {
+                return static_cast<size_t>(static_cast<ptrdiff_t>(location - location_ptr));
+            }
         }
 
-        return static_cast<size_t>(static_cast<ptrdiff_t>(location - location_ptr));
+        return limit;
     }
 
     /**
@@ -296,7 +300,7 @@ namespace cerb {
      * @return
      */
     template<CharacterLiteral CharT>
-    constexpr auto strlen(const CharT *str) -> size_t
+    CERBLIB_DECL auto strlen(const CharT *str) -> size_t
     {
         return find(str, static_cast<CharT>(0));
     }
@@ -309,9 +313,13 @@ namespace cerb {
      * @return true if they are equal, false otherwise
      */
     template<Iterable T>
-    constexpr auto equal(const T &lhs, const T &rhs) -> bool
+    CERBLIB_DECL auto cequal(const T &lhs, const T &rhs) -> bool
     {
-        auto length = min(std::size(lhs), std::size(rhs));
+        if (std::size(lhs) != std::size(rhs)) {
+            return false;
+        }
+
+        auto length = std::size(lhs);
 
 #if CERBLIB_AMD64
         if constexpr (RawAccessible<T> && CanBeStoredInIntegral<T>) {
@@ -324,8 +332,10 @@ namespace cerb {
         auto lhs_begin = lhs.cbegin();
         auto rhs_begin = rhs.cbegin();
 
+#ifndef __GNUC__
         CERBLIB_UNROLL_N(4)
-        for (size_t i = 0; i < length; ++i, ++lhs_begin, ++rhs_begin) {
+#endif
+        for (; lhs_begin != lhs.cend(); ++lhs_begin, ++rhs_begin) {
             if (*lhs_begin != *rhs_begin) {
                 return false;
             }
@@ -342,9 +352,9 @@ namespace cerb {
      * @return true if they are not equal, false otherwise
      */
     template<Iterable T>
-    constexpr auto not_equal(const T &lhs, const T &rhs) -> bool
+    constexpr auto not_cequal(const T &lhs, const T &rhs) -> bool
     {
-        return !equal<T>(lhs, rhs);
+        return !cequal<T>(lhs, rhs);
     }
 }// namespace cerb
 

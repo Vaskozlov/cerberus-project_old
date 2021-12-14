@@ -2,7 +2,7 @@
 #include <vector>
 
 namespace cerb::test {
-    auto pair_test() -> int
+    auto pairTest() -> int
     {
         {
             Pair<int, int> c_pair = cerb::make_pair(10, 10);
@@ -25,7 +25,6 @@ namespace cerb::test {
             EXPECT_FALSE(c_pair <= c_pair2);
             EXPECT_TRUE(c_pair != c_pair2);
         }
-
         {
             Pair<int, int, HowToComparePair::BY_FIRST_VALUE> c_pair = { 10, 10 };
 
@@ -69,6 +68,7 @@ namespace cerb::test {
             EXPECT_TRUE(c_pair <= pr2);
             EXPECT_TRUE(c_pair != pr2);
         }
+
         {
             const char *str = "Hello, World! It's a long string!";
 

@@ -12,16 +12,12 @@ namespace cerb {
         ANY
     };
 
-    namespace private_ {
-        using bitmap_value_type = uintmax_t;
-    }
-
     template<size_t AxisN, size_t BitN>
     struct ConstBitmap
     {
         static_assert(AxisN != 0);
 
-        using value_type       = private_::bitmap_value_type;
+        using value_type       = usize;
         using const_value_type = value_type;
         using pointer          = value_type *;
         using const_pointer    = const value_type *;

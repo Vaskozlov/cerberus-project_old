@@ -5,7 +5,7 @@
 #include <cerberus/bits.hpp>
 
 namespace cerb::test {
-    auto bit_test(u32 argc = 1U) -> int;
+    auto bitTest(u32 argc = 1U) -> int;
 }
 
 #endif /* CERBERUS_CATCH_BIT_HPP */

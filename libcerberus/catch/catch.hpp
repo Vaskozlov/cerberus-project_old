@@ -9,11 +9,11 @@
 #include <string_view>
 
 #define CERBLIB_LOCATION cerb::test::location(__FILE__, __LINE__)
-#define EXPECT_TRUE(value) expect_true(value, CERBLIB_LOCATION)
-#define EXPECT_FALSE(value) expect_false(value, CERBLIB_LOCATION)
+#define EXPECT_TRUE(value) expectTrue(value, CERBLIB_LOCATION)
+#define EXPECT_FALSE(value) expectFalse(value, CERBLIB_LOCATION)
 
 namespace cerb::test {
-    class constexpr_failure final : public std::exception
+    class constexpr_failure : public std::exception
     {
         std::string_view message;
 
@@ -65,7 +65,7 @@ namespace cerb::test {
         {}
     };
 
-    constexpr auto expect_true(bool condition, const location &loc = CERBLIB_LOCATION) -> void
+    constexpr auto expectTrue(bool condition, const location &loc = CERBLIB_LOCATION) -> void
     {
         if (!condition) {
             if (std::is_constant_evaluated()) {
@@ -79,7 +79,7 @@ namespace cerb::test {
         }
     }
 
-    constexpr auto expect_false(bool condition, const location &loc = CERBLIB_LOCATION) -> void
+    constexpr auto expectFalse(bool condition, const location &loc = CERBLIB_LOCATION) -> void
     {
         if (condition) {
             if (std::is_constant_evaluated()) {
@@ -93,8 +93,8 @@ namespace cerb::test {
         }
     }
 
-    template<typename T>
-    auto random_array(size_t size) -> std::unique_ptr<T>
+    template<std::integral T>
+    auto createRandomArrayOfInts(size_t size) -> std::unique_ptr<T>
     {
         static std::random_device random_device;
         static std::mt19937 engine(random_device());

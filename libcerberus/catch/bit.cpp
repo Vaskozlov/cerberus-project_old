@@ -17,8 +17,8 @@ namespace cerb::test {
 
     auto minMaxTest() -> void
     {
-        int v_min = min(10, -41, 14515, 0);
-        int v_max = max(10, -41, 14515, 0);
+        int v_min = min<int>(10, -41, 14515, 0);
+        int v_max = max<int>(10, -41, 14515, 0);
 
         EXPECT_TRUE(v_min == -41);
         EXPECT_TRUE(v_max == 14515);
@@ -48,15 +48,15 @@ namespace cerb::test {
         EXPECT_TRUE(pow2<u32>(10U) == 1024U);
         EXPECT_TRUE(pow2<u64>(54ULL) == (1ULL << 54ULL));
 
-        EXPECT_TRUE(equal(pow2<float>(0U), 1.0f));
-        EXPECT_TRUE(equal(pow2<float>(2U), 4.0f));
-        EXPECT_TRUE(equal(pow2<float>(10U), 1024.0f));
-        EXPECT_TRUE(equal(pow2<float>(54ULL), static_cast<float>((1ULL << 54ULL))));
+        EXPECT_TRUE(equal<f32>(pow2<f32>(0U), 1.0f));
+        EXPECT_TRUE(equal<f32>(pow2<f32>(2U), 4.0f));
+        EXPECT_TRUE(equal<f32>(pow2<f32>(10U), 1024.0f));
+        EXPECT_TRUE(equal<f32>(pow2<f32>(54ULL), static_cast<f32>((1ULL << 54ULL))));
 
-        EXPECT_TRUE(equal(pow2<double>(0U), 1.0));
-        EXPECT_TRUE(equal(pow2<double>(2U), 4.0));
-        EXPECT_TRUE(equal(pow2<double>(10U), 1024.0));
-        EXPECT_TRUE(equal(pow2<double>(54ULL), static_cast<double>((1ULL << 54ULL))));
+        EXPECT_TRUE(equal<f64>(pow2<f64>(0U), 1.0));
+        EXPECT_TRUE(equal<f64>(pow2<f64>(2U), 4.0));
+        EXPECT_TRUE(equal<f64>(pow2<f64>(10U), 1024.0));
+        EXPECT_TRUE(equal<f64>(pow2<f64>(54ULL), static_cast<f64>((1ULL << 54ULL))));
     }
 
     auto absTest() -> void
@@ -67,17 +67,17 @@ namespace cerb::test {
         EXPECT_TRUE(abs(-10) == 10);
         EXPECT_TRUE(abs(-10) == 10U);
 
-        EXPECT_TRUE(equal(abs(0.0f), 0.0f));
-        EXPECT_TRUE(equal(abs(10.0f), 10.0f));
+        EXPECT_TRUE(equal<f32>(abs(0.0f), 0.0f));
+        EXPECT_TRUE(equal<f32>(abs(10.0f), 10.0f));
 
-        EXPECT_TRUE(equal(abs(-0.0f), 0.0f));
-        EXPECT_TRUE(equal(abs(-10.0f), 10.0f));
+        EXPECT_TRUE(equal<f32>(abs(-0.0f), 0.0f));
+        EXPECT_TRUE(equal<f32>(abs(-10.0f), 10.0f));
 
-        EXPECT_TRUE(equal(abs(0.0f), 0.0f));
-        EXPECT_TRUE(equal(abs(10.0f), 10.0f));
+        EXPECT_TRUE(equal<f32>(abs(0.0f), 0.0f));
+        EXPECT_TRUE(equal<f32>(abs(10.0f), 10.0f));
 
-        EXPECT_TRUE(equal(abs(-0.0), 0.0));
-        EXPECT_TRUE(equal(abs(-10.0), 10.0));
+        EXPECT_TRUE(equal<f64>(abs(-0.0), 0.0));
+        EXPECT_TRUE(equal<f64>(abs(-10.0), 10.0));
     }
 
     auto findBitTest(u32 argc) -> void
@@ -142,7 +142,7 @@ namespace cerb::test {
         }());
     }
 
-    auto bit_test(u32 argc) -> int
+    auto bitTest(u32 argc) -> int
     {
         maskTest();
         minMaxTest();
