@@ -111,13 +111,6 @@ namespace cerb {
         }
     };
 
-    /**
-     * returns maximum argument
-     * @tparam T
-     * @param lhs
-     * @param rhs
-     * @return
-     */
     template<typename T, typename... Ts>
     CERBLIB_DECL auto max(AutoCopyType<T> lhs, Ts &&...args) -> T
     {
@@ -129,13 +122,6 @@ namespace cerb {
         }
     }
 
-    /**
-     * returns minimum argument
-     * @tparam T
-     * @param lhs
-     * @param rhs
-     * @return
-     */
     template<typename T, typename... Ts>
     CERBLIB_DECL auto min(AutoCopyType<T> lhs, Ts &&...args) -> T
     {
@@ -147,24 +133,12 @@ namespace cerb {
         }
     }
 
-    /**
-     * returns 2 in power of @powerOf2 (works with integrals and floating point numbers)
-     * @tparam T unsigned integral
-     * @param powerOf2 target power of 2
-     * @return
-     */
     template<std::unsigned_integral T, std::unsigned_integral PowerType>
     CERBLIB_DECL auto pow2(PowerType powerOf2) -> T
     {
         return static_cast<T>(1) << powerOf2;
     }
 
-    /**
-     * returns 2 in power of @powerOf2 (works with integrals and floating point numbers)
-     * @tparam T floating point number
-     * @param powerOf2 target power of 2
-     * @return
-     */
     template<std::floating_point T, std::unsigned_integral PowerType>
     CERBLIB_DECL auto pow2(PowerType powerOf2) -> T
     {
@@ -183,12 +157,6 @@ namespace cerb {
         return mask.value;
     }
 
-    /**
-     * Returns absolute value of integer.
-     * @tparam T some integer type
-     * @param value
-     * @return absolute value of @value
-     */
     template<std::integral T>
     CERBLIB_DECL auto abs(T value) -> T
     {
@@ -198,37 +166,28 @@ namespace cerb {
         return value < 0 ? -value : value;
     }
 
-    /**
-     * Returns absolute value of floating point number.
-     * @tparam T some floating point type
-     * @param value
-     * @return absolute value of @value
-     */
-    template<std::floating_point T>
-    CERBLIB_DECL auto abs(T value) -> T
+    CERBLIB_DECL auto abs(f32 value) -> f32
     {
-        static_assert(is_any_of_v<T, float, double>, "cerb::abs supports only floats and doubles.");
+        static_assert(sizeof(f32) == sizeof(u32));
 
-        ByteMask<T> mask{ value };
-
-        if constexpr (sizeof(T) == sizeof(u32)) {
-            mask.getAsInt() &= static_cast<u32>(std::numeric_limits<i32>::max());
-        } else if constexpr (sizeof(T) == sizeof(u64)) {
-            mask.getAsInt() &= static_cast<u64>(std::numeric_limits<i64>::max());
-        }
+        ByteMask mask{ value };
+        mask.getAsInt() &= static_cast<u32>(std::numeric_limits<i32>::max());
 
         return mask.value;
     }
 
-    /**
-     * Safely compare floating point numbers
-     * @tparam T
-     * @param lhs
-     * @param rhs
-     * @return
-     */
+    CERBLIB_DECL auto abs(f64 value) -> f64
+    {
+        static_assert(sizeof(f64) == sizeof(u64), "cerb::abs supports only floats and doubles.");
+
+        ByteMask mask{ value };
+        mask.getAsInt() &= static_cast<u64>(std::numeric_limits<i64>::max());
+
+        return mask.value;
+    }
+
     template<typename T>
-    CERBLIB_DECL auto equal(AutoCopyType<T> lhs, AutoCopyType<T> rhs) -> bool
+    CERBLIB_DECL auto safeEqual(AutoCopyType<T> lhs, AutoCopyType<T> rhs) -> bool
     {
         if constexpr (std::is_floating_point_v<T>) {
             return abs(lhs - rhs) <= std::numeric_limits<T>::epsilon();
@@ -237,15 +196,8 @@ namespace cerb {
         }
     }
 
-    /**
-     * Safely compare floating point numbers
-     * @tparam T
-     * @param lhs
-     * @param rhs
-     * @return
-     */
     template<typename T>
-    CERBLIB_DECL auto not_equal(T lhs, T rhs) -> bool
+    CERBLIB_DECL auto safeNotEqual(T lhs, T rhs) -> bool
     {
         if constexpr (std::is_floating_point_v<T>) {
             return abs(lhs - rhs) > std::numeric_limits<T>::epsilon();
@@ -436,49 +388,90 @@ namespace cerb {
 #endif
     }
 
-    /**
-     * Finds log2 for integer and floating point numbers (returning value is trunked to
-     * integer).
-     * @tparam T unsigned integer or floating point
-     * @param value
-     * @return
-     */
-    template<std::unsigned_integral T>
-    CERBLIB_DECL auto log2(T number) -> usize
+    CERBLIB_DECL auto log2(std::unsigned_integral auto number) -> usize
     {
         return bitScanForward<1>(number);
     }
 
-    /**
-     * Finds log2 for integer and floating point numbers (returning value is trunked to
-     * integer).
-     * @tparam T unsigned integer or floating point
-     * @param value
-     * @return
-     */
-    template<std::floating_point T>
-    CERBLIB_DECL auto log2(T number) -> isize
+    CERBLIB_DECL auto log2(f32 number) -> isize
     {
-        static_assert(is_any_of_v<T, f32, f64>, "cerb::log2 supports floats and doubles");
+        static_assert(sizeof(f32) == sizeof(u32), "cerb::log2 supports floats and doubles");
 
-        if (number <= static_cast<T>(0)) {
+        if (number <= 0.0f) {
             return -1;
         }
 
-        if constexpr (sizeof(T) == sizeof(f32)) {
-            const u32 mask                            = std::bit_cast<u32>(number);
-            constexpr i32 f32_exponent_bit            = 23;
-            constexpr i32 f32_exponent_for_zero_power = 0x7fU;
-            constexpr u32 f32_exponent_mask           = 0xFF80'0000;
-            return static_cast<isize>((mask & f32_exponent_mask) >> f32_exponent_bit) -
-                   f32_exponent_for_zero_power;
-        } else if constexpr (sizeof(T) == sizeof(f64)) {
-            const u64 mask                            = std::bit_cast<i64>(number);
-            constexpr i64 f64_exponent_bit            = 52;
-            constexpr i64 f64_exponent_for_zero_power = 0x3ffU;
-            constexpr u64 f64_exponent_mask           = 0xFFF0'0000'0000'0000;
-            return static_cast<isize>((mask & f64_exponent_mask) >> f64_exponent_bit) -
-                   f64_exponent_for_zero_power;
+        const u32 mask                            = std::bit_cast<u32>(number);
+        constexpr i32 f32_exponent_bit            = 23;
+        constexpr i32 f32_exponent_for_zero_power = 0x7fU;
+        constexpr u32 f32_exponent_mask           = 0xFF80'0000;
+        return static_cast<isize>((mask & f32_exponent_mask) >> f32_exponent_bit) -
+               f32_exponent_for_zero_power;
+    }
+
+    CERBLIB_DECL auto log2(f64 number) -> isize
+    {
+        const u64 mask                            = std::bit_cast<u64>(number);
+        constexpr i64 f64_exponent_bit            = 52;
+        constexpr i64 f64_exponent_for_zero_power = 0x3ffU;
+        constexpr u64 f64_exponent_mask           = 0xFFF0'0000'0000'0000;
+        return static_cast<isize>((mask & f64_exponent_mask) >> f64_exponent_bit) -
+               f64_exponent_for_zero_power;
+    }
+
+    /**
+     * Sets bit in the array of integers.
+     * @tparam BitValue value of bit to set.
+     * @tparam T type of numbers
+     * @param numbers location where we need to set bit.
+     * @param index index of the bit to set.
+     * @return
+     */
+    template<u16 BitValue, std::integral T>
+    constexpr auto setBitAt(T *numbers, size_t index) -> void
+    {
+        static_assert(BitValue == 0 || BitValue == 1, "Bit of value can be represented as 0 or 1");
+
+        auto arrayIndex = index / bitsizeof(T);
+        auto bitIndex   = index % bitsizeof(T);
+
+        if constexpr (BitValue == 0) {
+            numbers[arrayIndex] &= ~(static_cast<T>(1) << bitIndex);
+        } else {
+            numbers[arrayIndex] |= static_cast<T>(1) << bitIndex;
+        }
+    }
+
+    /**
+     * Sets bit in the number.
+     * @tparam BitValue  value of bit to set.
+     * @tparam T type of number
+     * @param number number where we need to set bit.
+     * @param index index of the bit to set.
+     * @return
+     */
+    template<u16 BitValue, std::integral T>
+    constexpr auto setBitAt(T &number, size_t index) -> decltype(auto)
+    {
+        return setBitAt<BitValue>(&number, index);
+    }
+
+    /**
+     * Sets bit in the array of integers.
+     * @tparam BitValue value of bit to set.
+     * @tparam T type of number
+     * @param array array where integers are stored.
+     * @param index index of the bit to set.
+     * @return
+     */
+    template<u16 BitValue, Iterable T>
+    constexpr auto setBitAt(T &array, size_t index) -> decltype(auto)
+    {
+        if constexpr (RawAccessible<T>) {
+            return setBitAt<BitValue>(std::data(array), index);
+        } else {
+            constexpr auto sizeOfType = bitsizeof(*array.begin());
+            return setBitAt<BitValue>(array.begin() + index / sizeOfType, index % sizeOfType);
         }
     }
 }// namespace cerb

@@ -21,18 +21,18 @@ namespace cerb {
         constexpr auto operator==(const Pairable auto &other) const -> bool
         {
             if constexpr (ComparisonRule == HowToComparePair::DEFAULT) {
-                return equal<T1>(first, other.first) && equal<T2>(second, other.second);
+                return safeEqual<T1>(first, other.first) && safeEqual<T2>(second, other.second);
             } else if constexpr (ComparisonRule == HowToComparePair::BY_FIRST_VALUE) {
-                return equal<T1>(first, other.first);
+                return safeEqual<T1>(first, other.first);
             } else {
-                return equal<T2>(second, other.second);
+                return safeEqual<T2>(second, other.second);
             }
         }
 
         constexpr auto operator<=>(const Pairable auto &other) const
         {
             if constexpr (ComparisonRule == HowToComparePair::DEFAULT) {
-                if (equal<T1>(first, other.first)) {
+                if (safeEqual<T1>(first, other.first)) {
                     return second <=> other.second;
                 }
                 return first <=> other.first;

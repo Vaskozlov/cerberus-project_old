@@ -165,14 +165,6 @@ namespace cerb {
 
     constexpr EmptyType empty{};
 
-    /**
-     * Calls function (if it is not cerb::EmptyType) with given arguments.
-     * @tparam F
-     * @tparam Ts
-     * @param function
-     * @param args
-     * @return
-     */
     template<typename F, typename... Ts>
     constexpr auto call(F &&function, Ts &&...args) -> decltype(auto)
     {
@@ -183,25 +175,12 @@ namespace cerb {
         }
     }
 
-    /**
-     * Allows you to get std::numeric_limits by value, not by type
-     * @tparam T
-     * @return std::numeric_limits<T>
-     */
     template<typename T>
     CERBLIB_DECL auto getLimit(const T & /*unused*/) -> std::numeric_limits<T>
     {
         return std::numeric_limits<T>();
     }
 
-    /**
-     * constexpr for loop
-     * @tparam Begin begin of iterator
-     * @tparam End end of iterator
-     * @tparam Inc this value will be added each iteration
-     * @param function function which will be called each iteration
-     * @return
-     */
     template<auto Begin, auto End, auto Inc>
     constexpr auto constexprFor(auto &&function) -> void
     {
@@ -219,7 +198,7 @@ namespace cerb {
      * @return
      */
     template<typename F, typename... Ts>
-    CERBLIB_DECL auto for_each(F &&function, Ts &&...args)
+    CERBLIB_DECL auto forEach(F &&function, Ts &&...args)
     {
         [[maybe_unused]] const auto iterator = { ([&function]<typename T>(T &&value) {
             call(std::forward<F>(function), std::forward<T>(value));
@@ -227,14 +206,6 @@ namespace cerb {
         })(std::forward<Ts>(args))... };
     }
 
-    /**
-     * short form of: condition ? on_true : on_false
-     * @tparam T
-     * @param condition
-     * @param on_true
-     * @param on_false
-     * @return
-     */
     template<typename T>
     constexpr auto cmov(bool condition, const T &on_true, const T &on_false) -> T
     {

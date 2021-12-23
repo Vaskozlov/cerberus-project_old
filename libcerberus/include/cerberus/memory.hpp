@@ -313,7 +313,7 @@ namespace cerb {
      * @return true if they are equal, false otherwise
      */
     template<Iterable T>
-    CERBLIB_DECL auto cequal(const T &lhs, const T &rhs) -> bool
+    CERBLIB_DECL auto areObjectsInClassEqual(const T &lhs, const T &rhs) -> bool
     {
         if (std::size(lhs) != std::size(rhs)) {
             return false;
@@ -322,7 +322,9 @@ namespace cerb {
         auto length = std::size(lhs);
 
 #if CERBLIB_AMD64
-        if constexpr (RawAccessible<T> && CanBeStoredInIntegral<T>) {
+        if constexpr (
+            RawAccessible<T> && CanBeStoredInIntegral<typename T::value_type> &&
+            std::is_trivially_copy_constructible_v<typename T::value_type>) {
             if (!std::is_constant_evaluated()) {
                 return private_::memcmp(std::data(lhs), std::data(rhs), length);
             }
@@ -352,9 +354,9 @@ namespace cerb {
      * @return true if they are not equal, false otherwise
      */
     template<Iterable T>
-    constexpr auto not_cequal(const T &lhs, const T &rhs) -> bool
+    constexpr auto areObjectsInClassNotEqual(const T &lhs, const T &rhs) -> bool
     {
-        return !cequal<T>(lhs, rhs);
+        return !areObjectsInClassEqual<T>(lhs, rhs);
     }
 }// namespace cerb
 

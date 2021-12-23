@@ -28,7 +28,7 @@ namespace cerb {
     {
         bool result = false;
 
-        for_each(
+        forEach(
             [&result, &target_value]<typename U>(const U &value) {
                 if constexpr (std::convertible_to<U, T>) {
                     result = result || (static_cast<T>(value) == target_value);
@@ -94,16 +94,16 @@ namespace cerb {
         }
 
         template<NotTrivial U>
-        CERBLIB_DECL static auto check() -> const U &
+        CERBLIB_DECL static auto check() -> U &
         {
             return *static_cast<const U *>(nullptr);
         }
 
-        using type = decltype(check<typename std::remove_reference<T>::type>());
+        using type = decltype(check<typename std::remove_reference_t<T>>());
     };
 
     template<typename T>
-    using AutoCopyType = typename GetType4Copy<T>::type;
+    using AutoCopyType = typename GetType4Copy<const T>::type;
 }// namespace cerb
 
 #endif /* LIBCERBERUS_TYPE_HPP */
