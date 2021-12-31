@@ -186,8 +186,8 @@ namespace cerb {
         return mask.value;
     }
 
-    template<typename T>
-    CERBLIB_DECL auto safeEqual(AutoCopyType<T> lhs, AutoCopyType<T> rhs) -> bool
+    template<std::equality_comparable T>
+    CERBLIB_DECL auto safeEqual(T lhs, T rhs) -> bool
     {
         if constexpr (std::is_floating_point_v<T>) {
             return abs(lhs - rhs) <= std::numeric_limits<T>::epsilon();
@@ -248,13 +248,6 @@ namespace cerb {
 
 #ifdef _MSC_VER
     namespace private_ {
-        /**
-         * Finds position of target bit in the number (right to left order)
-         * @tparam BitValue target bit. Must be 0 or 1.
-         * @tparam T unsigned integer
-         * @param value, where we need to find the position of target bit
-         * @return
-         */
         template<unsigned BitValue, std::unsigned_integral T>
         CERBLIB_DECL auto bitScanForward(T value) -> usize
         {
@@ -278,13 +271,6 @@ namespace cerb {
             return bitsizeof(usize);
         }
 
-        /**
-         * Finds position of target bit in the number (left to right order)
-         * @tparam BitValue target bit. Must be 0 or 1.
-         * @tparam T unsigned integer
-         * @param value, where we need to find the position of target bit
-         * @return
-         */
         template<unsigned BitValue, std::unsigned_integral T>
         CERBLIB_DECL auto bitScanReverse(T value) -> usize
         {
@@ -417,62 +403,6 @@ namespace cerb {
         constexpr u64 f64_exponent_mask           = 0xFFF0'0000'0000'0000;
         return static_cast<isize>((mask & f64_exponent_mask) >> f64_exponent_bit) -
                f64_exponent_for_zero_power;
-    }
-
-    /**
-     * Sets bit in the array of integers.
-     * @tparam BitValue value of bit to set.
-     * @tparam T type of numbers
-     * @param numbers location where we need to set bit.
-     * @param index index of the bit to set.
-     * @return
-     */
-    template<u16 BitValue, std::integral T>
-    constexpr auto setBitAt(T *numbers, size_t index) -> void
-    {
-        static_assert(BitValue == 0 || BitValue == 1, "Bit of value can be represented as 0 or 1");
-
-        auto arrayIndex = index / bitsizeof(T);
-        auto bitIndex   = index % bitsizeof(T);
-
-        if constexpr (BitValue == 0) {
-            numbers[arrayIndex] &= ~(static_cast<T>(1) << bitIndex);
-        } else {
-            numbers[arrayIndex] |= static_cast<T>(1) << bitIndex;
-        }
-    }
-
-    /**
-     * Sets bit in the number.
-     * @tparam BitValue  value of bit to set.
-     * @tparam T type of number
-     * @param number number where we need to set bit.
-     * @param index index of the bit to set.
-     * @return
-     */
-    template<u16 BitValue, std::integral T>
-    constexpr auto setBitAt(T &number, size_t index) -> decltype(auto)
-    {
-        return setBitAt<BitValue>(&number, index);
-    }
-
-    /**
-     * Sets bit in the array of integers.
-     * @tparam BitValue value of bit to set.
-     * @tparam T type of number
-     * @param array array where integers are stored.
-     * @param index index of the bit to set.
-     * @return
-     */
-    template<u16 BitValue, Iterable T>
-    constexpr auto setBitAt(T &array, size_t index) -> decltype(auto)
-    {
-        if constexpr (RawAccessible<T>) {
-            return setBitAt<BitValue>(std::data(array), index);
-        } else {
-            constexpr auto sizeOfType = bitsizeof(*array.begin());
-            return setBitAt<BitValue>(array.begin() + index / sizeOfType, index % sizeOfType);
-        }
     }
 }// namespace cerb
 

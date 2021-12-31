@@ -11,5 +11,11 @@ auto main() -> int
     cerb::test::bitTest();
     cerb::test::memoryTest();
     cerb::test::stringViewTest();
+
+    cerb::ConstBitmap<2, 512> bitmap{};
+    bitmap.clear();
+    bitmap.set<1>(10);
+    fmt::print("{}, {}\n", bitmap.at<0>(10), bitmap.at<0>(0));
+
     return 0;
 }

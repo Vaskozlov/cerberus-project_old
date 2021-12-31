@@ -15,7 +15,7 @@ namespace cerb::test {
         EXPECT_FALSE(str_view > standard_str_view);
         EXPECT_FALSE(str_view < standard_str_view);
 
-        EXPECT_TRUE(str_view.str_view() == standard_str_view);
+        EXPECT_TRUE(str_view.strView() == standard_str_view);
         EXPECT_TRUE(str_view.str() <= std::string(standard_str_view));
 
         EXPECT_TRUE(str_view.back() == standard_str_view.back());

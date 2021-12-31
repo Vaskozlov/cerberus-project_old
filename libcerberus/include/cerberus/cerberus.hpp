@@ -163,7 +163,7 @@ namespace cerb {
         }
     };
 
-    constexpr EmptyType empty{};
+    constexpr EmptyType Empty{};
 
     template<typename F, typename... Ts>
     constexpr auto call(F &&function, Ts &&...args) -> decltype(auto)

@@ -5,85 +5,82 @@ namespace cerb::test {
     auto pairTest() -> int
     {
         {
-            Pair<int, int> c_pair = cerb::make_pair(10, 10);
+            auto pair = cerb::makePair(10, 10);
 
-            EXPECT_TRUE(c_pair.first == 10 && c_pair.second == 10);
-            EXPECT_TRUE(c_pair == std::make_pair(10, 10));
+            EXPECT_TRUE(pair.first == 10 && pair.second == 10);
+            EXPECT_TRUE(pair == std::make_pair(10, 10));
 
-            const Pair<int, int> c_pair2 = c_pair;
+            const auto pair_2 = pair;
 
-            EXPECT_TRUE(c_pair == c_pair2);
+            EXPECT_TRUE(pair == pair_2);
 
-            c_pair.first += 10;
-            c_pair.second -= 5;
+            pair.first += 10;
+            pair.second -= 5;
 
-            EXPECT_FALSE(c_pair == c_pair2);
-            EXPECT_TRUE(c_pair.first == 20 && c_pair.second == 5);
-            EXPECT_TRUE(c_pair > c_pair2);
-            EXPECT_FALSE(c_pair < c_pair2);
-            EXPECT_TRUE(c_pair >= c_pair2);
-            EXPECT_FALSE(c_pair <= c_pair2);
-            EXPECT_TRUE(c_pair != c_pair2);
+            EXPECT_FALSE(pair == pair_2);
+            EXPECT_TRUE(pair.first == 20 && pair.second == 5);
+            EXPECT_TRUE(pair > pair_2);
+            EXPECT_FALSE(pair < pair_2);
+            EXPECT_TRUE(pair >= pair_2);
+            EXPECT_FALSE(pair <= pair_2);
+            EXPECT_TRUE(pair != pair_2);
         }
         {
-            Pair<int, int, HowToComparePair::BY_FIRST_VALUE> c_pair = { 10, 10 };
+            auto pair = makePair<HowToComparePair::BY_FIRST_VALUE>(10, 10);
 
-            EXPECT_TRUE(c_pair.first == 10 && c_pair.second == 10);
-            EXPECT_TRUE(c_pair == std::make_pair(10, 10));
+            EXPECT_TRUE(pair.first == 10 && pair.second == 10);
+            EXPECT_TRUE(pair == std::make_pair(10, 10));
 
-            const Pair<int, int, HowToComparePair::BY_FIRST_VALUE> c_pair2 = c_pair;
+            auto c_pair_2 = pair;
 
-            EXPECT_TRUE(c_pair == c_pair2);
+            EXPECT_TRUE(pair == c_pair_2);
 
-            c_pair.first -= 10;
-            c_pair.second += 5;
+            pair.first -= 10;
+            pair.second += 5;
 
-            EXPECT_FALSE(c_pair == c_pair2);
-            EXPECT_TRUE(c_pair.first == 0 && c_pair.second == 15);
-            EXPECT_FALSE(c_pair > c_pair2);
-            EXPECT_TRUE(c_pair < c_pair2);
-            EXPECT_FALSE(c_pair >= c_pair2);
-            EXPECT_TRUE(c_pair <= c_pair2);
-            EXPECT_TRUE(c_pair != c_pair2);
-        }
-
-        {
-            Pair<int, int, HowToComparePair::BY_SECOND_VALUE> c_pair = { 10, 10 };
-
-            EXPECT_TRUE(c_pair.first == 10 && c_pair.second == 10);
-            EXPECT_TRUE(c_pair == std::make_pair(10, 10));
-
-            const Pair<int, int, HowToComparePair::BY_SECOND_VALUE> pr2 = c_pair;
-
-            EXPECT_TRUE(c_pair == pr2);
-
-            c_pair.first += 10;
-            c_pair.second -= 50;
-
-            EXPECT_FALSE(c_pair == pr2);
-            EXPECT_TRUE(c_pair.first == 20 && c_pair.second == -40);
-            EXPECT_FALSE(c_pair > pr2);
-            EXPECT_TRUE(c_pair < pr2);
-            EXPECT_FALSE(c_pair >= pr2);
-            EXPECT_TRUE(c_pair <= pr2);
-            EXPECT_TRUE(c_pair != pr2);
+            EXPECT_FALSE(pair == c_pair_2);
+            EXPECT_TRUE(pair.first == 0 && pair.second == 15);
+            EXPECT_FALSE(pair > c_pair_2);
+            EXPECT_TRUE(pair < c_pair_2);
+            EXPECT_FALSE(pair >= c_pair_2);
+            EXPECT_TRUE(pair <= c_pair_2);
+            EXPECT_TRUE(pair != c_pair_2);
         }
 
         {
-            const char *str = "Hello, World! It's a long string!";
+            auto pair = makePair<HowToComparePair::BY_SECOND_VALUE>(10, 10);
 
-            const std::initializer_list<int> data = { 10, 20, 30, 40 };
+            EXPECT_TRUE(pair.first == 10 && pair.second == 10);
+            EXPECT_TRUE(pair == std::make_pair(10, 10));
 
-            Pair<std::string, std::vector<int>> c_pair = { str, data };
+            auto pair_2 = pair;
+
+            EXPECT_TRUE(pair == pair_2);
+
+            pair.first += 10;
+            pair.second -= 50;
+
+            EXPECT_FALSE(pair == pair_2);
+            EXPECT_TRUE(pair.first == 20 && pair.second == -40);
+            EXPECT_FALSE(pair > pair_2);
+            EXPECT_TRUE(pair < pair_2);
+            EXPECT_FALSE(pair >= pair_2);
+            EXPECT_TRUE(pair <= pair_2);
+            EXPECT_TRUE(pair != pair_2);
+        }
+
+        {
+            const char *str                            = "Hello, World! It's a long string!";
+            const std::initializer_list<int> data      = { 10, 20, 30, 40 };
+            Pair<std::string, std::vector<int>> pair   = { str, data };
+
+            EXPECT_TRUE(pair.first == std::string(str) && pair.second == std::vector<int>(data));
+
+            auto pair_2 = std::move(pair);
 
             EXPECT_TRUE(
-                c_pair.first == std::string(str) && c_pair.second == std::vector<int>(data));
-
-            Pair<std::string, std::vector<int>> c_pair2 = std::move(c_pair);
-
-            EXPECT_TRUE(
-                c_pair2.first == std::string(str) && c_pair2.second == std::vector<int>(data));
-            EXPECT_TRUE(c_pair.first.empty() && c_pair.second.empty());
+                pair_2.first == std::string(str) && pair_2.second == std::vector<int>(data));
+            EXPECT_TRUE(pair.first.empty() && pair.second.empty());
         }
 
         return 0;

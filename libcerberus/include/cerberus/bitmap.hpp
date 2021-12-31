@@ -2,16 +2,11 @@
 #define CERBERUS_BITMAP_HPP
 
 #include <array>
+#include <cerberus/bit_manipulation.hpp>
 #include <cerberus/memory.hpp>
 #include <memory>
 
 namespace cerb {
-    enum struct ValueOfBit
-    {
-        ONE,
-        ZERO,
-        ANY
-    };
 
     template<size_t AxisN, size_t BitN>
     struct ConstBitmap
@@ -30,7 +25,7 @@ namespace cerb {
         using storage_t      = std::array<axis_storage_t, AxisN>;
 
     private:
-        storage_t m_data{};
+        storage_t data{};
 
     public:
         CERBLIB_DECL auto size() const -> size_t
@@ -59,34 +54,34 @@ namespace cerb {
         }
 
         template<size_t Axis>
-        CERBLIB_DECL auto data() const -> pointer
+        CERBLIB_DECL auto getData() const -> pointer
         {
             static_assert(Axis <= AxisN);
-            return m_data[Axis].data();
+            return data[Axis].getData();
         }
 
         CERBLIB_DECL auto storage() const -> const storage_t &
         {
-            return m_data;
+            return data;
         }
 
         template<size_t Axis>
         CERBLIB_DECL auto storageOfAxis() const -> const axis_storage_t &
         {
             static_assert(Axis <= AxisN);
-            return m_data[Axis];
+            return data[Axis];
         }
 
         template<size_t Axis>
         constexpr auto clear() -> void
         {
             static_assert(Axis <= AxisN);
-            cerb::memset(m_data[Axis], static_cast<value_type>(0));
+            cerb::memset(data[Axis], static_cast<value_type>(0));
         }
 
         constexpr auto clear() -> void
         {
-            std::for_each(m_data.begin(), m_data.end(), [](axis_storage_t &axis_storage) {
+            std::for_each(data.begin(), data.end(), [](axis_storage_t &axis_storage) {
                 cerb::memset(axis_storage, static_cast<value_type>(0));
             });
         }
@@ -94,7 +89,15 @@ namespace cerb {
         template<u16 BitValue>
         constexpr auto set(size_t index) -> decltype(auto)
         {
-            return setBitAt<BitValue>(index);
+            return bit::set<BitValue>(data, index);
+        }
+
+        template<size_t Axis>
+        constexpr auto at(size_t index) const -> decltype(auto)
+        {
+            static_assert(Axis < AxisN);
+
+            return bit::at(data[Axis], index);
         }
 
         constexpr ConstBitmap() = default;

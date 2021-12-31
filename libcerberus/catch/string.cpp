@@ -5,9 +5,11 @@
 namespace cerb::test {
     auto stringTest(u32) -> int
     {
-        const std::string_view str                   = "hello, world!";
-        const std::u16string_view u16str             = u"hello, world!";
-        const std::wstring_view wide_string          = L"hello, world!";
+        using namespace std::string_view_literals;
+
+        const std::string_view str                   = "hello, world!"sv;
+        const std::u16string_view u16str             = u"hello, world!"sv;
+        const std::wstring_view wide_string          = L"hello, world!"sv;
         std::array array_of_integrals                = { -10, -20, 400, 14, 0, 123 };
         std::array<Pair<i32, i32>, 6> array_of_pairs = {
             { { -10, 10 }, { -20, 30 }, { 400, 400 }, { 14, 0 }, { 1, 0 }, { 123, 123 } }

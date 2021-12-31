@@ -8,7 +8,7 @@
 
 namespace cerb {
     template<CharacterLiteral CharT>
-    struct basic_string_view
+    struct BasicStringView
     {
         using size_type              = usize;
         using difference_type        = ptrdiff_t;
@@ -107,18 +107,18 @@ namespace cerb {
             return cerb::find(string + position, chr, length - position);
         }
 
-        CERBLIB_DECL auto str_view() const -> std::basic_string_view<CharT>
+        CERBLIB_DECL auto strView() const -> std::basic_string_view<CharT>
         {
             return { string, length };
         }
 
         CERBLIB_DECL auto str() const -> std::basic_string<CharT>
         {
-            return std::basic_string<CharT>(str_view());
+            return std::basic_string<CharT>(strView());
         }
 
         CERBLIB_DECL auto substr(size_t from, size_t size = std::numeric_limits<u32>::max()) const
-            -> basic_string_view
+            -> BasicStringView
         {
             return { cbegin() + from, max<size_t>(size, length - from) };
         }
@@ -127,18 +127,18 @@ namespace cerb {
         CERBLIB_DECL auto operator==(const T &other) const -> bool
         {
             static_assert(is_any_of_v<
-                          T, basic_string_view<CharT>, std::basic_string<CharT>,
+                          T, BasicStringView<CharT>, std::basic_string<CharT>,
                           std::basic_string_view<CharT>>);
 
             return cerb::areObjectsInClassEqual(
-                *this, basic_string_view<CharT>(std::data(other), std::size(other)));
+                *this, BasicStringView<CharT>(std::data(other), std::size(other)));
         }
 
         template<typename T>
         CERBLIB_DECL auto operator<=>(const T &other) const -> std::strong_ordering
         {
             static_assert(is_any_of_v<
-                          T, basic_string_view<CharT>, std::basic_string<CharT>,
+                          T, BasicStringView<CharT>, std::basic_string<CharT>,
                           std::basic_string_view<CharT>>);
 
             for (size_t i = 0; i < min<size_type>(this->length, std::size(other)); ++i) {
@@ -150,53 +150,53 @@ namespace cerb {
             return this->length <=> std::size(other);
         }
 
-        constexpr basic_string_view() = default;
+        constexpr BasicStringView() = default;
 
-        constexpr basic_string_view(const CharT *str) : length(strlen(str)), string(str)
+        constexpr BasicStringView(const CharT *str) : length(strlen(str)), string(str)
         {}
 
-        constexpr basic_string_view(const CharT *str, usize lengthOfString)
-          : length(lengthOfString), string(str)
+        constexpr BasicStringView(const CharT *str, usize length_of_string)
+          : length(length_of_string), string(str)
         {}
 
         template<unsigned long Size>
-        constexpr basic_string_view(const CharT (&str)[Size]) : length(Size), string(str)
+        constexpr BasicStringView(const CharT (&str)[Size]) : length(Size), string(str)
         {}
     };
 
-    using string_view    = cerb::basic_string_view<char>;
-    using u8string_view  = cerb::basic_string_view<char8_t>;
-    using u16string_view = cerb::basic_string_view<char16_t>;
-    using u32string_view = cerb::basic_string_view<char32_t>;
-    using wstring_view   = cerb::basic_string_view<wchar_t>;
+    using string_view    = cerb::BasicStringView<char>;
+    using u8string_view  = cerb::BasicStringView<char8_t>;
+    using u16string_view = cerb::BasicStringView<char16_t>;
+    using u32string_view = cerb::BasicStringView<char32_t>;
+    using wstring_view   = cerb::BasicStringView<wchar_t>;
 
     namespace string_view_literals {
         consteval auto operator""_sv(const char *string, size_t length)
-            -> cerb::basic_string_view<char>
+            -> cerb::BasicStringView<char>
         {
             return { string, length };
         }
 
         consteval auto operator""_sv(const char8_t *string, size_t length)
-            -> cerb::basic_string_view<char8_t>
+            -> cerb::BasicStringView<char8_t>
         {
             return { string, length };
         }
 
         consteval auto operator""_sv(const char16_t *string, size_t length)
-            -> cerb::basic_string_view<char16_t>
+            -> cerb::BasicStringView<char16_t>
         {
             return { string, length };
         }
 
         consteval auto operator""_sv(const char32_t *string, size_t length)
-            -> cerb::basic_string_view<char32_t>
+            -> cerb::BasicStringView<char32_t>
         {
             return { string, length };
         }
 
         consteval auto operator""_sv(const wchar_t *string, size_t length)
-            -> cerb::basic_string_view<wchar_t>
+            -> cerb::BasicStringView<wchar_t>
         {
             return { string, length };
         }
@@ -204,9 +204,9 @@ namespace cerb {
 }// namespace cerb
 
 template<typename OsType, cerb::CharacterLiteral CharT>
-auto operator<<(OsType &os, const cerb::basic_string_view<CharT> &string) -> OsType &
+auto operator<<(OsType &os, const cerb::BasicStringView<CharT> &string) -> OsType &
 {
-    return os << string.str_view();
+    return os << string.strView();
 }
 
 #endif /* CERBERUS_STRING_VIEW_HPP */
