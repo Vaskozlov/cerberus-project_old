@@ -16,7 +16,7 @@ jobs:
           fetch-depth: 50
       - name: Install dependencies, compiling and testing
         run: |
-          choco.exe install cmake
+          choco.exe -y install cmake
           cd scripts/windows
           ./install.bat
           cd ../..
