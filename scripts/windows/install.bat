@@ -22,7 +22,7 @@ cd ..\..\..\
 
 mkdir build
 
-powershell -Command "%cmake_dir%\cmake.exe\" -DCMAKE_BUILD_TYPE=Release -G 'Visual Studio 16 2019' -A x64 -S .. -DCMAKE_TOOLCHAIN_FILE=%CMAKE_TOOLCHAIN_FILE%"
+powershell -Command "%cmake_dir%\cmake.exe  " -DCMAKE_BUILD_TYPE=Release -G 'Visual Studio 16 2019' -A x64 -S .. -DCMAKE_TOOLCHAIN_FILE=%CMAKE_TOOLCHAIN_FILE%"
 
 echo "SUCCESS! Installation is completed"
 
