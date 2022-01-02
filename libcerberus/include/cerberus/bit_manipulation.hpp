@@ -19,7 +19,7 @@ namespace cerb::bit {
         ValueType result = std::numeric_limits<ValueType>::max();
 
         forEach(
-            [&array_iterator, &index_of_number](ValueOfBit bit_value){
+            [&array_iterator, &index_of_number, &result](ValueOfBit bit_value){
                 switch (bit_value) {
                 case ValueOfBit::ONE:
                     result &= (*array_iterator)[index_of_number];
