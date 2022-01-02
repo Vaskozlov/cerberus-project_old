@@ -12,7 +12,7 @@ namespace cerb::bit {
         ANY
     };
 
-    template<ValueOfBit... BitValues, std::unsigned_integral ValueType, typename T>
+    template<std::unsigned_integral ValueType, typename T, ValueOfBit... BitValues>
     CERBLIB_DECL auto applyMaskOnArray(size_t index_of_number, T array_iterator)
         -> ValueType
     {
