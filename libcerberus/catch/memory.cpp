@@ -47,7 +47,7 @@ namespace cerb::test {
         auto random_complex_data = std::unique_ptr<ComplexValue>(
             static_cast<ComplexValue *>(::operator new(size * sizeof(ComplexValue))));
 
-        for (i64 i = 0; i < size; ++i) {
+        for (usize i = 0; i < size; ++i) {
             random_complex_data.get()[i] = { isize_distribution(engine),
                                              static_cast<double>(isize_distribution(engine)) };
         }
