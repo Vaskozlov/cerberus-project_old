@@ -257,7 +257,7 @@ namespace cerb {
                 value = ~value;
             }
 
-            usize bit_index  = 0;
+            usize bit_index = 0;
             constexpr T mask = 0b1;
 
             CERBLIB_UNROLL_N(2)
@@ -281,7 +281,7 @@ namespace cerb {
                 value = ~value;
             }
 
-            usize bit_index  = bitsizeof(T) - 1;
+            usize bit_index = bitsizeof(T) - 1;
             constexpr T mask = static_cast<T>(1) << (bitsizeof(T) - 1);
 
             CERBLIB_UNROLL_N(2)
@@ -387,20 +387,20 @@ namespace cerb {
             return -1;
         }
 
-        const u32 mask                            = std::bit_cast<u32>(number);
-        constexpr i32 f32_exponent_bit            = 23;
+        const u32 mask = std::bit_cast<u32>(number);
+        constexpr i32 f32_exponent_bit = 23;
         constexpr i32 f32_exponent_for_zero_power = 0x7fU;
-        constexpr u32 f32_exponent_mask           = 0xFF80'0000;
+        constexpr u32 f32_exponent_mask = 0xFF80'0000;
         return static_cast<isize>((mask & f32_exponent_mask) >> f32_exponent_bit) -
                f32_exponent_for_zero_power;
     }
 
     CERBLIB_DECL auto log2(f64 number) -> isize
     {
-        const u64 mask                            = std::bit_cast<u64>(number);
-        constexpr i64 f64_exponent_bit            = 52;
+        const u64 mask = std::bit_cast<u64>(number);
+        constexpr i64 f64_exponent_bit = 52;
         constexpr i64 f64_exponent_for_zero_power = 0x3ffU;
-        constexpr u64 f64_exponent_mask           = 0xFFF0'0000'0000'0000;
+        constexpr u64 f64_exponent_mask = 0xFFF0'0000'0000'0000;
         return static_cast<isize>((mask & f64_exponent_mask) >> f64_exponent_bit) -
                f64_exponent_for_zero_power;
     }

@@ -6,7 +6,7 @@ namespace cerb::test {
     auto basicStringViewTestEqualStrings(u32 argc) -> void
     {
         std::string_view standard_str_view = "Hello, World!";
-        cerb::string_view str_view         = "Hello, World!";
+        cerb::string_view str_view = "Hello, World!";
 
         EXPECT_TRUE(str_view == standard_str_view);
         EXPECT_FALSE(str_view != standard_str_view);
@@ -47,7 +47,7 @@ namespace cerb::test {
     auto basicStringViewTestNotEqualStrings(u32) -> void
     {
         std::string_view standard_str_view = "It's a \"Hello, World!\" program";
-        cerb::string_view str_view         = "It's not a \"Hello, World!\" program";
+        cerb::string_view str_view = "It's not a \"Hello, World!\" program";
 
         EXPECT_FALSE(str_view == standard_str_view);
         EXPECT_TRUE(str_view != standard_str_view);

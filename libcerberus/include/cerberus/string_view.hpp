@@ -10,16 +10,16 @@ namespace cerb {
     template<CharacterLiteral CharT>
     struct BasicStringView
     {
-        using size_type              = usize;
-        using difference_type        = ptrdiff_t;
-        using value_type             = CharT;
-        using pointer                = value_type *;
-        using const_pointer          = const value_type *;
-        using reference              = value_type &;
-        using const_reference        = const value_type &;
-        using const_iterator         = const CharT *;
-        using iterator               = const_iterator;
-        using reverse_iterator       = std::reverse_iterator<iterator>;
+        using size_type = usize;
+        using difference_type = ptrdiff_t;
+        using value_type = CharT;
+        using pointer = value_type *;
+        using const_pointer = const value_type *;
+        using reference = value_type &;
+        using const_reference = const value_type &;
+        using const_iterator = const CharT *;
+        using iterator = const_iterator;
+        using reverse_iterator = std::reverse_iterator<iterator>;
         using const_reverse_iterator = std::reverse_iterator<const_iterator>;
 
     private:
@@ -164,11 +164,11 @@ namespace cerb {
         {}
     };
 
-    using string_view    = cerb::BasicStringView<char>;
-    using u8string_view  = cerb::BasicStringView<char8_t>;
+    using string_view = cerb::BasicStringView<char>;
+    using u8string_view = cerb::BasicStringView<char8_t>;
     using u16string_view = cerb::BasicStringView<char16_t>;
     using u32string_view = cerb::BasicStringView<char32_t>;
-    using wstring_view   = cerb::BasicStringView<wchar_t>;
+    using wstring_view = cerb::BasicStringView<wchar_t>;
 
     namespace string_view_literals {
         consteval auto operator""_sv(const char *string, size_t length)

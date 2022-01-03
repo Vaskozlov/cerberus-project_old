@@ -53,7 +53,7 @@ namespace cerb::test {
 
     struct ComplexValue
     {
-        i64 integral_value;
+        isize integral_value;
         double floating_point_value;
 
         CERBLIB_CLANG_DISABLE_WARNING("-Wfloat-equal")

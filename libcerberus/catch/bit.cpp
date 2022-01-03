@@ -2,9 +2,9 @@
 
 namespace cerb::test {
 
-    auto maskTest() -> void
+    auto byteMaskTest() -> void
     {
-        ByteMask<i64> mask{ 0 };
+        ByteMask mask{ 0ll };
         mask.mask_8[0] = 255;
         mask.mask_8[2] = 255;
 
@@ -22,7 +22,10 @@ namespace cerb::test {
 
         EXPECT_TRUE(v_min == -41);
         EXPECT_TRUE(v_max == 14515);
+    }
 
+    auto forEachTest() -> void
+    {
         int counter = 0;
 
         EXPECT_FALSE([&counter]() {
@@ -80,7 +83,7 @@ namespace cerb::test {
         EXPECT_TRUE(safeEqual<f64>(abs(-10.0), 10.0));
     }
 
-    auto findBitTest(u32 argc) -> void
+    auto bitScanTest(u32 argc) -> void
     {
         EXPECT_TRUE(bitScanForward<1>(0b1000U * argc) == 3);
         EXPECT_TRUE(bitScanForward<1>(0b1001U * argc) == 0);
@@ -108,7 +111,7 @@ namespace cerb::test {
         }());
     }
 
-    auto logTest(u32 argc) -> void
+    auto log2Test(u32 argc) -> void
     {
         EXPECT_TRUE(cerb::log2(8U * argc) == 3);
         EXPECT_TRUE(cerb::log2(1U * argc) == 0);
@@ -144,12 +147,13 @@ namespace cerb::test {
 
     auto bitTest(u32 argc) -> int
     {
-        maskTest();
+        byteMaskTest();
         minMaxTest();
         pow2Test();
+        forEachTest();
         absTest();
-        findBitTest(argc);
-        logTest(argc);
+        bitScanTest(argc);
+        log2Test(argc);
         return 0;
     }
 }// namespace cerb::test

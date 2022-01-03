@@ -231,7 +231,7 @@ namespace cerb {
     template<Iterable T, Iterable U>
     constexpr auto memcpy(T &dest, const U &src) -> void
     {
-        using value_type  = GetValueType<T>;
+        using value_type = GetValueType<T>;
         using value_type2 = GetValueType<U>;
         static_assert(std::is_same_v<value_type, value_type2>);
 
@@ -247,7 +247,7 @@ namespace cerb {
         }
 #endif
 
-        auto src_begin  = std::begin(src);
+        auto src_begin = std::begin(src);
         auto dest_begin = std::begin(dest);
 
         CERBLIB_UNROLL_N(4)

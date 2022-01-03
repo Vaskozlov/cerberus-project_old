@@ -45,7 +45,7 @@ namespace cerb {
 
         constexpr auto operator=(const Pairable auto &pair) -> Pair &
         {
-            first  = pair.first;
+            first = pair.first;
             second = pair.second;
             return *this;
         }
