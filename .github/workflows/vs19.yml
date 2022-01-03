@@ -25,4 +25,7 @@ jobs:
       - name: Build
         run: MSBuild.exe build/ALL_BUILD.vcxproj /property:Configuration=${{ matrix.config_type }} /property:Platform=${{ matrix.platform_type }}
       - name: Tests
-        run: C:\"Program Files"\CMake\bin\ctest.exe .\build
+        run: |
+          cd build
+          C:\"Program Files"\CMake\bin\ctest.exe
+          cd ..
