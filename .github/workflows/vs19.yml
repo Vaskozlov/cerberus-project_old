@@ -1,4 +1,4 @@
-name: VS2019
+name: VS2022
 
 on: [ pull_request ]
 jobs:
@@ -8,7 +8,7 @@ jobs:
       matrix:
         config_type: [ Release ]
         platform_type: [ x64 ]
-    name: VS2019 (${{ matrix.config_type }} ${{ matrix.platform_type }})
+    name: VS2022 (${{ matrix.config_type }} ${{ matrix.platform_type }})
     runs-on: windows-2022
     steps:
       - uses: actions/checkout@v2

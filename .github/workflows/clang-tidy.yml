@@ -14,7 +14,7 @@ jobs:
       - name: Install dependencies and clang-tidy
         run: |
           sudo apt-get update
-          sudo apt-get install -y libfmt-dev gettext clang-tidy-13 gcc-11 g++-11
+          sudo apt-get install -y libfmt-dev gettext clang-tidy-12 gcc-11 g++-11
       - name: Setup clang-tidy
         run: |
           sudo update-alternatives --install /usr/bin/clang-tidy clang-tidy /usr/bin/clang-tidy-12 200
