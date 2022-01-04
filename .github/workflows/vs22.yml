@@ -1,4 +1,4 @@
-name: VS2019
+name: VS2022
 
 on: [ pull_request ]
 jobs:
@@ -8,14 +8,15 @@ jobs:
       matrix:
         config_type: [ Release ]
         platform_type: [ x64 ]
-    name: VS2019 (${{ matrix.config_type }} ${{ matrix.platform_type }})
-    runs-on: windows-2019
+    name: VS2022 (${{ matrix.config_type }} ${{ matrix.platform_type }})
+    runs-on: windows-2022
     steps:
       - uses: actions/checkout@v2
         with:
           fetch-depth: 50
-      - name: Install dependencies, compiling and testing
+      - name: Install dependencies
         run: |
+          choco.exe install -y cmake
           cd scripts/windows
           ./install.bat
           cd ../..
@@ -23,4 +24,8 @@ jobs:
         uses: microsoft/setup-msbuild@v1.0.2
       - name: Build
         run: MSBuild.exe build/ALL_BUILD.vcxproj /property:Configuration=${{ matrix.config_type }} /property:Platform=${{ matrix.platform_type }}
-  
+      - name: Tests
+        run: |
+          cd build
+          C:\"Program Files"\CMake\bin\ctest.exe
+          cd ..

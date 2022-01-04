@@ -180,16 +180,16 @@ namespace cerb {
      * @return
      */
     template<Iterable T>
-    constexpr auto memset(T &dest, AutoCopyType<typename T::value_type> value) -> void
+    constexpr auto memset(T &dest, AutoCopyType<GetValueType<T>> value) -> void
     {
 #if CERBLIB_AMD64
         if constexpr (RawAccessible<T> && ClassValueFastCopiable<T> && CanBeStoredInIntegral<T>) {
             if (!std::is_constant_evaluated()) {
-                return private_::memset(dest.data(), value, dest.size());
+                return private_::memset(dest.getData(), value, dest.size());
             }
         }
 #endif
-        for (typename T::value_type &elem : dest) {
+        for (GetValueType<T> &elem : dest) {
             elem = value;
         }
     }
@@ -231,23 +231,23 @@ namespace cerb {
     template<Iterable T, Iterable U>
     constexpr auto memcpy(T &dest, const U &src) -> void
     {
-        using value_type  = typename T::value_type;
-        using value_type2 = typename U::value_type;
+        using value_type = GetValueType<T>;
+        using value_type2 = GetValueType<U>;
         static_assert(std::is_same_v<value_type, value_type2>);
 
-        const auto length = min<typename T::size_type>(std::size(dest), std::size(src));
+        const auto length = min<GetSizeType<T>>(std::size(dest), std::size(src));
 
 #if CERBLIB_AMD64
         if constexpr (
             RawAccessible<T> && RawAccessible<U> &&
             std::is_trivially_copy_assignable_v<value_type>) {
             if (!std::is_constant_evaluated()) {
-                return private_::memcpy(dest.data(), src.data(), length);
+                return private_::memcpy(dest.getData(), src.getData(), length);
             }
         }
 #endif
 
-        auto src_begin  = std::begin(src);
+        auto src_begin = std::begin(src);
         auto dest_begin = std::begin(dest);
 
         CERBLIB_UNROLL_N(4)
@@ -269,10 +269,10 @@ namespace cerb {
         size_t limit = std::numeric_limits<u32>::max()) -> size_t
     {
 #if CERBLIB_AMD64
-        if constexpr (CanBeStoredInIntegral<T>) {
+        if constexpr (CanBeStoredInIntegral<T> && std::is_trivially_copy_assignable_v<T>) {
             u64 value2find;
 
-            if constexpr (std::is_integral_v<T> && std::is_unsigned_v<T>) {
+            if constexpr (std::unsigned_integral<T>) {
                 value2find = value;
             } else {
                 ByteMask<T> mask{ value };
@@ -313,7 +313,7 @@ namespace cerb {
      * @return true if they are equal, false otherwise
      */
     template<Iterable T>
-    CERBLIB_DECL auto cequal(const T &lhs, const T &rhs) -> bool
+    CERBLIB_DECL auto areObjectsInClassEqual(const T &lhs, const T &rhs) -> bool
     {
         if (std::size(lhs) != std::size(rhs)) {
             return false;
@@ -322,7 +322,9 @@ namespace cerb {
         auto length = std::size(lhs);
 
 #if CERBLIB_AMD64
-        if constexpr (RawAccessible<T> && CanBeStoredInIntegral<T>) {
+        if constexpr (
+            RawAccessible<T> && CanBeStoredInIntegral<GetValueType<T>> &&
+            std::is_trivially_copy_constructible_v<GetValueType<T>>) {
             if (!std::is_constant_evaluated()) {
                 return private_::memcmp(std::data(lhs), std::data(rhs), length);
             }
@@ -352,9 +354,9 @@ namespace cerb {
      * @return true if they are not equal, false otherwise
      */
     template<Iterable T>
-    constexpr auto not_cequal(const T &lhs, const T &rhs) -> bool
+    constexpr auto areObjectsInClassNotEqual(const T &lhs, const T &rhs) -> bool
     {
-        return !cequal<T>(lhs, rhs);
+        return !areObjectsInClassEqual<T>(lhs, rhs);
     }
 }// namespace cerb
 

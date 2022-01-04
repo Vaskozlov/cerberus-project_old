@@ -2,9 +2,9 @@
 
 namespace cerb::test {
 
-    auto maskTest() -> void
+    auto byteMaskTest() -> void
     {
-        ByteMask<i64> mask{ 0 };
+        ByteMask mask{ 0ll };
         mask.mask_8[0] = 255;
         mask.mask_8[2] = 255;
 
@@ -22,11 +22,14 @@ namespace cerb::test {
 
         EXPECT_TRUE(v_min == -41);
         EXPECT_TRUE(v_max == 14515);
+    }
 
+    auto forEachTest() -> void
+    {
         int counter = 0;
 
         EXPECT_FALSE([&counter]() {
-            for_each(
+            forEach(
                 [&counter](const auto &elem) {
                     EXPECT_TRUE(elem == counter * 10);
                     ++counter;
@@ -48,15 +51,15 @@ namespace cerb::test {
         EXPECT_TRUE(pow2<u32>(10U) == 1024U);
         EXPECT_TRUE(pow2<u64>(54ULL) == (1ULL << 54ULL));
 
-        EXPECT_TRUE(equal<f32>(pow2<f32>(0U), 1.0f));
-        EXPECT_TRUE(equal<f32>(pow2<f32>(2U), 4.0f));
-        EXPECT_TRUE(equal<f32>(pow2<f32>(10U), 1024.0f));
-        EXPECT_TRUE(equal<f32>(pow2<f32>(54ULL), static_cast<f32>((1ULL << 54ULL))));
+        EXPECT_TRUE(safeEqual<f32>(pow2<f32>(0U), 1.0f));
+        EXPECT_TRUE(safeEqual<f32>(pow2<f32>(2U), 4.0f));
+        EXPECT_TRUE(safeEqual<f32>(pow2<f32>(10U), 1024.0f));
+        EXPECT_TRUE(safeEqual<f32>(pow2<f32>(54ULL), static_cast<f32>((1ULL << 54ULL))));
 
-        EXPECT_TRUE(equal<f64>(pow2<f64>(0U), 1.0));
-        EXPECT_TRUE(equal<f64>(pow2<f64>(2U), 4.0));
-        EXPECT_TRUE(equal<f64>(pow2<f64>(10U), 1024.0));
-        EXPECT_TRUE(equal<f64>(pow2<f64>(54ULL), static_cast<f64>((1ULL << 54ULL))));
+        EXPECT_TRUE(safeEqual<f64>(pow2<f64>(0U), 1.0));
+        EXPECT_TRUE(safeEqual<f64>(pow2<f64>(2U), 4.0));
+        EXPECT_TRUE(safeEqual<f64>(pow2<f64>(10U), 1024.0));
+        EXPECT_TRUE(safeEqual<f64>(pow2<f64>(54ULL), static_cast<f64>((1ULL << 54ULL))));
     }
 
     auto absTest() -> void
@@ -67,20 +70,20 @@ namespace cerb::test {
         EXPECT_TRUE(abs(-10) == 10);
         EXPECT_TRUE(abs(-10) == 10U);
 
-        EXPECT_TRUE(equal<f32>(abs(0.0f), 0.0f));
-        EXPECT_TRUE(equal<f32>(abs(10.0f), 10.0f));
+        EXPECT_TRUE(safeEqual<f32>(abs(0.0f), 0.0f));
+        EXPECT_TRUE(safeEqual<f32>(abs(10.0f), 10.0f));
 
-        EXPECT_TRUE(equal<f32>(abs(-0.0f), 0.0f));
-        EXPECT_TRUE(equal<f32>(abs(-10.0f), 10.0f));
+        EXPECT_TRUE(safeEqual<f32>(abs(-0.0f), 0.0f));
+        EXPECT_TRUE(safeEqual<f32>(abs(-10.0f), 10.0f));
 
-        EXPECT_TRUE(equal<f32>(abs(0.0f), 0.0f));
-        EXPECT_TRUE(equal<f32>(abs(10.0f), 10.0f));
+        EXPECT_TRUE(safeEqual<f32>(abs(0.0f), 0.0f));
+        EXPECT_TRUE(safeEqual<f32>(abs(10.0f), 10.0f));
 
-        EXPECT_TRUE(equal<f64>(abs(-0.0), 0.0));
-        EXPECT_TRUE(equal<f64>(abs(-10.0), 10.0));
+        EXPECT_TRUE(safeEqual<f64>(abs(-0.0), 0.0));
+        EXPECT_TRUE(safeEqual<f64>(abs(-10.0), 10.0));
     }
 
-    auto findBitTest(u32 argc) -> void
+    auto bitScanTest(u32 argc) -> void
     {
         EXPECT_TRUE(bitScanForward<1>(0b1000U * argc) == 3);
         EXPECT_TRUE(bitScanForward<1>(0b1001U * argc) == 0);
@@ -108,7 +111,7 @@ namespace cerb::test {
         }());
     }
 
-    auto logTest(u32 argc) -> void
+    auto log2Test(u32 argc) -> void
     {
         EXPECT_TRUE(cerb::log2(8U * argc) == 3);
         EXPECT_TRUE(cerb::log2(1U * argc) == 0);
@@ -144,12 +147,13 @@ namespace cerb::test {
 
     auto bitTest(u32 argc) -> int
     {
-        maskTest();
+        byteMaskTest();
         minMaxTest();
         pow2Test();
+        forEachTest();
         absTest();
-        findBitTest(argc);
-        logTest(argc);
+        bitScanTest(argc);
+        log2Test(argc);
         return 0;
     }
 }// namespace cerb::test

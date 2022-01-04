@@ -21,18 +21,18 @@ namespace cerb {
         constexpr auto operator==(const Pairable auto &other) const -> bool
         {
             if constexpr (ComparisonRule == HowToComparePair::DEFAULT) {
-                return equal<T1>(first, other.first) && equal<T2>(second, other.second);
+                return safeEqual<T1>(first, other.first) && safeEqual<T2>(second, other.second);
             } else if constexpr (ComparisonRule == HowToComparePair::BY_FIRST_VALUE) {
-                return equal<T1>(first, other.first);
+                return safeEqual<T1>(first, other.first);
             } else {
-                return equal<T2>(second, other.second);
+                return safeEqual<T2>(second, other.second);
             }
         }
 
         constexpr auto operator<=>(const Pairable auto &other) const
         {
             if constexpr (ComparisonRule == HowToComparePair::DEFAULT) {
-                if (equal<T1>(first, other.first)) {
+                if (safeEqual<T1>(first, other.first)) {
                     return second <=> other.second;
                 }
                 return first <=> other.first;
@@ -45,38 +45,55 @@ namespace cerb {
 
         constexpr auto operator=(const Pairable auto &pair) -> Pair &
         {
-            first  = pair.first;
+            first = pair.first;
             second = pair.second;
             return *this;
         }
 
         constexpr Pair() = default;
 
-        constexpr explicit Pair(const T1 &first_) : first(first_), second()
+        constexpr explicit Pair(const T1 &first_value) : first(first_value), second()
         {}
 
-        constexpr explicit Pair(T1 &&first_) noexcept : first(std::move(first_)), second()
+        constexpr explicit Pair(T1 &&first_value) noexcept : first(std::move(first_value)), second()
         {}
 
-        constexpr Pair(const T1 &first_, const T2 &second_) : first(first_), second(second_)
+        constexpr Pair(const T1 &first_value, const T2 &second_value)
+          : first(first_value), second(second_value)
         {}
 
-        constexpr Pair(T1 &&first_, T2 &&second_) noexcept
-          : first(std::move(first_)), second(std::move(second_))
+        constexpr Pair(T1 &&first_valuefirst, T2 &&second_value) noexcept
+          : first(std::move(first_valuefirst)), second(std::move(second_value))
         {}
 
         constexpr explicit Pair(const Pairable auto &pair) : first(pair.first), second(pair.second)
         {}
     };
 
+    template<HowToComparePair ComparisonRule = HowToComparePair::DEFAULT, Pairable T>
+    constexpr auto makePair(T &&pair) -> decltype(auto)
+    {
+        return cerb::Pair<decltype(pair.first), decltype(pair.second), ComparisonRule>{
+            std::move(pair.first), std::move(pair.second)
+        };
+    }
+
+    template<HowToComparePair ComparisonRule = HowToComparePair::DEFAULT, Pairable T>
+    constexpr auto makePair(const T &pair) -> decltype(auto)
+    {
+        return cerb::Pair<decltype(pair.first), decltype(pair.second), ComparisonRule>{
+            pair.first, pair.second
+        };
+    }
+
     template<HowToComparePair ComparisonRule = HowToComparePair::DEFAULT, typename T1, typename T2>
-    constexpr auto make_pair(T1 &&first, T2 &&second) -> Pair<T1, T2, ComparisonRule>
+    constexpr auto makePair(T1 &&first, T2 &&second) -> Pair<T1, T2, ComparisonRule>
     {
         return { std::forward<T1>(first), std::forward<T2>(second) };
     }
 
     template<HowToComparePair ComparisonRule = HowToComparePair::DEFAULT, typename T1, typename T2>
-    constexpr auto make_pair(const T1 &first, const T2 &second) -> Pair<T1, T2, ComparisonRule>
+    constexpr auto makePair(const T1 &first, const T2 &second) -> Pair<T1, T2, ComparisonRule>
     {
         return { first, second };
     }

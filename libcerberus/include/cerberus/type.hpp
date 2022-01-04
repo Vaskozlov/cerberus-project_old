@@ -28,7 +28,7 @@ namespace cerb {
     {
         bool result = false;
 
-        for_each(
+        forEach(
             [&result, &target_value]<typename U>(const U &value) {
                 if constexpr (std::convertible_to<U, T>) {
                     result = result || (static_cast<T>(value) == target_value);
@@ -52,7 +52,7 @@ namespace cerb {
     template<typename T>
     concept DataAccessible = requires(T value)
     {
-        value.data();
+        value.getData();
         value.size();
     };
 
@@ -63,8 +63,20 @@ namespace cerb {
     };
 
     template<typename T>
+    concept HasGotValueType = requires(T value)
+    {
+        typename T::value_type;
+    };
+
+    template<typename T>
+    concept HasGotSizeType = requires(T value)
+    {
+        typename T::size_type;
+    };
+
+    template<typename T>
     concept CanBeStoredInIntegral =
-        is_one_of(sizeof(T), sizeof(u8), sizeof(u16), sizeof(u32), sizeof(u64));
+        is_one_of(sizeof(T), sizeof(u8), sizeof(u16), sizeof(u32), sizeof(u64), sizeof(usize));
 
     template<typename T>
     concept Trivial = std::is_trivial_v<T> &&(sizeof(T) <= sizeof(usize) * 2);
@@ -80,8 +92,7 @@ namespace cerb {
     concept ClassValueFastCopiable = std::is_trivially_copy_assignable_v<typename T::value_type>;
 
     template<typename CharT>
-    concept CharacterLiteral =
-        !std::is_array_v<CharT> && std::is_trivial_v<CharT> && std::is_standard_layout_v<CharT> &&
+    concept CharacterLiteral = std::is_standard_layout_v<CharT> &&
         cerb::is_any_of_v<CharT, char, unsigned char, char8_t, char16_t, char32_t, wchar_t>;
 
     template<typename T>
@@ -94,16 +105,25 @@ namespace cerb {
         }
 
         template<NotTrivial U>
-        CERBLIB_DECL static auto check() -> const U &
+        CERBLIB_DECL static auto check() -> U &
         {
-            return *static_cast<const U *>(nullptr);
+            return *static_cast<U *>(nullptr);
         }
 
-        using type = decltype(check<typename std::remove_reference<T>::type>());
+        using type = decltype(check<typename std::remove_reference_t<T>>());
     };
 
     template<typename T>
-    using AutoCopyType = typename GetType4Copy<T>::type;
+    using AutoCopyType = typename GetType4Copy<const T>::type;
+
+    template<HasGotValueType T>
+    using GetValueType = typename T::value_type;
+
+    template<Iterable T>
+    using GetIteratorType = typename T::iterator;
+
+    template<HasGotSizeType T>
+    using GetSizeType = typename T::size_type;
 }// namespace cerb
 
 #endif /* LIBCERBERUS_TYPE_HPP */
