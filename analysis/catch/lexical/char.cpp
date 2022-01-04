@@ -1,4 +1,5 @@
 #include "char.hpp"
+#include <cerberus/lexical/char.hpp>
 
 namespace cerb::test {
     auto endOfInputTest() -> void

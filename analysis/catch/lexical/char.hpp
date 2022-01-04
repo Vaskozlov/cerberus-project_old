@@ -2,10 +2,8 @@
 #define CERBERUS_CATCH_CHAR_HPP
 
 #include <cerberus/catch.hpp>
-#include <cerberus/lexical/char.hpp>
 
-namespace cerb::test
-{
+namespace cerb::test {
     auto lexicalCharTest(u32 = 1) -> int;
 }
 

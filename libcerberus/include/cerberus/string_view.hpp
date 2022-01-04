@@ -123,24 +123,14 @@ namespace cerb {
             return { cbegin() + from, max<size_t>(size, length - from) };
         }
 
-        template<typename T>
-        CERBLIB_DECL auto operator==(const T &other) const -> bool
+        CERBLIB_DECL auto operator==(const BasicStringView &other) const -> bool
         {
-            static_assert(is_any_of_v<
-                          T, BasicStringView<CharT>, std::basic_string<CharT>,
-                          std::basic_string_view<CharT>>);
-
             return cerb::areObjectsInClassEqual(
                 *this, BasicStringView<CharT>(std::data(other), std::size(other)));
         }
 
-        template<typename T>
-        CERBLIB_DECL auto operator<=>(const T &other) const -> std::strong_ordering
+        CERBLIB_DECL auto operator<=>(const BasicStringView &other) const -> std::strong_ordering
         {
-            static_assert(is_any_of_v<
-                          T, BasicStringView<CharT>, std::basic_string<CharT>,
-                          std::basic_string_view<CharT>>);
-
             for (size_t i = 0; i < min<size_type>(this->length, std::size(other)); ++i) {
                 if (this->at(i) != other.at(i)) {
                     return this->at(i) <=> other.at(i);
