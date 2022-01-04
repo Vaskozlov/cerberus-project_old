@@ -21,7 +21,9 @@ namespace cerb::test {
         EXPECT_TRUE(manager.getLine() == 0);
         EXPECT_TRUE(manager.getCharacter() == 8);
 
-        while (manager.newChar() != '\n') {}
+        while (manager.newChar() != '\n') {
+            // empty statement
+        }
 
         EXPECT_TRUE(manager.skipLayoutAndGiveNewChar() == 'I');
         EXPECT_TRUE(manager.getLine() == 1);

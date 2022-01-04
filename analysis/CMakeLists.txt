@@ -13,13 +13,13 @@ file(
 )
 
 add_executable(
-        lexical_analysis_catch
+        analysis_catch
         ${ANALYSIS_CATCH_OBJ}
 )
 
 target_link_libraries(
-        lexical_analysis_catch
+        analysis_catch
         fmt::fmt
 )
 
-add_test(LIBCERBERUS_TEST analysis_catch)
+add_test(ANALYSIS_TEST analysis_catch)
