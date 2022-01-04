@@ -9,7 +9,7 @@ namespace cerb::test {
     constexpr u16 TestU16Value = 1024U;
     constexpr u32 TestU32Value = 1U << 31;
     constexpr u64 TestU64Value = static_cast<u64>(1U) << 51;
-    constexpr ComplexValue TestComplexValue = { -1515, 4019441.0 };
+    constexpr PairedNumbers TestComplexValue = { -1515, 4019441.0 };
 
     constexpr auto arrayStoresSameValues(const auto &array, auto expected_value) -> bool
     {
@@ -36,7 +36,7 @@ namespace cerb::test {
         EXPECT_TRUE(areObjectsInClassEqual(src, dest));
     }
 
-    auto generateRandomComplexData(usize size) -> std::unique_ptr<ComplexValue>
+    auto generateRandomComplexData(usize size) -> std::unique_ptr<PairedNumbers>
     {
         static std::random_device random_device;
         static std::mt19937 engine(random_device());
@@ -44,8 +44,8 @@ namespace cerb::test {
         static std::uniform_int_distribution<isize> isize_distribution(
             std::numeric_limits<isize>::min(), std::numeric_limits<isize>::max());
 
-        auto random_complex_data = std::unique_ptr<ComplexValue>(
-            static_cast<ComplexValue *>(::operator new(size * sizeof(ComplexValue))));
+        auto random_complex_data = std::unique_ptr<PairedNumbers>(
+            static_cast<PairedNumbers *>(::operator new(size * sizeof(PairedNumbers))));
 
         for (usize i = 0; i < size; ++i) {
             random_complex_data.get()[i] = { isize_distribution(engine),
@@ -61,13 +61,13 @@ namespace cerb::test {
         std::array<u16, 512> data_16{};
         std::array<u32, 512> data_32{};
         std::array<u64, 512> data_64{};
-        std::array<ComplexValue, 512> data_complex{};
+        std::array<PairedNumbers, 512> data_complex{};
 
         cerb::memset<u8>(data_8.data(), TestU8Value, 512);
         cerb::memset<u16>(data_16.data(), TestU16Value, 512);
         cerb::memset<u32>(data_32.data(), TestU32Value, 512);
         cerb::memset<u64>(data_64.data(), TestU64Value, 512);
-        cerb::memset<ComplexValue>(data_complex.data(), TestComplexValue, 512);
+        cerb::memset<PairedNumbers>(data_complex.data(), TestComplexValue, 512);
 
         std::array<i32, 512> array_32{};
         cerb::memset(array_32, CheckValueI32);
@@ -91,18 +91,18 @@ namespace cerb::test {
 
         std::array<i32, 512> array_32{};
         std::vector<std::string> vector_str;
-        std::vector<ComplexValue> complex_vector;
+        std::vector<PairedNumbers> complex_vector;
         std::array<std::string, complex_buffer_size> array_str;
 
-        auto data = std::unique_ptr<ComplexValue>(
-            static_cast<ComplexValue *>(::operator new(buffer_size * sizeof(ComplexValue))));
+        auto data = std::unique_ptr<PairedNumbers>(
+            static_cast<PairedNumbers *>(::operator new(buffer_size * sizeof(PairedNumbers))));
         auto *void_data = static_cast<void *>(data.get());
 
         auto data_8 = RawPointerWrapper<u8>(static_cast<u8 *>(void_data), buffer_size);
         auto data_16 = RawPointerWrapper<u16>(static_cast<u16 *>(void_data), buffer_size);
         auto data_32 = RawPointerWrapper<u32>(static_cast<u32 *>(void_data), buffer_size);
         auto data_64 = RawPointerWrapper<u64>(static_cast<u64 *>(void_data), buffer_size);
-        auto data_complex = RawPointerWrapper<ComplexValue>(data.get(), 512);
+        auto data_complex = RawPointerWrapper<PairedNumbers>(data.get(), 512);
 
         EXPECT_FALSE(const_result);
 
@@ -118,7 +118,7 @@ namespace cerb::test {
         cerb::memset<u64>(data_64.get(), TestU64Value, buffer_size);
         EXPECT_TRUE(arrayStoresSameValues(data_64, TestU64Value));
 
-        cerb::memset<ComplexValue>(data_complex.get(), TestComplexValue, buffer_size);
+        cerb::memset<PairedNumbers>(data_complex.get(), TestComplexValue, buffer_size);
         EXPECT_TRUE(arrayStoresSameValues(data_complex, TestComplexValue));
 
         cerb::memset(array_32, CheckValueI32);

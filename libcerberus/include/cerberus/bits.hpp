@@ -171,7 +171,12 @@ namespace cerb {
         static_assert(sizeof(f32) == sizeof(u32));
 
         ByteMask mask{ value };
-        mask.getAsInt() &= static_cast<u32>(std::numeric_limits<i32>::max());
+
+        if (std::is_constant_evaluated()) {
+            mask.value = -mask.value;
+        } else {
+            mask.getAsInt() &= static_cast<u32>(std::numeric_limits<i32>::max());
+        }
 
         return mask.value;
     }
@@ -181,7 +186,12 @@ namespace cerb {
         static_assert(sizeof(f64) == sizeof(u64), "cerb::abs supports only floats and doubles.");
 
         ByteMask mask{ value };
-        mask.getAsInt() &= static_cast<u64>(std::numeric_limits<i64>::max());
+
+        if (std::is_constant_evaluated()) {
+            mask.value = -mask.value;
+        } else {
+            mask.getAsInt() &= static_cast<u64>(std::numeric_limits<i64>::max());
+        }
 
         return mask.value;
     }

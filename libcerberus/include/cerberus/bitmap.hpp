@@ -54,7 +54,7 @@ namespace cerb {
 
         constexpr auto clear() -> void
         {
-            std::for_each(storage.begin(), storage.end(), [](axis_storage_t &axis_storage) {
+            std::ranges::for_each(storage, [](axis_storage_t &axis_storage) {
                 cerb::memset(axis_storage, static_cast<value_type>(0));
             });
         }

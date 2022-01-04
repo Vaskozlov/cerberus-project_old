@@ -183,13 +183,15 @@ namespace cerb {
     constexpr auto memset(T &dest, AutoCopyType<GetValueType<T>> value) -> void
     {
 #if CERBLIB_AMD64
-        if constexpr (RawAccessible<T> && ClassValueFastCopiable<T> && CanBeStoredInIntegral<T>) {
+        if constexpr (
+            RawAccessible<T> && ClassValueFastCopiable<T> &&
+            CanBeStoredInIntegral<GetValueType<T>>) {
             if (!std::is_constant_evaluated()) {
                 return private_::memset(dest.getData(), value, dest.size());
             }
         }
 #endif
-        for (GetValueType<T> &elem : dest) {
+        for (auto &elem : dest) {
             elem = value;
         }
     }
@@ -270,7 +272,7 @@ namespace cerb {
     {
 #if CERBLIB_AMD64
         if constexpr (CanBeStoredInIntegral<T> && std::is_trivially_copy_assignable_v<T>) {
-            u64 value2find;
+            usize value2find;
 
             if constexpr (std::unsigned_integral<T>) {
                 value2find = value;
