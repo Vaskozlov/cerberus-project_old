@@ -120,6 +120,7 @@
 #include <limits>
 #include <type_traits>
 #include <utility>
+#include <string_view>
 
 namespace cerb {
     using u8 = uint8_t;
