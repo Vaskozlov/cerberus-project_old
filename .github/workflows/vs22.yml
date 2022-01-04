@@ -27,5 +27,5 @@ jobs:
       - name: Tests
         run: |
           cd build
-          C:\"Program Files"\CMake\bin\ctest.exe
+          C:\"Program Files"\CMake\bin\ctest.exe --rerun-failed --output-on-failure
           cd ..

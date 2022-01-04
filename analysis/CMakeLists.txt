@@ -22,4 +22,4 @@ target_link_libraries(
         fmt::fmt
 )
 
-add_test(LIBCERBERUS_TEST catch)
+add_test(LIBCERBERUS_TEST analysis_catch)
