@@ -140,7 +140,7 @@ namespace cerb {
                           T, BasicStringView<CharT>, std::basic_string<CharT>,
                           std::basic_string_view<CharT>>);
 
-            return cerb::areObjectsInClassEqual(
+            return std::ranges::equal(
                 *this, BasicStringView<CharT>(std::data(other), std::size(other)));
         }
 

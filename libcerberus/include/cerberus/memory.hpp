@@ -167,9 +167,7 @@ namespace cerb {
             }
         }
 #endif
-        for (const T *end_of_dest = dest + times; dest != end_of_dest; ++dest) {
-            *dest = value;
-        }
+        std::fill(dest, dest + times, value);
     }
 
     /**
@@ -191,9 +189,7 @@ namespace cerb {
             }
         }
 #endif
-        for (auto &elem : dest) {
-            elem = value;
-        }
+        std::ranges::fill(dest, value);
     }
 
     /**
@@ -305,60 +301,6 @@ namespace cerb {
     CERBLIB_DECL auto strlen(const CharT *str) -> size_t
     {
         return find(str, static_cast<CharT>(0));
-    }
-
-    /**
-     * Compares two classes/structs
-     * @tparam T iterable type
-     * @param lhs first class/struct
-     * @param rhs second class/struct
-     * @return true if they are equal, false otherwise
-     */
-    template<Iterable T>
-    CERBLIB_DECL auto areObjectsInClassEqual(const T &lhs, const T &rhs) -> bool
-    {
-        if (std::size(lhs) != std::size(rhs)) {
-            return false;
-        }
-
-        auto length = std::size(lhs);
-
-#if CERBLIB_AMD64
-        if constexpr (
-            RawAccessible<T> && CanBeStoredInIntegral<GetValueType<T>> &&
-            std::is_trivially_copy_constructible_v<GetValueType<T>>) {
-            if (!std::is_constant_evaluated()) {
-                return private_::memcmp(std::data(lhs), std::data(rhs), length);
-            }
-        }
-#endif
-
-        auto lhs_begin = lhs.cbegin();
-        auto rhs_begin = rhs.cbegin();
-
-#ifndef __GNUC__
-        CERBLIB_UNROLL_N(4)
-#endif
-        for (; lhs_begin != lhs.cend(); ++lhs_begin, ++rhs_begin) {
-            if (*lhs_begin != *rhs_begin) {
-                return false;
-            }
-        }
-
-        return true;
-    }
-
-    /**
-     * Compares two classes/structs
-     * @tparam T iterable type
-     * @param lhs first class/struct
-     * @param rhs second class/struct
-     * @return true if they are not equal, false otherwise
-     */
-    template<Iterable T>
-    constexpr auto areObjectsInClassNotEqual(const T &lhs, const T &rhs) -> bool
-    {
-        return !areObjectsInClassEqual<T>(lhs, rhs);
     }
 }// namespace cerb
 

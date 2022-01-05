@@ -1,4 +1,5 @@
 #include "memory.hpp"
+#include <algorithm>
 #include <cerberus/pointer_wrapper.hpp>
 #include <vector>
 
@@ -29,11 +30,12 @@ namespace cerb::test {
         std::array<T, ArraySize> dest{};
 
         memcpy(src.data(), random_data, ArraySize);
-        EXPECT_TRUE(areObjectsInClassEqual<RawPointerWrapper<T>>(
-            { src.data(), ArraySize }, { random_data, ArraySize }));
+        EXPECT_TRUE(std::ranges::equal(
+            RawPointerWrapper<T>{ src.data(), ArraySize },
+            RawPointerWrapper<T>{ random_data, ArraySize }));
 
         memcpy(dest, src);
-        EXPECT_TRUE(areObjectsInClassEqual(src, dest));
+        EXPECT_TRUE(std::ranges::equal(src, dest));
     }
 
     auto generateRandomComplexData(usize size) -> std::unique_ptr<PairedNumbers>
