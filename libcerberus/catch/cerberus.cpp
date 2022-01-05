@@ -3,8 +3,8 @@
 #include "memory.hpp"
 #include "pair.hpp"
 #include "pointer_wrapper.hpp"
-#include "string_view.hpp"
 #include "string_pool.hpp"
+#include "string_view.hpp"
 
 auto main() -> int
 {

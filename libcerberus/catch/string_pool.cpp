@@ -11,7 +11,7 @@ namespace cerb::test {
         EXPECT_TRUE(string_pool.at("World") == 1);
         EXPECT_FALSE(string_pool.contains("Test"));
 
-        string_pool.emplace("Test", 3);
+        string_pool.try_emplace("Test", 3);
         EXPECT_TRUE(string_pool.contains("Test"));
         EXPECT_TRUE(string_pool.at("Test") == 3);
 

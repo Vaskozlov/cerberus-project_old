@@ -118,9 +118,9 @@
 #include <cinttypes>
 #include <cstddef>
 #include <limits>
+#include <string_view>
 #include <type_traits>
 #include <utility>
-#include <string_view>
 
 namespace cerb {
     using u8 = uint8_t;

@@ -3,8 +3,7 @@
 
 #include <cerberus/catch.hpp>
 
-namespace cerb::test
-{
+namespace cerb::test {
     auto stringPoolTest() -> int;
 }
 

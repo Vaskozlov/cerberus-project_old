@@ -88,10 +88,9 @@ namespace cerb {
             return tabs_and_spaces;
         }
 
-        CERBLIB_DECL auto getCurrentLine() const -> BasicStringView<CharT>
+        CERBLIB_DECL auto getCurrentLine() const -> BasicStringView<CharT> const &
         {
-            auto length = static_cast<ptrdiff_t>(data.end() - begin_of_the_line);
-            return {begin_of_the_line, find(begin_of_the_line, '\n', length)};
+            return current_line;
         }
 
         CERBLIB_DECL auto skipLayoutAndGiveNewChar() -> CharT
@@ -147,10 +146,19 @@ namespace cerb {
         }
 
     private:
+        constexpr auto setCurrentLine() -> void
+        {
+            auto begin_of_the_line = data.begin() + location.getOffset();
+            auto length = static_cast<ptrdiff_t>(data.end() - begin_of_the_line);
+
+            current_line = { begin_of_the_line,
+                             find(begin_of_the_line, '\n', static_cast<usize>(length)) };
+        }
+
         constexpr auto newLine() -> void
         {
             location.newLine();
-            begin_of_the_line = data.begin() + location.getOffset();
+            setCurrentLine();
         }
 
         constexpr auto clearTabsAndSpacesIfNeeded() -> void
@@ -165,15 +173,18 @@ namespace cerb {
 
     public:
         constexpr TextGenerator() = default;
-        constexpr TextGenerator(const LocationInFile &current_location, BasicStringView<CharT> content)
-          : location(current_location), data(content), begin_of_the_line(content.begin())
-        {}
+        constexpr TextGenerator(
+            const LocationInFile &current_location, BasicStringView<CharT> content)
+          : location(current_location), data(content)
+        {
+            setCurrentLine();
+        }
 
     private:
         LocationInFile location{};
         BasicStringView<CharT> data{};
         std::basic_string<CharT> tabs_and_spaces{};
-        GetIteratorType<BasicStringView<CharT>> begin_of_the_line{};
+        BasicStringView<CharT> current_line{};
     };
 }// namespace cerb
 
