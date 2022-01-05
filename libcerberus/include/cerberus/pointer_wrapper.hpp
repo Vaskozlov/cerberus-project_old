@@ -5,11 +5,9 @@
 #include <cerberus/type.hpp>
 
 namespace cerb {
-    template<typename T, typename ValueType>
-    struct PointerWrapper
+    template<typename T>
+    struct RawPointerWrapper
     {
-        using value_type = ValueType;
-
         CERBLIB_DECL auto operator*() -> decltype(auto)
         {
             return *pointer;
@@ -20,12 +18,12 @@ namespace cerb {
             return *pointer;
         }
 
-        CERBLIB_DECL auto operator->() -> T
+        CERBLIB_DECL auto operator->() -> T *
         {
             return pointer;
         }
 
-        CERBLIB_DECL auto operator->() const -> T
+        CERBLIB_DECL auto operator->() const -> T *
         {
             return pointer;
         }
@@ -35,7 +33,7 @@ namespace cerb {
             return length;
         }
 
-        CERBLIB_DECL auto get() const -> T
+        CERBLIB_DECL auto get() const -> T *
         {
             return pointer;
         }
@@ -46,12 +44,12 @@ namespace cerb {
             return static_cast<U *>(pointer);
         }
 
-        CERBLIB_DECL auto operator==(const PointerWrapper &other) -> bool
+        CERBLIB_DECL auto operator==(const RawPointerWrapper &other) -> bool
         {
             return areObjectsInClassEqual(*this, other);
         }
 
-        CERBLIB_DECL auto operator<=>(const PointerWrapper &other) -> decltype(auto)
+        CERBLIB_DECL auto operator<=>(const RawPointerWrapper &other) -> decltype(auto)
         {
             for (size_t i = 0; i < min<size_t>(size(), other.size()); ++i) {
                 if (*(pointer + i) != *(other.pointer + i)) {
@@ -62,96 +60,26 @@ namespace cerb {
             return size() <=> other.size();
         }
 
-        struct iterator
+        using reverse_iterator = std::reverse_iterator<T *>;
+
+        CERBLIB_DECL auto begin() const -> T *
         {
-            using iterator_category = std::contiguous_iterator_tag;
-
-            CERBLIB_DECL auto operator*() -> decltype(auto)
-            {
-                return *pointer;
-            }
-
-            CERBLIB_DECL auto operator*() const -> decltype(auto)
-            {
-                return *pointer;
-            }
-
-            CERBLIB_DECL auto operator->() -> T
-            {
-                return pointer;
-            }
-
-            CERBLIB_DECL auto operator->() const -> T
-            {
-                return pointer;
-            }
-
-            CERBLIB_DECL auto operator+(const iterator &other) const -> iterator
-            {
-                return iterator(pointer + other.pointer);
-            }
-
-            CERBLIB_DECL auto operator-(const iterator &other) const -> iterator
-            {
-                return iterator(pointer - other.pointer);
-            }
-
-            constexpr auto operator++() -> iterator &
-            {
-                ++pointer;
-                return *this;
-            }
-
-            constexpr auto operator++(int) -> iterator
-            {
-                iterator copy_of_iterator = *this;
-                ++pointer;
-                return copy_of_iterator;
-            }
-
-            constexpr auto operator--() -> iterator &
-            {
-                --pointer;
-                return *this;
-            }
-
-            constexpr auto operator--(int) -> iterator
-            {
-                iterator copy_of_iterator = *this;
-                --pointer;
-                return copy_of_iterator;
-            }
-
-            CERBLIB_DECL auto operator<=>(const iterator &) const = default;
-
-            constexpr iterator() = default;
-            explicit constexpr iterator(T ptr) : pointer(ptr)
-            {}
-
-        private:
-            T pointer{};
-        };
-
-        using reverse_iterator = std::reverse_iterator<iterator>;
-
-        CERBLIB_DECL auto begin() const -> iterator
-        {
-            return iterator(pointer);
+            return pointer;
         }
 
-        CERBLIB_DECL auto end() const -> iterator
+        CERBLIB_DECL auto end() const -> T *
         {
-            return iterator(pointer + length);
+            return pointer + length;
         }
 
-        CERBLIB_DECL auto cbegin() const -> iterator
+        CERBLIB_DECL auto cbegin() const -> T *
         {
-            return iterator(pointer);
+            return pointer;
         }
 
-        CERBLIB_DECL auto cend() const -> iterator
+        CERBLIB_DECL auto cend() const -> T *
         {
-            return iterator(pointer + length);
+            return pointer + length;
         }
 
         CERBLIB_DECL auto rbegin() const -> reverse_iterator
@@ -190,17 +118,14 @@ namespace cerb {
             length = len;
         }
 
-        constexpr PointerWrapper() = default;
-        constexpr PointerWrapper(T ptr, size_t len) : pointer(ptr), length(len)
+        constexpr RawPointerWrapper() = default;
+        constexpr RawPointerWrapper(T *ptr, size_t len) : pointer(ptr), length(len)
         {}
 
     private:
-        T pointer{};
+        T *pointer{};
         size_t length{};
     };
-
-    template<typename T>
-    using RawPointerWrapper = PointerWrapper<T *, T>;
 }// namespace cerb
 
 #endif /* CERBERUS_POINTER_WRAPPER_HPP */
