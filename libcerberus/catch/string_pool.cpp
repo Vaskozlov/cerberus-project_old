@@ -7,13 +7,13 @@ namespace cerb::test {
         StringPool<char, unsigned> string_pool({ { "Hello", 0 }, { "World", 1 } });
 
         EXPECT_TRUE(string_pool.contains("Hello"));
-        EXPECT_TRUE(string_pool.getTokenOfString("Hello") == 0);
-        EXPECT_TRUE(string_pool.getTokenOfString("World") == 1);
+        EXPECT_TRUE(string_pool.at("Hello") == 0);
+        EXPECT_TRUE(string_pool.at("World") == 1);
         EXPECT_FALSE(string_pool.contains("Test"));
 
-        string_pool.addString({ "Test", 3 });
+        string_pool.emplace("Test", 3);
         EXPECT_TRUE(string_pool.contains("Test"));
-        EXPECT_TRUE(string_pool.getTokenOfString("Test") == 3);
+        EXPECT_TRUE(string_pool.at("Test") == 3);
 
         return 0;
     }
