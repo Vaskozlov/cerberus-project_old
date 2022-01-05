@@ -3,18 +3,18 @@ include_directories(libcerberus/include)
 
 file(
         GLOB_RECURSE
-        CATCH_OBJS
+        LIBRARY_CATCH_OBJS
         "libcerberus/catch/*.cpp"
 )
 
 add_executable(
-        catch
-        ${CATCH_OBJS}
+        library_catch
+        ${LIBRARY_CATCH_OBJS}
 )
 
 target_link_libraries(
-        catch
+        library_catch
         fmt::fmt
 )
 
-add_test(LIBCERBERUS_TEST catch)
+add_test(LIBCERBERUS_TEST library_catch)

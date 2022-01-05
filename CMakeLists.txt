@@ -10,3 +10,4 @@ message(STATUS "CXX " ${CMAKE_CXX_COMPILER})
 message(STATUS "Strict compilation? " ${CERBERUS_STRICT_COMPILATION})
 
 include(libcerberus/CMakeLists.txt)
+include(analysis/CMakeLists.txt)

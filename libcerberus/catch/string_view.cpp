@@ -61,10 +61,20 @@ namespace cerb::test {
         EXPECT_TRUE(str_view.find('!') != standard_str_view.find('!'));
     }
 
+    auto basicStringViewContainsAtTest(u32) -> void
+    {
+        cerb::string_view str = "Hello, World!";
+        EXPECT_TRUE(str.containsAt(0, "Hello"));
+        EXPECT_TRUE(str.containsAt(7, "World!"));
+        EXPECT_FALSE(str.containsAt(7, "World!!"));
+        EXPECT_FALSE(str.containsAt(0, "World!"));
+    }
+
     auto stringViewTest(u32 argc) -> int
     {
         basicStringViewTestEqualStrings(argc);
         basicStringViewTestNotEqualStrings(argc);
+        basicStringViewContainsAtTest(argc);
         return 0;
     }
 }// namespace cerb::test

@@ -1,7 +1,7 @@
 #ifndef CERBERUS_CATCH_STRING_VIEW_HPP
 #define CERBERUS_CATCH_STRING_VIEW_HPP
 
-#include "catch.hpp"
+#include <cerberus/catch.hpp>
 #include <cerberus/string_view.hpp>
 
 namespace cerb::test {

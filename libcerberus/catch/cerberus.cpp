@@ -3,6 +3,7 @@
 #include "memory.hpp"
 #include "pair.hpp"
 #include "pointer_wrapper.hpp"
+#include "string_pool.hpp"
 #include "string_view.hpp"
 
 auto main() -> int
@@ -15,6 +16,7 @@ auto main() -> int
     stringViewTest();
     pointerWrapperTest();
     bitmapTest();
+    stringPoolTest();
 
     return 0;
 }

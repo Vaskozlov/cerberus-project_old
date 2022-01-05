@@ -40,6 +40,12 @@ namespace cerb {
             return pointer;
         }
 
+        template<typename U>
+        CERBLIB_DECL explicit operator U *() const
+        {
+            return static_cast<U *>(pointer);
+        }
+
         CERBLIB_DECL auto operator==(const PointerWrapper &other) -> bool
         {
             return areObjectsInClassEqual(*this, other);
@@ -119,7 +125,7 @@ namespace cerb {
             CERBLIB_DECL auto operator<=>(const iterator &) const = default;
 
             constexpr iterator() = default;
-            constexpr iterator(T ptr) : pointer(ptr)
+            explicit constexpr iterator(T ptr) : pointer(ptr)
             {}
 
         private:

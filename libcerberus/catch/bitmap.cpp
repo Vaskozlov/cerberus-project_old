@@ -44,18 +44,15 @@ namespace cerb::test {
         bitmap.set<1, 1>(511);
 
         bitmap.clear<0>();
-        EXPECT_TRUE(
-            std::all_of(bitmap_data_begin->begin(), bitmap_data_begin->end(), [](auto elem) {
-                return elem == 0;
-            }));
+        EXPECT_TRUE(std::ranges::all_of(*bitmap_data_begin, [](auto elem) { return elem == 0; }));
 
         bitmap.set<1, 0>(0);
         bitmap.set<1, 0>(511);
 
         bitmap.clear();
 
-        EXPECT_TRUE(std::all_of(bitmap_data.begin(), bitmap_data.end(), [](const auto &array) {
-            return std::all_of(array.begin(), array.end(), [](auto elem) { return elem == 0; });
+        EXPECT_TRUE(std::ranges::all_of(bitmap_data, [](const auto &array) {
+            return std::ranges::all_of(array, [](auto elem) { return elem == 0; });
         }));
     }
 

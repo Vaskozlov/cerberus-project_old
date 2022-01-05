@@ -113,10 +113,12 @@
 #    endif
 #endif /* CERBLIB_CLANG_ENABLE_WARNING */
 
+#include <algorithm>
 #include <array>
 #include <cinttypes>
 #include <cstddef>
 #include <limits>
+#include <string_view>
 #include <type_traits>
 #include <utility>
 

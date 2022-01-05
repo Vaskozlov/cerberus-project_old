@@ -1,7 +1,7 @@
 #ifndef LIBCERBERUS_CATCH_PAIR_HPP
 #define LIBCERBERUS_CATCH_PAIR_HPP
 
-#include "catch.hpp"
+#include <cerberus/catch.hpp>
 #include <cerberus/pair.hpp>
 
 namespace cerb::test {
