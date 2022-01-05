@@ -22,7 +22,7 @@ namespace cerb {
             return offset;
         }
 
-        CERBLIB_DECL auto getFilename() const -> cerb::string_view
+        CERBLIB_DECL auto getFilename() const -> cerb::string_view const &
         {
             return filename;
         }
@@ -56,7 +56,7 @@ namespace cerb {
     };
 
     template<CharacterLiteral CharT = char>
-    struct TxtManager
+    struct TextGenerator
     {
         CERBLIB_DECL auto getLine() const -> size_t
         {
@@ -73,19 +73,25 @@ namespace cerb {
             return location.getOffset();
         }
 
-        CERBLIB_DECL auto getFilename() const -> cerb::string_view
+        CERBLIB_DECL auto getFilename() const -> string_view const &
         {
             return location.getFilename();
         }
 
-        CERBLIB_DECL auto getLocation() const -> LocationInFile
+        CERBLIB_DECL auto getLocation() const -> LocationInFile const &
         {
             return location;
         }
 
-        CERBLIB_DECL auto getTabsAndSpaces() const -> const std::basic_string<CharT> &
+        CERBLIB_DECL auto getTabsAndSpaces() const -> std::basic_string<CharT> const &
         {
             return tabs_and_spaces;
+        }
+
+        CERBLIB_DECL auto getCurrentLine() const -> BasicStringView<CharT>
+        {
+            auto length = static_cast<ptrdiff_t>(data.end() - begin_of_the_line);
+            return {begin_of_the_line, find(begin_of_the_line, '\n', length)};
         }
 
         CERBLIB_DECL auto skipLayoutAndGiveNewChar() -> CharT
@@ -105,7 +111,7 @@ namespace cerb {
             clearTabsAndSpacesIfNeeded();
 
             if (data[offset] == '\n') {
-                location.newLine();
+                newLine();
             } else {
                 location.newChar();
             }
@@ -126,7 +132,7 @@ namespace cerb {
             while (lex::isLayout(data[offset])) {
                 switch (data[offset]) {
                 case '\n':
-                    location.newLine();
+                    newLine();
                     break;
                 case ' ':
                 case '\t':
@@ -141,6 +147,12 @@ namespace cerb {
         }
 
     private:
+        constexpr auto newLine() -> void
+        {
+            location.newLine();
+            begin_of_the_line = data.begin() + location.getOffset();
+        }
+
         constexpr auto clearTabsAndSpacesIfNeeded() -> void
         {
             auto offset = getOffset();
@@ -152,16 +164,16 @@ namespace cerb {
         }
 
     public:
-        constexpr TxtManager() = default;
-        constexpr TxtManager(
-            const LocationInFile &current_location, cerb::BasicStringView<CharT> content)
-          : location(current_location), data(content)
+        constexpr TextGenerator() = default;
+        constexpr TextGenerator(const LocationInFile &current_location, BasicStringView<CharT> content)
+          : location(current_location), data(content), begin_of_the_line(content.begin())
         {}
 
     private:
         LocationInFile location{};
-        cerb::BasicStringView<CharT> data{};
+        BasicStringView<CharT> data{};
         std::basic_string<CharT> tabs_and_spaces{};
+        GetIteratorType<BasicStringView<CharT>> begin_of_the_line{};
     };
 }// namespace cerb
 

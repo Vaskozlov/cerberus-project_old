@@ -123,6 +123,11 @@ namespace cerb {
             return { cbegin() + from, max<size_t>(size, length - from) };
         }
 
+        CERBLIB_DECL auto containsAt(size_t index, BasicStringView const &str) -> bool
+        {
+            return BasicStringView(begin() + index, str.size()).operator==(str);
+        }
+
         CERBLIB_DECL auto operator==(const CharT *other) const -> bool
         {
             return this->operator==(BasicStringView<CharT>(other));
@@ -167,6 +172,10 @@ namespace cerb {
 
         constexpr BasicStringView(const CharT *str, usize length_of_string)
           : length(length_of_string), string(str)
+        {}
+
+        constexpr BasicStringView(iterator first, iterator last)
+          : length(static_cast<ptrdiff_t>(last - first)), string(first)
         {}
 
         template<unsigned long Size>

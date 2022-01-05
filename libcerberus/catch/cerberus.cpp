@@ -4,6 +4,7 @@
 #include "pair.hpp"
 #include "pointer_wrapper.hpp"
 #include "string_view.hpp"
+#include "string_pool.hpp"
 
 auto main() -> int
 {
@@ -15,6 +16,7 @@ auto main() -> int
     stringViewTest();
     pointerWrapperTest();
     bitmapTest();
+    stringPoolTest();
 
     return 0;
 }

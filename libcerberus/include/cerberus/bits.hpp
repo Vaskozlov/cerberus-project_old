@@ -196,6 +196,26 @@ namespace cerb {
         return mask.value;
     }
 
+    template<std::integral T>
+    CERBLIB_DECL auto convert2UnsignedInt(T number) -> decltype(auto)
+    {
+        static_assert(CanBeStoredInIntegral<T>);
+
+        if constexpr (std::is_unsigned_v<T>) {
+            return number;
+        } else if constexpr (sizeof(T) == sizeof(u8)) {
+            return std::bit_cast<u8>(number);
+        } else if constexpr (sizeof(T) == sizeof(u16)) {
+            return std::bit_cast<u16>(number);
+        } else if constexpr (sizeof(T) == sizeof(u32)) {
+            return std::bit_cast<u32>(number);
+        } else if constexpr (sizeof(T) == sizeof(u64)) {
+            return std::bit_cast<u64>(number);
+        } else if constexpr (sizeof(T) == sizeof(usize)) {
+            return std::bit_cast<usize>(number);
+        }
+    }
+
     template<std::equality_comparable T>
     CERBLIB_DECL auto safeEqual(T lhs, T rhs) -> bool
     {
