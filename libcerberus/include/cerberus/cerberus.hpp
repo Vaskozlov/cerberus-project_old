@@ -208,6 +208,20 @@ namespace cerb {
         })(std::forward<Ts>(args))... };
     }
 
+    template<typename... Ts>
+    CERBLIB_DECL auto logicalAnd(bool first, Ts... other) -> bool
+    {
+        forEach([&first](bool value) { first &= value; }, other...);
+        return first;
+    }
+
+    template<typename... Ts>
+    CERBLIB_DECL auto logicalOr(bool first, Ts... other) -> bool
+    {
+        forEach([&first](bool value) { first |= value; }, other...);
+        return first;
+    }
+
     template<typename T>
     constexpr auto cmov(bool condition, const T &on_true, const T &on_false) -> T
     {

@@ -103,7 +103,7 @@ namespace cerb {
                 }
                 if (elem == '1') {
                     m_expected |= current_bit;
-                } else if (elem == 'x' || elem == 'X') {
+                } else if (logicalOr(elem == 'x', elem == 'X')) {
                     m_mask &= ~current_bit;
                 }
                 current_bit >>= 1U;
@@ -118,6 +118,13 @@ namespace cerb {
             return lhs;
         } else {
             T rhs = max<T>(std::forward<Ts>(args)...);
+
+#ifdef __clang__
+            if constexpr (std::integral<T>) {
+                std::array temporary = { lhs, rhs };
+                return temporary[lhs < rhs];
+            }
+#endif
             return lhs > rhs ? lhs : rhs;
         }
     }
@@ -129,6 +136,13 @@ namespace cerb {
             return lhs;
         } else {
             T rhs = min<T>(std::forward<Ts>(args)...);
+
+#ifdef __clang__
+            if constexpr (std::integral<T>) {
+                std::array temporary = { lhs, rhs };
+                return temporary[lhs > rhs];
+            }
+#endif
             return lhs < rhs ? lhs : rhs;
         }
     }
@@ -277,7 +291,7 @@ namespace cerb {
     }
 
 #ifdef _MSC_VER
-    namespace private_ {
+    namespace msvc {
         template<unsigned BitValue, std::unsigned_integral T>
         CERBLIB_DECL auto bitScanForward(T value) -> usize
         {
@@ -324,7 +338,7 @@ namespace cerb {
 
             return bitsizeof(usize);
         }
-    }  // namespace private_
+    }  // namespace msvc
 #endif /* _MSC_VER */
 
     /**
@@ -348,7 +362,7 @@ namespace cerb {
 
 #ifdef _MSC_VER
         if (std::is_constant_evaluated()) {
-            return private_::bitScanForward<BitValue>(value);
+            return msvc::bitScanForward<BitValue>(value);
         }
 
         unsigned long bit_index;
@@ -358,7 +372,6 @@ namespace cerb {
 #    else
         _BitScanForward64(&bit_index, static_cast<usize>(value));
 #    endif
-
         return static_cast<usize>(bit_index);
 #else
         return static_cast<usize>(__builtin_ctzl(static_cast<usize>(value)));
@@ -386,7 +399,7 @@ namespace cerb {
 
 #ifdef _MSC_VER
         if (std::is_constant_evaluated()) {
-            return private_::bitScanReverse<BitValue>(value);
+            return msvc::bitScanReverse<BitValue>(value);
         }
 
         unsigned long bit_index;
@@ -396,7 +409,6 @@ namespace cerb {
 #    else
         _BitScanReverse64(&bit_index, static_cast<usize>(value));
 #    endif
-
         return bit_index;
 #else
         return bitsizeof(unsigned long) - 1UL -

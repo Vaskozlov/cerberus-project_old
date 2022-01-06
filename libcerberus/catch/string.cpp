@@ -8,8 +8,8 @@ namespace cerb::test {
         using namespace std::string_view_literals;
 
         const std::string_view str = "hello, world!"sv;
-        EXPECT_TRUE(find(str.data(), '\0', str.size() + 1) == str.size());
-        EXPECT_TRUE(find(str.data(), '\1', str.size()) >= str.size());
+        EXPECT_TRUE(find(str, '\0') == str.end());
+        EXPECT_TRUE(find(str, '\1') >= str.end());
     }
 
     auto u16StringViewFindTest() -> void
@@ -17,8 +17,10 @@ namespace cerb::test {
         using namespace std::string_view_literals;
 
         const std::u16string_view str = u"hello, world!"sv;
-        EXPECT_TRUE(find(str.data(), u'\0', str.size() + 1) == str.size());
-        EXPECT_TRUE(find(str.data(), u'\1', str.size()) >= str.size());
+        EXPECT_TRUE(find(str.data(), u'\0', str.size()) == str.end());
+        EXPECT_TRUE(find(str.data(), u'\1', str.size()) >= str.end());
+        EXPECT_TRUE(find(str, u'\0') == str.end());
+        EXPECT_TRUE(find(str, u'\1') >= str.end());
     }
 
     auto wstringViewFindTest() -> void
@@ -26,18 +28,25 @@ namespace cerb::test {
         using namespace std::string_view_literals;
 
         const std::wstring_view str = L"hello, world!"sv;
-        EXPECT_TRUE(find(str.data(), L'\0', str.size() + 1) == str.size());
-        EXPECT_TRUE(find(str.data(), L'\1', str.size()) >= str.size());
+        EXPECT_TRUE(find(str.data(), L'\0', str.size()) == str.end());
+        EXPECT_TRUE(find(str.data(), L'\1', str.size()) >= str.end());
+        EXPECT_TRUE(find(str, L'\0') == str.end());
+        EXPECT_TRUE(find(str, L'\1') >= str.end());
     }
 
     auto arrayOfIntFindTest() -> void
     {
         std::array array_of_integrals = { -10, -20, 400, 14, 0, 123 };
 
-        EXPECT_TRUE(find(array_of_integrals.data(), 123) == array_of_integrals.size() - 1);
+        EXPECT_TRUE(find(array_of_integrals, 123) == array_of_integrals.end() - 1);
+        EXPECT_TRUE(
+            find(array_of_integrals.data(), 123, array_of_integrals.size()) ==
+            array_of_integrals.end() - 1);
+
+        EXPECT_TRUE(find(array_of_integrals, 500) >= array_of_integrals.end());
         EXPECT_TRUE(
             find(array_of_integrals.data(), 500, array_of_integrals.size()) >=
-            array_of_integrals.size());
+            array_of_integrals.end());
     }
 
     auto arrayOfPairsFindTest() -> void
@@ -46,7 +55,8 @@ namespace cerb::test {
             { { -10, 10 }, { -20, 30 }, { 400, 400 }, { 14, 0 }, { 1, 0 }, { 123, 123 } }
         };
 
-        EXPECT_TRUE(find(array_of_pairs.data(), { 123, 123 }) == array_of_pairs.size() - 1);
+        EXPECT_TRUE(find(array_of_pairs, { 123, 123 }) == array_of_pairs.end() - 1);
+        EXPECT_TRUE(find(array_of_pairs, { 123, 123 }) == array_of_pairs.end() - 1);
     }
 
     auto stringTest(u32) -> int

@@ -20,7 +20,7 @@ namespace cerb::lex {
     template<CharacterLiteral CharT>
     CERBLIB_DECL auto isLayout(CharT chr) -> bool
     {
-        return chr > static_cast<CharT>(0) && chr <= static_cast<CharT>(' ');
+        return logicalAnd(chr > static_cast<CharT>(0), chr <= static_cast<CharT>(' '));
     }
 
     template<CharacterLiteral CharT>
@@ -29,38 +29,38 @@ namespace cerb::lex {
         if constexpr (std::is_unsigned_v<CharT>) {
             return chr <= static_cast<CharT>(' ');
         } else {
-            return chr >= static_cast<CharT>(0) && chr <= static_cast<CharT>(' ');
+            return logicalAnd(chr >= static_cast<CharT>(0), chr <= static_cast<CharT>(' '));
         }
     }
 
     template<CharacterLiteral CharT>
     CERBLIB_DECL auto isUCLetter(CharT chr) -> bool
     {
-        return chr >= static_cast<CharT>('A') && chr <= static_cast<CharT>('Z');
+        return logicalAnd(chr >= static_cast<CharT>('A'), chr <= static_cast<CharT>('Z'));
     }
 
     template<CharacterLiteral CharT>
     CERBLIB_DECL auto isLCLetter(CharT chr) -> bool
     {
-        return chr >= static_cast<CharT>('a') && chr <= static_cast<CharT>('z');
+        return logicalAnd(chr >= static_cast<CharT>('a'), chr <= static_cast<CharT>('z'));
     }
 
     template<CharacterLiteral CharT>
     CERBLIB_DECL auto isLetter(CharT chr) -> bool
     {
-        return isUCLetter(chr) || isLCLetter(chr);
+        return logicalOr(isUCLetter(chr), isLCLetter(chr));
     }
 
     template<CharacterLiteral CharT>
     CERBLIB_DECL auto isDigit(CharT chr) -> bool
     {
-        return chr >= static_cast<CharT>('0') && chr <= static_cast<CharT>('9');
+        return logicalAnd(chr >= static_cast<CharT>('0'), chr <= static_cast<CharT>('9'));
     }
 
     template<CharacterLiteral CharT>
     CERBLIB_DECL auto isLetterOrDigit(CharT chr) -> bool
     {
-        return isLetter(chr) || isDigit(chr);
+        return logicalOr(isLetter(chr), isDigit(chr));
     }
 }// namespace cerb::lex
 

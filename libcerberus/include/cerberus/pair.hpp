@@ -15,9 +15,6 @@ namespace cerb {
     template<typename T1, typename T2, HowToComparePair ComparisonRule = HowToComparePair::DEFAULT>
     struct CERBLIB_TRIVIAL Pair
     {
-        T1 first{};
-        T2 second{};
-
         constexpr auto operator==(const Pairable auto &other) const -> bool
         {
             if constexpr (ComparisonRule == HowToComparePair::DEFAULT) {
@@ -62,12 +59,15 @@ namespace cerb {
           : first(first_value), second(second_value)
         {}
 
-        constexpr Pair(T1 &&first_valuefirst, T2 &&second_value) noexcept
-          : first(std::move(first_valuefirst)), second(std::move(second_value))
+        constexpr Pair(T1 &&first_value, T2 &&second_value) noexcept
+          : first(std::move(first_value)), second(std::move(second_value))
         {}
 
         constexpr explicit Pair(const Pairable auto &pair) : first(pair.first), second(pair.second)
         {}
+
+        T1 first{};
+        T2 second{};
     };
 
     template<HowToComparePair ComparisonRule = HowToComparePair::DEFAULT, Pairable T>

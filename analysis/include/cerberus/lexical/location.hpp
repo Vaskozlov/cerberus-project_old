@@ -149,7 +149,7 @@ namespace cerb {
         constexpr auto setCurrentLine() -> void
         {
             auto begin_of_the_line = data.begin() + location.getOffset();
-            auto length = static_cast<ptrdiff_t>(data.end() - begin_of_the_line);
+            auto length = ptrdiff(data.end(), begin_of_the_line);
 
             current_line = { begin_of_the_line,
                              find(begin_of_the_line, '\n', static_cast<usize>(length)) };
@@ -165,8 +165,9 @@ namespace cerb {
         {
             auto offset = getOffset();
 
-            if (tabs_and_spaces.size() > 0 &&
-                (data[offset - 1] != '\t' && data[offset - 1] != ' ')) {
+            if (logicalAnd(
+                    tabs_and_spaces.size() > 0, data[offset - 1] != '\t',
+                    data[offset - 1] != ' ')) {
                 tabs_and_spaces.clear();
             }
         }

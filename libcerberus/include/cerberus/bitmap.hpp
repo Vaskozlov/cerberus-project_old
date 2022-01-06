@@ -49,13 +49,13 @@ namespace cerb {
         constexpr auto clear() -> void
         {
             static_assert(Axis <= AxisN);
-            cerb::memset(storage[Axis], static_cast<value_type>(0));
+            fill(storage[Axis], static_cast<value_type>(0));
         }
 
         constexpr auto clear() -> void
         {
             std::ranges::for_each(storage, [](axis_storage_t &axis_storage) {
-                cerb::memset(axis_storage, static_cast<value_type>(0));
+                fill(axis_storage, static_cast<value_type>(0));
             });
         }
 

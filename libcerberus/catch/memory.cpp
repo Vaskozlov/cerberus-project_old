@@ -29,12 +29,12 @@ namespace cerb::test {
         std::array<T, ArraySize> src{};
         std::array<T, ArraySize> dest{};
 
-        memcpy(src.data(), random_data, ArraySize);
+        copy(src.data(), random_data, ArraySize);
         EXPECT_TRUE(std::ranges::equal(
             RawPointerWrapper<T>{ src.data(), ArraySize },
             RawPointerWrapper<T>{ random_data, ArraySize }));
 
-        memcpy(dest, src);
+        copy(dest, src);
         EXPECT_TRUE(std::ranges::equal(src, dest));
     }
 
@@ -65,14 +65,14 @@ namespace cerb::test {
         std::array<u64, 512> data_64{};
         std::array<PairedNumbers, 512> data_complex{};
 
-        cerb::memset<u8>(data_8.data(), TestU8Value, 512);
-        cerb::memset<u16>(data_16.data(), TestU16Value, 512);
-        cerb::memset<u32>(data_32.data(), TestU32Value, 512);
-        cerb::memset<u64>(data_64.data(), TestU64Value, 512);
-        cerb::memset<PairedNumbers>(data_complex.data(), TestComplexValue, 512);
+        fill<u8>(data_8.data(), TestU8Value, 512);
+        fill<u16>(data_16.data(), TestU16Value, 512);
+        fill<u32>(data_32.data(), TestU32Value, 512);
+        fill<u64>(data_64.data(), TestU64Value, 512);
+        fill<PairedNumbers>(data_complex.data(), TestComplexValue, 512);
 
         std::array<i32, 512> array_32{};
-        cerb::memset(array_32, CheckValueI32);
+        fill(array_32, CheckValueI32);
 
         EXPECT_TRUE(arrayStoresSameValues(data_8, TestU8Value));
         EXPECT_TRUE(arrayStoresSameValues(data_16, TestU16Value));
@@ -108,33 +108,33 @@ namespace cerb::test {
 
         EXPECT_FALSE(const_result);
 
-        cerb::memset<u8>(data_8.get(), TestU8Value, buffer_size);
+        fill(data_8.get(), TestU8Value, buffer_size);
         EXPECT_TRUE(arrayStoresSameValues(data_8, TestU8Value));
 
-        cerb::memset<u16>(data_16.get(), TestU16Value, buffer_size);
+        fill(data_16.get(), TestU16Value, buffer_size);
         EXPECT_TRUE(arrayStoresSameValues(data_16, TestU16Value));
 
-        cerb::memset<u32>(data_32.get(), TestU32Value, buffer_size);
+        fill(data_32.get(), TestU32Value, buffer_size);
         EXPECT_TRUE(arrayStoresSameValues(data_32, TestU32Value));
 
-        cerb::memset<u64>(data_64.get(), TestU64Value, buffer_size);
+        fill(data_64.get(), TestU64Value, buffer_size);
         EXPECT_TRUE(arrayStoresSameValues(data_64, TestU64Value));
 
-        cerb::memset<PairedNumbers>(data_complex.get(), TestComplexValue, buffer_size);
+        fill<PairedNumbers>(data_complex.get(), TestComplexValue, buffer_size);
         EXPECT_TRUE(arrayStoresSameValues(data_complex, TestComplexValue));
 
-        cerb::memset(array_32, CheckValueI32);
+        fill(array_32, CheckValueI32);
         EXPECT_TRUE(arrayStoresSameValues(array_32, CheckValueI32));
 
-        cerb::memset(array_str, long_string);
+        fill(array_str, long_string);
         EXPECT_TRUE(arrayStoresSameValues(array_str, long_string));
 
         vector_str.resize(complex_buffer_size);
-        cerb::memset(vector_str, long_string);
+        fill(vector_str, long_string);
         EXPECT_TRUE(arrayStoresSameValues(vector_str, long_string));
 
         complex_vector.resize(complex_buffer_size);
-        cerb::memset(complex_vector, TestComplexValue);
+        fill(complex_vector, TestComplexValue);
         EXPECT_TRUE(arrayStoresSameValues(complex_vector, TestComplexValue));
     }
 
