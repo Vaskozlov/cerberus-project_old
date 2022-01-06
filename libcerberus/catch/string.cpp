@@ -17,8 +17,8 @@ namespace cerb::test {
         using namespace std::string_view_literals;
 
         const std::u16string_view str = u"hello, world!"sv;
-        EXPECT_TRUE(find(str.data(), u'\0', str.size()) == str.end());
-        EXPECT_TRUE(find(str.data(), u'\1', str.size()) >= str.end());
+        EXPECT_TRUE(find(str.data(), u'\0', str.size()) == (str.data() + str.size()));
+        EXPECT_TRUE(find(str.data(), u'\1', str.size()) >= (str.data() + str.size()));
         EXPECT_TRUE(find(str, u'\0') == str.end());
         EXPECT_TRUE(find(str, u'\1') >= str.end());
     }
@@ -28,8 +28,8 @@ namespace cerb::test {
         using namespace std::string_view_literals;
 
         const std::wstring_view str = L"hello, world!"sv;
-        EXPECT_TRUE(find(str.data(), L'\0', str.size()) == str.end());
-        EXPECT_TRUE(find(str.data(), L'\1', str.size()) >= str.end());
+        EXPECT_TRUE(find(str.data(), L'\0', str.size()) == (str.data() + str.size()));
+        EXPECT_TRUE(find(str.data(), L'\1', str.size()) >= (str.data() + str.size()));
         EXPECT_TRUE(find(str, L'\0') == str.end());
         EXPECT_TRUE(find(str, L'\1') >= str.end());
     }
@@ -41,12 +41,12 @@ namespace cerb::test {
         EXPECT_TRUE(find(array_of_integrals, 123) == array_of_integrals.end() - 1);
         EXPECT_TRUE(
             find(array_of_integrals.data(), 123, array_of_integrals.size()) ==
-            array_of_integrals.end() - 1);
+            (array_of_integrals.data() + array_of_integrals.size() - 1));
 
         EXPECT_TRUE(find(array_of_integrals, 500) >= array_of_integrals.end());
         EXPECT_TRUE(
             find(array_of_integrals.data(), 500, array_of_integrals.size()) >=
-            array_of_integrals.end());
+            (array_of_integrals.data() + array_of_integrals.size()));
     }
 
     auto arrayOfPairsFindTest() -> void
