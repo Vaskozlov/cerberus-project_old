@@ -196,7 +196,7 @@ namespace cerb {
         constexpr auto setCurrentLine() -> void
         {
             auto begin_of_the_line = data.begin() + location.getOffset();
-            auto length = ptrdiff(data.end(), begin_of_the_line);
+            auto length = ptrdiff(begin_of_the_line, data.end());
 
             current_line = { begin_of_the_line,
                              find(begin_of_the_line, '\n', static_cast<usize>(length)) };
