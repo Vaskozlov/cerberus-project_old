@@ -130,11 +130,13 @@ namespace cerb {
 
             while (lex::isLayout(data[offset])) {
                 switch (data[offset]) {
+                case '\0':
+                    break;
                 case '\n':
                     newLine();
                     break;
-                case ' ':
                 case '\t':
+                case ' ':
                     tabs_and_spaces.push_back(data[offset]);
                     [[fallthrough]];
                 default:
@@ -143,6 +145,51 @@ namespace cerb {
                 }
                 offset = getOffset();
             }
+        }
+
+        struct iterator
+        {
+            constexpr auto operator++() -> iterator &
+            {
+                current_char = generator->skipLayoutAndGiveNewChar();
+                return *this;
+            }
+
+            constexpr auto operator==(iterator const &other) const -> bool
+            {
+                return current_char == other.current_char;
+            }
+
+            constexpr auto operator*() const -> CharT
+            {
+                return current_char;
+            }
+
+            constexpr auto nextChar() const -> CharT
+            {
+                return generator->nextYieldedChar();
+            }
+
+            constexpr iterator() = default;
+            constexpr explicit iterator(CharT chr) : current_char(chr)
+            {}
+            constexpr explicit iterator(TextGenerator *gen)
+              : generator(gen), current_char(generator->skipLayoutAndGiveNewChar())
+            {}
+
+        private:
+            TextGenerator *generator{};
+            CharT current_char{};
+        };
+
+        constexpr auto begin() -> iterator
+        {
+            return iterator(this);
+        }
+
+        constexpr auto end() -> iterator
+        {
+            return iterator('\0');
         }
 
     private:

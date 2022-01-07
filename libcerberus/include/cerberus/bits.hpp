@@ -210,10 +210,10 @@ namespace cerb {
         return mask.value;
     }
 
-    template<std::integral T>
+    template<typename T>
     CERBLIB_DECL auto convert2UnsignedInt(T number) -> decltype(auto)
     {
-        static_assert(CanBeStoredInIntegral<T>);
+        static_assert((std::integral<T> || std::is_enum_v<T>)&&CanBeStoredInIntegral<T>);
 
         if constexpr (std::is_unsigned_v<T>) {
             return number;

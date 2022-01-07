@@ -2,7 +2,6 @@
 #include <cerberus/lexical/token.hpp>
 
 namespace cerb::test {
-    using SimpleTokenType = unsigned;
 
     auto tokenTest(u32) -> int
     {
@@ -28,7 +27,7 @@ namespace cerb::test {
         }
 
         EXPECT_TRUE(manager.skipLayoutAndGiveNewChar() == 'I');
-        lex::Token<char, SimpleTokenType> token{ 10, manager.getLocation(), "It's", manager };
+        lex::Token<char> token{ 10, manager.getLocation(), "It's", manager };
 
         EXPECT_TRUE(token.getType() == 10);
         EXPECT_TRUE(token.getLine() == 1);

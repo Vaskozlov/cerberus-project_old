@@ -1,4 +1,5 @@
 #include "char.hpp"
+#include "lexical_analyzer.hpp"
 #include "location.hpp"
 #include "token.hpp"
 
@@ -9,6 +10,7 @@ auto main() -> int
     lexicalCharTest();
     txtManagerTest();
     tokenTest();
+    lexicalAnalyzerTest();
 
     return 0;
 }

@@ -75,6 +75,16 @@ namespace cerb {
             return bit::at<usize>(storage[Axis].begin(), index);
         }
 
+        template<size_t Axis>
+        constexpr auto reverseBits() -> void
+        {
+            static_assert(Axis < AxisN);
+
+            for (auto &number : storage[Axis]) {
+                number = ~number;
+            }
+        }
+
         template<bit::ValueOfBit... BitValues>
         constexpr auto find() -> usize
         {

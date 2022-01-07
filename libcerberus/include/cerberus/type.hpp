@@ -75,6 +75,9 @@ namespace cerb {
     };
 
     template<typename T>
+    concept Enum = std::is_enum_v<T>;
+
+    template<typename T>
     concept CanBeStoredInIntegral =
         is_one_of(sizeof(T), sizeof(u8), sizeof(u16), sizeof(u32), sizeof(u64), sizeof(usize));
 

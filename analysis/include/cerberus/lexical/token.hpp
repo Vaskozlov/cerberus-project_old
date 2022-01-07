@@ -3,12 +3,15 @@
 
 #include <cerberus/lexical/location.hpp>
 #include <string>
+#include <vector>
 
 namespace cerb::lex {
 
-    template<CharacterLiteral CharT, typename TokenType>
+    template<CharacterLiteral CharT>
     struct Token
     {
+        using TokenType = usize;
+
         CERBLIB_DECL auto getType() const -> TokenType
         {
             return type;
@@ -69,7 +72,11 @@ namespace cerb::lex {
             return type <=> other;
         }
 
+        virtual auto transformToken() -> void
+        {}
+
         constexpr Token() = default;
+        constexpr virtual ~Token() = default;
         constexpr Token(
             TokenType type_of_token, LocationInFile const &location_in_file,
             BasicStringView<CharT> const &repr_of_token, TextGenerator<CharT> const &txt_manager)
@@ -78,11 +85,11 @@ namespace cerb::lex {
         {}
 
     private:
-        LocationInFile location;
-        BasicStringView<CharT> repr;
-        BasicStringView<CharT> line;
-        std::basic_string<CharT> tabs_and_spaces;
-        TokenType type;
+        LocationInFile location{};
+        BasicStringView<CharT> repr{};
+        BasicStringView<CharT> line{};
+        std::basic_string<CharT> tabs_and_spaces{};
+        TokenType type{};
     };
 }// namespace cerb::lex
 

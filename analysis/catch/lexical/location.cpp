@@ -40,6 +40,19 @@ namespace cerb::test {
     {
         txtManagerTestOnStr();
 
+        cerb::string_view str = "Hello,World!It'sateststring.";
+        auto str_it = str.begin();
+
+        TextGenerator<> manager(
+            LocationInFile("None"),
+            "    "
+            "\t\tHello, World! \nIt's a test \t\t  \nstring.");
+
+        for (char elem : manager) {
+            EXPECT_TRUE(*str_it == elem);
+            ++str_it;
+        }
+
         return 0;
     }
 }// namespace cerb::test

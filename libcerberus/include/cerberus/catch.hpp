@@ -14,14 +14,14 @@
 #define EXPECT_FALSE(value) expectFalse(value, CERBLIB_LOCATION)
 
 namespace cerb::test {
-    class constexpr_failure : public std::exception
+    class ConstexprFailure : public std::exception
     {
         std::string_view message;
 
     public:
-        constexpr_failure() = default;
+        ConstexprFailure() = default;
 
-        explicit constexpr_failure(std::string_view t_message) : message(t_message)
+        explicit ConstexprFailure(std::string_view t_message) : message(t_message)
         {}
 
         [[nodiscard]] auto what() const noexcept -> const char * override
@@ -58,7 +58,7 @@ namespace cerb::test {
     {
         if (!condition) {
             if (std::is_constant_evaluated()) {
-                throw constexpr_failure("Cerberus test failure!");
+                throw ConstexprFailure("Cerberus test failure!");
             } else {
                 fmt::print(
                     fmt::fg(fmt::color::red), "Cerberus test failure with code: {}! ", condition);
@@ -72,7 +72,7 @@ namespace cerb::test {
     {
         if (condition) {
             if (std::is_constant_evaluated()) {
-                throw constexpr_failure("Cerberus test failure!");
+                throw ConstexprFailure("Cerberus test failure!");
             } else {
                 fmt::print(
                     fmt::fg(fmt::color::red), "Cerberus test failure with code: {}! ", condition);
