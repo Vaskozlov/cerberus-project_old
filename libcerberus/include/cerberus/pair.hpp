@@ -26,6 +26,19 @@ namespace cerb {
             }
         }
 
+        constexpr auto operator==(const auto &other) const -> bool
+        {
+            static_assert(
+                ComparisonRule == HowToComparePair::BY_FIRST_VALUE ||
+                ComparisonRule == HowToComparePair::BY_SECOND_VALUE);
+
+            if constexpr (ComparisonRule == HowToComparePair::BY_FIRST_VALUE) {
+                return safeEqual<T1>(first, other);
+            } else if constexpr (ComparisonRule == HowToComparePair::BY_SECOND_VALUE) {
+                return safeEqual<T2>(second, other);
+            }
+        }
+
         constexpr auto operator<=>(const Pairable auto &other) const
         {
             if constexpr (ComparisonRule == HowToComparePair::DEFAULT) {
@@ -37,6 +50,19 @@ namespace cerb {
                 return first <=> other.first;
             } else {
                 return second <=> other.second;
+            }
+        }
+
+        constexpr auto operator<=>(const auto &other) const
+        {
+            static_assert(
+                ComparisonRule == HowToComparePair::BY_FIRST_VALUE ||
+                ComparisonRule == HowToComparePair::BY_SECOND_VALUE);
+
+            if constexpr (ComparisonRule == HowToComparePair::BY_FIRST_VALUE) {
+                return first <=> other;
+            } else if constexpr (ComparisonRule == HowToComparePair::BY_SECOND_VALUE) {
+                return second <=> other;
             }
         }
 

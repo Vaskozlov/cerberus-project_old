@@ -5,6 +5,22 @@
 #include <string_view>
 
 namespace cerb::lex {
+    class StringParsingError : public std::exception
+    {
+        std::string_view message;
+
+    public:
+        StringParsingError() = default;
+
+        explicit StringParsingError(std::string_view t_message) : message(t_message)
+        {}
+
+        [[nodiscard]] auto what() const noexcept -> const char * override
+        {
+            return message.data();
+        }
+    };
+
     class DotItemParsingError : public std::exception
     {
         std::string_view message;

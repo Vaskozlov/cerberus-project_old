@@ -109,12 +109,12 @@ namespace cerb::lex {
 
         constexpr auto addPrefixOrPostfixTag() -> void
         {
-            addFlag(flags_for_sequence, sequence::Flags::PREFIX_OR_POSTFIX);
+            flags_for_sequence |= sequence::Flags::PREFIX_OR_POSTFIX;
         }
 
         constexpr auto addReverseTag() -> void
         {
-            addFlag(flags_for_sequence, sequence::Flags::REVERSE);
+            flags_for_sequence |= sequence::Flags::REVERSE;
         }
 
         constexpr auto processString() -> void

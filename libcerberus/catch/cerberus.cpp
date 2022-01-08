@@ -1,5 +1,7 @@
 #include "bit.hpp"
 #include "bitmap.hpp"
+#include "enum.hpp"
+#include "flat_map.hpp"
 #include "memory.hpp"
 #include "pair.hpp"
 #include "pointer_wrapper.hpp"
@@ -17,6 +19,8 @@ auto main() -> int
     pointerWrapperTest();
     bitmapTest();
     stringPoolTest();
+    enumTest();
+    flatMapTest();
 
     return 0;
 }

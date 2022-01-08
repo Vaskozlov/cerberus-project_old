@@ -10,7 +10,10 @@ namespace cerb::lex {
     template<CharacterLiteral CharT>
     struct SequenceParser
     {
+        constexpr static size_t number_of_chars = 1ULL << bitsizeof(CharT);
+
         using str_view = BasicStringView<CharT>;
+        using constant_bitmap = ConstBitmap<1, number_of_chars>;
         using text_iterator = GetIteratorType<TextGenerator<CharT>>;
 
         constexpr auto reverse() -> void
@@ -23,9 +26,8 @@ namespace cerb::lex {
             return iterator_for_text;
         }
 
-        constexpr SequenceParser() = default;
-        constexpr SequenceParser(text_iterator begin, text_iterator end)
-          : iterator_for_text(begin), end_of_text(end)
+        constexpr SequenceParser(constant_bitmap &bitmap, text_iterator begin, text_iterator end)
+          : available_chars(bitmap), iterator_for_text(begin), end_of_text(end)
         {
             parseSequence();
         }
@@ -152,9 +154,7 @@ namespace cerb::lex {
             }
         }
 
-        constexpr static size_t number_of_chars = 1ULL << bitsizeof(CharT);
-
-        ConstBitmap<1, number_of_chars> available_chars{};
+        constant_bitmap &available_chars{};
         text_iterator iterator_for_text{};
         text_iterator end_of_text{};
     };
