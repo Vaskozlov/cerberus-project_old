@@ -48,7 +48,7 @@ namespace cerb {
 
         CERBLIB_DECL auto cend() const -> const_iterator
         {
-            return storage.end() + number_of_elems;
+            return storage.begin() + number_of_elems;
         }
 
         constexpr auto insert(value_type const &new_value) -> void
