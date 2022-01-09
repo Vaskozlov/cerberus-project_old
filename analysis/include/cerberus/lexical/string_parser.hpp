@@ -18,6 +18,26 @@ namespace cerb::lex {
         }
 
     public:
+        CERBLIB_DECL auto get() -> std::basic_string<CharT> &
+        {
+            return parsed_string;
+        }
+
+        CERBLIB_DECL auto get() const -> std::basic_string<CharT> &
+        {
+            return parsed_string;
+        }
+
+        CERBLIB_DECL auto getIterator() -> Iterator
+        {
+            return begin_of_string;
+        }
+
+        CERBLIB_DECL auto getIterator() const -> Iterator
+        {
+            return begin_of_string;
+        }
+
         constexpr auto parseString() -> std::basic_string<CharT> &
         {
             if (*begin_of_string != string_char) {
@@ -30,6 +50,7 @@ namespace cerb::lex {
                 auto chr = *begin_of_string;
 
                 if (chr == string_char) {
+                    ++begin_of_string;
                     return parsed_string;
                 }
 
@@ -48,6 +69,13 @@ namespace cerb::lex {
             }
 
             throw StringParsingError("Unable to find end of string.");
+        }
+
+        constexpr auto init(CharT string_starter, Iterator begin, Iterator end) -> void
+        {
+            begin_of_string = begin;
+            end_of_string = end;
+            string_char = string_starter;
         }
 
         constexpr StringParser() = default;

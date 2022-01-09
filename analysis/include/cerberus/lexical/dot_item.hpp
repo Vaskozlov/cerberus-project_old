@@ -2,11 +2,10 @@
 #define CERBERUS_DOT_ITEM_HPP
 
 #include <cerberus/bitmap.hpp>
-#include <cerberus/enum.hpp>
 #include <cerberus/lexical/sequence.hpp>
+#include <cerberus/lexical/string_parser.hpp>
+#include <cerberus/lexical/string_sequence.hpp>
 #include <cerberus/lexical/token.hpp>
-#include <deque>
-#include <list>
 
 namespace cerb::lex {
     template<CharacterLiteral CharT, typename TokenType>
@@ -21,9 +20,10 @@ namespace cerb::lex {
         using str_view = BasicStringView<CharT>;
         using text_iterator = GetIteratorType<TextGenerator<CharT>>;
         using sequence = Sequence<CharT>;
-        using sequence_flags = typename sequence::Flags;
-        using sequence_parser = typename sequence::sequence_parser;
-        using sequence_storage = std::deque<sequence>;
+        using string_sequence = StringSequence<CharT>;
+        using Flags = typename sequence::Flags;
+        using Object = DotItemObject<CharT>;
+        using storage_t = std::vector<std::unique_ptr<Object>>;
 
     public:
         explicit constexpr DotItem(str_view regex)
@@ -39,22 +39,22 @@ namespace cerb::lex {
             flags_for_sequence = sequence::Flags::NONE;
         }
 
-        CERBLIB_DECL auto getLastSequence() -> sequence &
+        CERBLIB_DECL auto getLastSequence() -> Object &
         {
-            if (sequences.empty()) {
+            if (objects.empty()) {
                 throw DotItemParsingError("Unable to find an sequences");
             }
 
-            return sequences.back();
+            return *objects.back().get();
         }
 
-        CERBLIB_DECL auto getLastSequence() const -> sequence &
+        CERBLIB_DECL auto getLastSequence() const -> Object &
         {
-            if (sequences.empty()) {
+            if (objects.empty()) {
                 throw DotItemParsingError("Unable to find an sequences");
             }
 
-            return sequences.back();
+            return *objects.back().get();
         }
 
         constexpr auto parseRegex()
@@ -98,8 +98,11 @@ namespace cerb::lex {
 
         constexpr auto startNewSequenceOfChar() -> void
         {
-            sequences.emplace_back(flags_for_sequence, iterator_for_text, text_generator.end());
-            iterator_for_text = getLastSequence().getIterator();
+            std::unique_ptr<Object> new_sequence = std::make_unique<sequence>(
+                flags_for_sequence, iterator_for_text, text_generator.end());
+
+            iterator_for_text = new_sequence->getIterator();
+            objects.push_back(std::move(new_sequence));
         }
 
         constexpr auto endNewSequenceOfChar() -> void
@@ -118,7 +121,13 @@ namespace cerb::lex {
         }
 
         constexpr auto processString() -> void
-        {}
+        {
+            std::unique_ptr<Object> new_string_sequence = std::make_unique<string_sequence>(
+                flags_for_sequence, iterator_for_text, text_generator.end());
+
+            iterator_for_text = new_string_sequence->getIterator();
+            objects.push_back(std::move(new_string_sequence));
+        }
 
         constexpr auto addStar() -> void
         {
@@ -137,8 +146,8 @@ namespace cerb::lex {
 
         TextGenerator<CharT> text_generator{};
         text_iterator iterator_for_text{};
-        sequence_storage sequences{};
-        sequence_flags flags_for_sequence{};
+        storage_t objects{};
+        Flags flags_for_sequence{};
     };
 }// namespace cerb::lex
 

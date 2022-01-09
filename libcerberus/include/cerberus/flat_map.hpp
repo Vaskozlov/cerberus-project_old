@@ -133,7 +133,7 @@ namespace cerb {
         }
 
         storage_t storage{};
-        size_t number_of_elems{};
+        size_t number_of_elems{ 0 };
     };
 }// namespace cerb
 

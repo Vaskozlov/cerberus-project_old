@@ -3,9 +3,8 @@
 
 #include <cerberus/catch.hpp>
 
-namespace cerb::test
-{
+namespace cerb::test {
     auto lexicalAnalyzerTest(u32 = 1) -> int;
 }
 
-#endif/* CERBERUS_CATCH_LEXICAL_ANALYZER_HPP */
+#endif /* CERBERUS_CATCH_LEXICAL_ANALYZER_HPP */

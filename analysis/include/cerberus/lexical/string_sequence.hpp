@@ -1,18 +1,18 @@
-#ifndef CERBERUS_SEQUENCE_HPP
-#define CERBERUS_SEQUENCE_HPP
+#ifndef CERBERUS_STRING_SEQUENCE_HPP
+#define CERBERUS_STRING_SEQUENCE_HPP
 
 #include <cerberus/lexical/dot_item_object.hpp>
-#include <cerberus/lexical/sequence_parser.hpp>
+#include <string>
 
 namespace cerb::lex {
     template<CharacterLiteral CharT>
-    struct Sequence final : public DotItemObject<CharT>
+    struct StringSequence final : public DotItemObject<CharT>
     {
         using parent = DotItemObject<CharT>;
-        using sequence_parser = SequenceParser<CharT>;
-        using constant_bitmap = typename sequence_parser::constant_bitmap;
-        using str_view = typename parent::str_view;
+        using str = std::basic_string<CharT>;
+        using str_iterator = GetIteratorType<str>;
         using text_iterator = typename parent::text_iterator;
+        using string_parser = StringParser<CharT, text_iterator>;
         using Rule = typename parent::Rule;
         using Flags = typename parent::Flags;
 
@@ -26,26 +26,28 @@ namespace cerb::lex {
 
         CERBLIB_DECL auto getIterator() const -> text_iterator override
         {
-            return parser_of_sequence.getIterator();
+            return parser_for_string.getIterator();
         }
 
-        constexpr Sequence(Flags flags, text_iterator begin, text_iterator end)
-          : parser_of_sequence{ available_chars, begin, end }
+        constexpr StringSequence(Flags flags, text_iterator begin, text_iterator end)
+          : parser_for_string{ static_cast<CharT>('\"'), begin, end }
         {
+            parser_for_string.parseString();
+
             if (flags.isSet(Flags::PREFIX_OR_POSTFIX)) {
                 is_prefix_or_postfix = true;
             }
             if (flags.isSet(Flags::REVERSE)) {
-                parser_of_sequence.reverse();
+                std::ranges::reverse(parsed_string);
             }
         }
 
     private:
-        constant_bitmap available_chars{};
-        sequence_parser parser_of_sequence{ available_chars, text_iterator(), text_iterator() };
+        string_parser parser_for_string{};
+        str &parsed_string{ parser_for_string.get() };
         Rule sequence_rule{ Rule::NONE };
         bool is_prefix_or_postfix{ false };
     };
 }// namespace cerb::lex
 
-#endif /* CERBERUS_SEQUENCE_HPP */
+#endif /* CERBERUS_STRING_SEQUENCE_HPP */
