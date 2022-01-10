@@ -18,7 +18,7 @@ namespace cerb::lex {
         }
 
         using str_view = BasicStringView<CharT>;
-        using text_iterator = GetIteratorType<TextGenerator<CharT>>;
+        using text_iterator = GetIteratorType<GeneratorForText<CharT>>;
         using sequence = Sequence<CharT>;
         using string_sequence = StringSequence<CharT>;
         using Flags = typename sequence::Flags;
@@ -27,8 +27,7 @@ namespace cerb::lex {
 
     public:
         explicit constexpr DotItem(str_view regex)
-          : text_generator(LocationInFile("DotItem generator"), regex),
-            iterator_for_text(text_generator.begin())
+          : iterator_for_text(GeneratorForText(LocationInFile("DotItem generator"), regex).begin())
         {
             parseRegex();
         }
@@ -59,7 +58,7 @@ namespace cerb::lex {
 
         constexpr auto parseRegex()
         {
-            for (; iterator_for_text != text_generator.end(); ++iterator_for_text) {
+            for (; iterator_for_text != generator_end; ++iterator_for_text) {
                 switch (*iterator_for_text) {
                 case '[':
                     startNewSequenceOfChar();
@@ -98,10 +97,9 @@ namespace cerb::lex {
 
         constexpr auto startNewSequenceOfChar() -> void
         {
-            std::unique_ptr<Object> new_sequence = std::make_unique<sequence>(
-                flags_for_sequence, iterator_for_text, text_generator.end());
+            std::unique_ptr<Object> new_sequence =
+                std::make_unique<sequence>(flags_for_sequence, iterator_for_text, generator_end);
 
-            iterator_for_text = new_sequence->getIterator();
             objects.push_back(std::move(new_sequence));
         }
 
@@ -123,9 +121,8 @@ namespace cerb::lex {
         constexpr auto processString() -> void
         {
             std::unique_ptr<Object> new_string_sequence = std::make_unique<string_sequence>(
-                flags_for_sequence, iterator_for_text, text_generator.end());
+                flags_for_sequence, iterator_for_text, generator_end);
 
-            iterator_for_text = new_string_sequence->getIterator();
             objects.push_back(std::move(new_string_sequence));
         }
 
@@ -144,7 +141,9 @@ namespace cerb::lex {
             getLastSequence().setRule(sequence::Rule::QUESTION);
         }
 
-        TextGenerator<CharT> text_generator{};
+        inline static const auto generator_end =
+            typename GeneratorForText<CharT>::iterator(cast('\0'));
+
         text_iterator iterator_for_text{};
         storage_t objects{};
         Flags flags_for_sequence{};

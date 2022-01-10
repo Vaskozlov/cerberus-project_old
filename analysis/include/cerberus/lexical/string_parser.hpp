@@ -71,7 +71,7 @@ namespace cerb::lex {
             throw StringParsingError("Unable to find end of string.");
         }
 
-        constexpr auto init(CharT string_starter, Iterator begin, Iterator end) -> void
+        constexpr auto init(CharT string_starter, Iterator &begin, Iterator const &end) -> void
         {
             begin_of_string = begin;
             end_of_string = end;
@@ -79,7 +79,7 @@ namespace cerb::lex {
         }
 
         constexpr StringParser() = default;
-        constexpr StringParser(CharT string_starter, Iterator begin, Iterator end)
+        constexpr StringParser(CharT string_starter, Iterator &begin, Iterator const &end)
           : begin_of_string(begin), end_of_string(end), string_char(string_starter)
         {}
 
@@ -176,8 +176,8 @@ namespace cerb::lex {
         }
 
         std::basic_string<CharT> parsed_string{};
-        Iterator begin_of_string{};
-        Iterator end_of_string{};
+        Iterator &begin_of_string{};
+        Iterator const &end_of_string{};
         CharT string_char{};
     };
 }// namespace cerb::lex

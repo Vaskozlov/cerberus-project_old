@@ -24,12 +24,7 @@ namespace cerb::lex {
             sequence_rule = rule;
         }
 
-        CERBLIB_DECL auto getIterator() const -> text_iterator override
-        {
-            return parser_for_string.getIterator();
-        }
-
-        constexpr StringSequence(Flags flags, text_iterator begin, text_iterator end)
+        constexpr StringSequence(Flags flags, text_iterator &begin, text_iterator const &end)
           : parser_for_string{ static_cast<CharT>('\"'), begin, end }
         {
             parser_for_string.parseString();

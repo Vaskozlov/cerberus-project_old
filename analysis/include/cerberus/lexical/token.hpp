@@ -1,7 +1,7 @@
 #ifndef CERBERUS_TOKEN_HPP
 #define CERBERUS_TOKEN_HPP
 
-#include <cerberus/lexical/location.hpp>
+#include <cerberus/lexical/generator_for_text.hpp>
 #include <string>
 #include <vector>
 
@@ -29,7 +29,7 @@ namespace cerb::lex {
 
         CERBLIB_DECL auto getCharacter() const -> size_t
         {
-            return location.getCharacter();
+            return location.getCharacterInLine();
         }
 
         CERBLIB_DECL auto getOffset() const -> size_t
@@ -79,7 +79,7 @@ namespace cerb::lex {
         constexpr virtual ~Token() = default;
         constexpr Token(
             TokenType type_of_token, LocationInFile const &location_in_file,
-            BasicStringView<CharT> const &repr_of_token, TextGenerator<CharT> const &txt_manager)
+            BasicStringView<CharT> const &repr_of_token, GeneratorForText<CharT> const &txt_manager)
           : location(location_in_file), repr(repr_of_token), line(txt_manager.getCurrentLine()),
             tabs_and_spaces(txt_manager.getTabsAndSpaces()), type(type_of_token)
         {}

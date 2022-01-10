@@ -24,12 +24,7 @@ namespace cerb::lex {
             sequence_rule = rule;
         }
 
-        CERBLIB_DECL auto getIterator() const -> text_iterator override
-        {
-            return parser_of_sequence.getIterator();
-        }
-
-        constexpr Sequence(Flags flags, text_iterator begin, text_iterator end)
+        constexpr Sequence(Flags flags, text_iterator &begin, text_iterator const &end)
           : parser_of_sequence{ available_chars, begin, end }
         {
             if (flags.isSet(Flags::PREFIX_OR_POSTFIX)) {

@@ -1,10 +1,10 @@
-#include "location.hpp"
-#include <cerberus/lexical/location.hpp>
+#include "generator_for_text.hpp"
+#include <cerberus/lexical/generator_for_text.hpp>
 
 namespace cerb::test {
     auto txtManagerTestOnStr() -> void
     {
-        TextGenerator<> manager(
+        lex::GeneratorForText<> manager(
             LocationInFile("None"),
             "    "
             "\t\tHello, World! \nIt's a test \t\t  \nstring.");
@@ -14,24 +14,24 @@ namespace cerb::test {
             "    "
             "\t\tHello, World! ");
         EXPECT_TRUE(manager.getFilename() == "None");
-        EXPECT_TRUE(manager.nextYieldedChar() == ' ');
-        EXPECT_TRUE(manager.skipLayoutAndGiveNewChar() == 'H');
+        EXPECT_TRUE(manager.getCharAtCurrentOffset() == ' ');
+        EXPECT_TRUE(manager.skipLayoutAndGiveChar() == 'H');
         EXPECT_TRUE(
             manager.getTabsAndSpaces() ==
             "    "
             "\t\t");
-        EXPECT_TRUE(manager.newChar() == 'e');
+        EXPECT_TRUE(manager.newRawChar() == 'e');
         EXPECT_TRUE(manager.getTabsAndSpaces().empty());
         EXPECT_TRUE(manager.getLine() == 0);
-        EXPECT_TRUE(manager.getCharacter() == 8);
+        EXPECT_TRUE(manager.getCharacterInLine() == 8);
 
-        while (manager.newChar() != '\n') {
+        while (manager.newRawChar() != '\n') {
             // empty statement
         }
 
-        EXPECT_TRUE(manager.skipLayoutAndGiveNewChar() == 'I');
+        EXPECT_TRUE(manager.skipLayoutAndGiveChar() == 'I');
         EXPECT_TRUE(manager.getLine() == 1);
-        EXPECT_TRUE(manager.getCharacter() == 1);
+        EXPECT_TRUE(manager.getCharacterInLine() == 1);
         EXPECT_TRUE(manager.getOffset() == 22);
         EXPECT_TRUE(manager.getCurrentLine() == "It's a test \t\t  ");
     }
@@ -40,18 +40,19 @@ namespace cerb::test {
     {
         txtManagerTestOnStr();
 
-        cerb::string_view str = "Hello,World!It'sateststring.";
-        auto str_it = str.begin();
+        std::string str = "Hello,World!It'sateststring.";
+        std::string process_str{};
 
-        TextGenerator<> manager(
+        lex::GeneratorForText<> manager(
             LocationInFile("None"),
             "    "
             "\t\tHello, World! \nIt's a test \t\t  \nstring.");
 
         for (char elem : manager) {
-            EXPECT_TRUE(*str_it == elem);
-            ++str_it;
+            process_str.push_back(elem);
         }
+
+        EXPECT_TRUE(process_str == str);
 
         return 0;
     }

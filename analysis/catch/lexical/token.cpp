@@ -5,7 +5,7 @@ namespace cerb::test {
 
     auto tokenTest(u32) -> int
     {
-        TextGenerator<> manager(
+        lex::GeneratorForText<> manager(
             LocationInFile("None"),
             "    "
             "\t\tHello, World! \nIt's a test \t\t  \nstring.");
@@ -14,19 +14,19 @@ namespace cerb::test {
             manager.getCurrentLine() ==
             "    "
             "\t\tHello, World! ");
-        EXPECT_TRUE(manager.nextYieldedChar() == ' ');
-        EXPECT_TRUE(manager.skipLayoutAndGiveNewChar() == 'H');
+        EXPECT_TRUE(manager.getCharAtCurrentOffset() == ' ');
+        EXPECT_TRUE(manager.skipLayoutAndGiveChar() == 'H');
         EXPECT_TRUE(
             manager.getTabsAndSpaces() ==
             "    "
             "\t\t");
-        EXPECT_TRUE(manager.newChar() == 'e');
+        EXPECT_TRUE(manager.newRawChar() == 'e');
 
-        while (manager.newChar() != '\n') {
+        while (manager.newRawChar() != '\n') {
             // empty statement
         }
 
-        EXPECT_TRUE(manager.skipLayoutAndGiveNewChar() == 'I');
+        EXPECT_TRUE(manager.skipLayoutAndGiveChar() == 'I');
         lex::Token<char> token{ 10, manager.getLocation(), "It's", manager };
 
         EXPECT_TRUE(token.getType() == 10);

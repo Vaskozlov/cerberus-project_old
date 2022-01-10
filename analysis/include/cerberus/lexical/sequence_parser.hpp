@@ -14,19 +14,17 @@ namespace cerb::lex {
 
         using str_view = BasicStringView<CharT>;
         using constant_bitmap = ConstBitmap<1, number_of_chars>;
-        using text_iterator = GetIteratorType<TextGenerator<CharT>>;
+        using text_iterator = GetIteratorType<GeneratorForText<CharT>>;
 
         constexpr auto reverse() -> void
         {
             available_chars.template reverseBits<0>();
         }
 
-        CERBLIB_DECL auto getIterator() const -> text_iterator
-        {
-            return iterator_for_text;
-        }
-
-        constexpr SequenceParser(constant_bitmap &bitmap, text_iterator begin, text_iterator end)
+        constexpr SequenceParser(
+            constant_bitmap &bitmap,
+            text_iterator &begin,
+            text_iterator const &end)
           : available_chars(bitmap), iterator_for_text(begin), end_of_text(end)
         {
             parseSequence();
@@ -87,13 +85,15 @@ namespace cerb::lex {
         CERBLIB_DECL auto canStartRange() const -> bool
         {
             return logicalAnd(
-                *iterator_for_text == cast('-'), iterator_for_text.nextChar() != cast('-'));
+                *iterator_for_text == cast('-'),
+                iterator_for_text.getCharAtCurrentOffset(1) != cast('-'));
         }
 
         template<CharacterLiteral T>
         CERBLIB_DECL auto charRepeatTwice(T chr) const -> bool
         {
-            return *iterator_for_text == cast(chr) && iterator_for_text.nextChar() == chr;
+            return *iterator_for_text == cast(chr) &&
+                   iterator_for_text.getCharAtCurrentOffset(1) == chr;
         }
 
         CERBLIB_DECL auto skipCharsOrShouldStop() -> bool
@@ -155,8 +155,8 @@ namespace cerb::lex {
         }
 
         constant_bitmap &available_chars{};
-        text_iterator iterator_for_text{};
-        text_iterator end_of_text{};
+        text_iterator &iterator_for_text{};
+        text_iterator const &end_of_text{};
     };
 }// namespace cerb::lex
 
