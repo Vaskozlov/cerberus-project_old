@@ -6,7 +6,7 @@ namespace cerb::test {
     auto tokenTest(u32) -> int
     {
         lex::GeneratorForText<> manager(
-            LocationInFile{"None"},
+            LocationInFile{ "None" },
             "    "
             "\t\tHello, World! \nIt's a test \t\t  \nstring.");
 
@@ -27,7 +27,7 @@ namespace cerb::test {
         }
 
         EXPECT_TRUE(manager.skipLayoutAndGiveChar() == 'I');
-        lex::Token<char> token{ 10, manager.getLocation(), "It's", manager };
+        lex::Token<char, int> token{ 10, manager.getLocation(), "It's", manager };
 
         EXPECT_TRUE(token.getType() == 10);
         EXPECT_TRUE(token.getLine() == 1);

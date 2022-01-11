@@ -57,6 +57,10 @@
 #    define CERBLIB_DEPRECATED_SUGGEST(ALT) [[deprecated(ALT)]]
 #endif /* CERBLIB_DEPRECATED_SUGGEST */
 
+#ifndef CERBLIB_IGNORE
+#    define CERBLIB_IGNORE [[maybe_unused]] auto _ =
+#endif /* CERBLIB_IGNORE */
+
 #ifndef CERBLIB_DO_PRAGMA
 #    ifdef _MSC_VER
 #        define CERBLIB_DO_PRAGMA(x) __pragma(#        x)

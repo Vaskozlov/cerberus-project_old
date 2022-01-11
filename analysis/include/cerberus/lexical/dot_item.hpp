@@ -9,23 +9,41 @@
 
 namespace cerb::lex {
     template<CharacterLiteral CharT, typename TokenType>
-    class DotItem
+    struct DotItem
     {
+        using str_view = BasicStringView<CharT>;
+        using text_iterator = GetIteratorType<GeneratorForText<CharT>>;
+        using sequence = Sequence<CharT, TokenType>;
+        using string_sequence = StringSequence<CharT, TokenType>;
+        using Flags = typename sequence::Flags;
+        using Object = DotItemObject<CharT, TokenType>;
+        using CommentsTokens = typename Object::CommentsTokens;
+        using ParametersPack = typename Object::ParametersPack;
+        using ScanStatus = typename Object::ScanStatus;
+        using storage_t = std::vector<std::unique_ptr<Object>>;
+
         template<std::integral T>
         CERBLIB_DECL static auto cast(T value) -> CharT
         {
             return static_cast<CharT>(value);
         }
 
-        using str_view = BasicStringView<CharT>;
-        using text_iterator = GetIteratorType<GeneratorForText<CharT>>;
-        using sequence = Sequence<CharT>;
-        using string_sequence = StringSequence<CharT>;
-        using Flags = typename sequence::Flags;
-        using Object = DotItemObject<CharT>;
-        using storage_t = std::vector<std::unique_ptr<Object>>;
+        constexpr auto setInput(text_iterator &&new_iterator)
+        {
+            iterator_for_text = std::move(new_iterator);
+        }
 
-    public:
+        constexpr auto setInput(text_iterator const &new_iterator)
+        {
+            iterator_for_text = new_iterator;
+        }
+
+        constexpr auto scan() -> ScanStatus
+        {
+            return ScanStatus{};
+        }
+
+        constexpr DotItem() noexcept = default;
         explicit constexpr DotItem(str_view regex)
           : iterator_for_text(GeneratorForText(LocationInFile("DotItem generator"), regex).begin())
         {
@@ -100,6 +118,8 @@ namespace cerb::lex {
             std::unique_ptr<Object> new_sequence =
                 std::make_unique<sequence>(flags_for_sequence, iterator_for_text, generator_end);
 
+            new_sequence->setIterator(&iterator_for_text);
+
             objects.push_back(std::move(new_sequence));
         }
 
@@ -122,6 +142,8 @@ namespace cerb::lex {
         {
             std::unique_ptr<Object> new_string_sequence = std::make_unique<string_sequence>(
                 flags_for_sequence, iterator_for_text, generator_end);
+
+            new_string_sequence->setIterator(&iterator_for_text);
 
             objects.push_back(std::move(new_string_sequence));
         }

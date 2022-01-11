@@ -7,11 +7,9 @@
 
 namespace cerb::lex {
 
-    template<CharacterLiteral CharT>
+    template<CharacterLiteral CharT, typename TokenType>
     struct Token
     {
-        using TokenType = usize;
-
         CERBLIB_DECL auto getType() const -> TokenType
         {
             return type;
@@ -73,7 +71,6 @@ namespace cerb::lex {
         }
 
         constexpr Token() = default;
-        constexpr virtual ~Token() = default;
         constexpr Token(
             TokenType type_of_token, LocationInFile const &location_in_file,
             BasicStringView<CharT> const &repr_of_token, GeneratorForText<CharT> const &txt_manager)

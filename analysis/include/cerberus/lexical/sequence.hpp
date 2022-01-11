@@ -5,23 +5,26 @@
 #include <cerberus/lexical/sequence_parser.hpp>
 
 namespace cerb::lex {
-    template<CharacterLiteral CharT>
-    struct Sequence final : public DotItemObject<CharT>
+    template<CharacterLiteral CharT, typename TokenType>
+    struct Sequence final : public DotItemObject<CharT, TokenType>
     {
-        using parent = DotItemObject<CharT>;
+        using parent = DotItemObject<CharT, TokenType>;
         using parent::is_prefix_or_postfix;
         using parent::sequence_rule;
         using str = typename parent::str;
         using str_view = typename parent::str_view;
         using Rule = typename parent::Rule;
         using Flags = typename parent::Flags;
+        using ScanStatus = typename parent::ScanStatus;
         using text_iterator = typename parent::text_iterator;
         using text_generator = typename parent::text_generator;
         using sequence_parser = SequenceParser<CharT>;
         using constant_bitmap = typename sequence_parser::constant_bitmap;
 
-        constexpr auto scan() -> void override
-        {}
+        constexpr auto scan() -> ScanStatus override
+        {
+            return ScanStatus{};
+        }
 
         constexpr Sequence(Flags flags, text_iterator &begin, text_iterator const &end)
         {

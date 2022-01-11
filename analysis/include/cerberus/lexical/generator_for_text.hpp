@@ -59,6 +59,11 @@ namespace cerb::lex {
                 static_cast<isize>(getOffset()) + offset_for_offset)];
         }
 
+        CERBLIB_DECL auto getStrFromCurrentState() const -> str_view
+        {
+            return { text_data.begin() + getOffset(), text_data.end() };
+        }
+
         CERBLIB_DECL auto skipLayoutAndGiveChar() -> CharT
         {
             skipLayout();
@@ -149,22 +154,22 @@ namespace cerb::lex {
             CharT current_char{};
         };
 
-        constexpr auto begin() -> iterator
+        CERBLIB_DECL auto begin() -> iterator
         {
             return iterator(*this);
         }
 
-        constexpr auto begin() const -> iterator
+        CERBLIB_DECL auto begin() const -> iterator
         {
             return iterator(*this);
         }
 
-        constexpr auto end() -> iterator
+        CERBLIB_DECL auto end() -> iterator
         {
             return iterator(cast('\0'));
         }
 
-        constexpr auto end() const -> iterator
+        CERBLIB_DECL auto end() const -> iterator
         {
             return iterator(cast('\0'));
         }

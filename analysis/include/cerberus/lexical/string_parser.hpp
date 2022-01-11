@@ -50,7 +50,6 @@ namespace cerb::lex {
                 auto chr = *begin_of_string;
 
                 if (chr == string_char) {
-                    ++begin_of_string;
                     return parsed_string;
                 }
 

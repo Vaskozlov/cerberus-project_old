@@ -118,7 +118,7 @@ namespace cerb {
             return { cbegin() + from, max<size_t>(size, length - from) };
         }
 
-        CERBLIB_DECL auto containsAt(size_t index, BasicStringView const &str) -> bool
+        CERBLIB_DECL auto containsAt(size_t index, BasicStringView const &str) const -> bool
         {
             return BasicStringView(begin() + index, str.size()).operator==(str);
         }
