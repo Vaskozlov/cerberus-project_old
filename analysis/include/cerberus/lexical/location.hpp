@@ -44,15 +44,15 @@ namespace cerb {
         constexpr explicit LocationInFile(
             cerb::string_view name_of_file, size_t current_line = 0, size_t current_character = 0,
             size_t chars_from_the_beginning = 0)
-          : line(current_line), character(current_character), offset(chars_from_the_beginning),
-            filename(name_of_file)
+          : filename(name_of_file), line(current_line), character(current_character),
+            offset(chars_from_the_beginning)
         {}
 
     private:
+        cerb::string_view filename{};
         size_t line{};
         size_t character{};
         size_t offset{};
-        cerb::string_view filename{};
     };
 }// namespace cerb
 

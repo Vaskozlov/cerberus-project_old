@@ -9,25 +9,23 @@ namespace cerb::lex {
     struct StringSequence final : public DotItemObject<CharT>
     {
         using parent = DotItemObject<CharT>;
-        using str = std::basic_string<CharT>;
-        using str_iterator = GetIteratorType<str>;
-        using text_iterator = typename parent::text_iterator;
-        using string_parser = StringParser<CharT, text_iterator>;
+        using parent::is_prefix_or_postfix;
+        using parent::sequence_rule;
+        using str = typename parent::str;
+        using str_iterator = typename parent::str_view;
         using Rule = typename parent::Rule;
         using Flags = typename parent::Flags;
+        using text_iterator = typename parent::text_iterator;
+        using text_generator = typename parent::text_generator;
+        using string_parser = StringParser<CharT, text_iterator>;
 
-        constexpr auto setRule(Rule rule) -> void override
-        {
-            if (sequence_rule != Rule::NONE) {
-                throw DotItemNotASequenceError("Attempt to set rule for sequence twice!");
-            }
-            sequence_rule = rule;
-        }
+        constexpr auto scan() -> void override
+        {}
 
         constexpr StringSequence(Flags flags, text_iterator &begin, text_iterator const &end)
-          : parser_for_string{ static_cast<CharT>('\"'), begin, end }
         {
-            parser_for_string.parseString();
+            string_parser parser_for_string{ static_cast<CharT>('\"'), begin, end };
+            parsed_string = std::move(parser_for_string.parseString());
 
             if (flags.isSet(Flags::PREFIX_OR_POSTFIX)) {
                 is_prefix_or_postfix = true;
@@ -38,10 +36,7 @@ namespace cerb::lex {
         }
 
     private:
-        string_parser parser_for_string{};
-        str &parsed_string{ parser_for_string.get() };
-        Rule sequence_rule{ Rule::NONE };
-        bool is_prefix_or_postfix{ false };
+        str parsed_string{};
     };
 }// namespace cerb::lex
 

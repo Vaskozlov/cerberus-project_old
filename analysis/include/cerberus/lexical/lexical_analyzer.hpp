@@ -13,11 +13,6 @@ namespace cerb::lex {
 
         struct SimpleToken
         {
-            constexpr SimpleToken() = default;
-            constexpr SimpleToken(CharT repr_of_token, TokenType type_of_token)
-              : separator(repr_of_token), type(type_of_token)
-            {}
-
             CharT separator{};
             TokenType type{};
         };
@@ -30,7 +25,7 @@ namespace cerb::lex {
         };
 
         template<std::integral T>
-        CERBLIB_DECL static auto cast(T value)
+        CERBLIB_DECL static auto cast(T value) -> CharT
         {
             return static_cast<CharT>(value);
         }
@@ -43,9 +38,8 @@ namespace cerb::lex {
           : terminals(terminals_pool), comments_tokens(tokens_of_comments),
             char_token(token_for_char), string_token(token_for_string)
         {
-            for (const auto &elem : terminals_pool) {
-                DotItem<CharT, TokenType>(elem.first);
-            }
+            std::ranges::for_each(
+                terminals_pool, [](const auto &elem) { DotItem<CharT, TokenType>(elem.first); });
         }
 
     private:

@@ -5,7 +5,7 @@ namespace cerb::test {
     auto txtManagerTestOnStr() -> void
     {
         lex::GeneratorForText<> manager(
-            LocationInFile("None"),
+            LocationInFile{ "None" },
             "    "
             "\t\tHello, World! \nIt's a test \t\t  \nstring.");
 

@@ -32,9 +32,17 @@ namespace cerb::lex {
 
     private:
         template<std::integral T>
-        CERBLIB_DECL static auto cast(T value)
+        CERBLIB_DECL static auto cast(T value) -> CharT
         {
             return static_cast<CharT>(value);
+        }
+
+        constexpr auto incAndCheckThatStringDoesNotEnd() -> void
+        {
+            ++iterator_for_text;
+            if (iterator_for_text == end_of_text) {
+                throw DotItemNotASequenceError("Unable to close sequence");
+            }
         }
 
         constexpr auto parseSequence() -> void
@@ -43,43 +51,66 @@ namespace cerb::lex {
                 throw DotItemNotASequenceError("Unable to match '[' to start sequence");
             }
 
-            ++iterator_for_text;
+            incAndCheckThatStringDoesNotEnd();
             parseCharsInSequence();
         }
 
         constexpr auto parseCharsInSequence() -> void
         {
-            bool need_to_fill_range = false;
+            bool is_range_of_chars = false;
             CharT previous_char = cast('\0');
 
             for (; iterator_for_text != end_of_text; ++iterator_for_text) {
                 if (canStartRange()) {
-                    need_to_fill_range = true;
+                    is_range_of_chars = true;
                     continue;
                 }
-                if (*iterator_for_text == cast('-')) {
-                    ++iterator_for_text;
 
-                    if (iterator_for_text == end_of_text) {
-                        break;
-                    }
+                if (*iterator_for_text == cast('-')) {
+                    incAndCheckThatStringDoesNotEnd();
                 }
 
                 if (skipCharsOrShouldStop()) {
                     return;
                 }
 
-                if (need_to_fill_range) {
-                    fillRange(previous_char, *iterator_for_text);
-                } else {
-                    setChar(*iterator_for_text);
-                }
+                fillAccordingToRule(is_range_of_chars, previous_char);
 
                 previous_char = *iterator_for_text;
-                need_to_fill_range = false;
+                is_range_of_chars = false;
             }
 
             throw DotItemNotASequenceError("Unable to close sequence");
+        }
+
+        constexpr auto fillAccordingToRule(bool is_range_of_chars, CharT previous_char) -> void
+        {
+            if (is_range_of_chars) {
+                fillRange(previous_char, *iterator_for_text);
+            } else {
+                setChar(*iterator_for_text);
+            }
+        }
+
+        constexpr auto fillRange(CharT first, CharT last) -> void
+        {
+            if (first > last) {
+                throw DotItemNotASequenceError(
+                    "DotItem::SequenceOfChar error! Range start with lower char!");
+            }
+
+            auto converted_first = static_cast<i32>(first);
+            auto converted_last = static_cast<i32>(last);
+
+            for (; converted_first != converted_last; ++converted_first) {
+                setChar(converted_first);
+            }
+        }
+
+        template<std::integral T>
+        constexpr auto setChar(T chr) -> void
+        {
+            available_chars.template set<1, 0>(convert2UnsignedInt(chr));
         }
 
         CERBLIB_DECL auto canStartRange() const -> bool
@@ -87,13 +118,6 @@ namespace cerb::lex {
             return logicalAnd(
                 *iterator_for_text == cast('-'),
                 iterator_for_text.getCharAtCurrentOffset(1) != cast('-'));
-        }
-
-        template<CharacterLiteral T>
-        CERBLIB_DECL auto charRepeatTwice(T chr) const -> bool
-        {
-            return *iterator_for_text == cast(chr) &&
-                   iterator_for_text.getCharAtCurrentOffset(1) == chr;
         }
 
         CERBLIB_DECL auto skipCharsOrShouldStop() -> bool
@@ -115,8 +139,8 @@ namespace cerb::lex {
 
         constexpr auto checkFor2OpenedSequences() -> void
         {
-            if (charRepeatTwice('[')) {
-                ++iterator_for_text;
+            if (doesCharRepeatTwice('[')) {
+                incAndCheckThatStringDoesNotEnd();
             } else {
                 throw DotItemNotASequenceError(
                     "Unable to open sequence inside other sequence. If you mean '[' as a "
@@ -126,32 +150,19 @@ namespace cerb::lex {
 
         CERBLIB_DECL auto skipCharIfNotEndOfSequence() -> bool
         {
-            if (charRepeatTwice(']')) {
-                ++iterator_for_text;
+            if (doesCharRepeatTwice(']')) {
+                incAndCheckThatStringDoesNotEnd();
                 return false;
             }
             return true;
         }
 
-        template<std::integral T>
-        constexpr auto setChar(T chr) -> void
+        template<CharacterLiteral T>
+        CERBLIB_DECL auto doesCharRepeatTwice(T chr) const -> bool
         {
-            available_chars.template set<1, 0>(convert2UnsignedInt(chr));
-        }
-
-        constexpr auto fillRange(CharT first, CharT last) -> void
-        {
-            if (first > last) {
-                throw DotItemNotASequenceError(
-                    "DotItem::SequenceOfChar error! Range start with lower char!");
-            }
-
-            auto converted_first = static_cast<i32>(first);
-            auto converted_last = static_cast<i32>(last);
-
-            for (; converted_first != converted_last; ++converted_first) {
-                setChar(converted_first);
-            }
+            return logicalAnd(
+                *iterator_for_text == cast(chr),
+                iterator_for_text.getCharAtCurrentOffset(1) == chr);
         }
 
         constant_bitmap &available_chars{};

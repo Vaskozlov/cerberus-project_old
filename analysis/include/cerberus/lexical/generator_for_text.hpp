@@ -12,7 +12,7 @@ namespace cerb::lex {
         using str_view = BasicStringView<CharT>;
 
         template<std::integral T>
-        CERBLIB_DECL static auto cast(T value)
+        CERBLIB_DECL static auto cast(T value) -> CharT
         {
             return static_cast<CharT>(value);
         }

@@ -12,7 +12,7 @@ namespace cerb::lex {
     class StringParser
     {
         template<std::integral T>
-        CERBLIB_DECL static auto cast(T value)
+        CERBLIB_DECL static auto cast(T value) -> CharT
         {
             return static_cast<CharT>(value);
         }

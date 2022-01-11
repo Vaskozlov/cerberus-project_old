@@ -72,9 +72,6 @@ namespace cerb::lex {
             return type <=> other;
         }
 
-        virtual auto transformToken() -> void
-        {}
-
         constexpr Token() = default;
         constexpr virtual ~Token() = default;
         constexpr Token(

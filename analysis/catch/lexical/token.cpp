@@ -6,7 +6,7 @@ namespace cerb::test {
     auto tokenTest(u32) -> int
     {
         lex::GeneratorForText<> manager(
-            LocationInFile("None"),
+            LocationInFile{"None"},
             "    "
             "\t\tHello, World! \nIt's a test \t\t  \nstring.");
 
