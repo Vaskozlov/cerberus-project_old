@@ -1,6 +1,8 @@
 #include "bit.hpp"
+#include <cerberus/bits.hpp>
 
-namespace cerb::test {
+namespace cerb::test
+{
 
     auto byteMaskTest() -> void
     {
@@ -8,11 +10,11 @@ namespace cerb::test {
         mask.mask_8[0] = 255;
         mask.mask_8[2] = 255;
 
-        EXPECT_TRUE(mask() == 0xFF00FF);
+        EXPECT_TRUE(mask.getAsInt() == 0xFF00FF);
 
         mask.getAsInt() += 0xFF00;
 
-        EXPECT_TRUE(mask() == 0xFFFFFF);
+        EXPECT_TRUE(mask.getAsInt() == 0xFFFFFF);
     }
 
     auto minMaxTest() -> void

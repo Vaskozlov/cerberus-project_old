@@ -5,7 +5,8 @@
 #include <cerberus/cerberus.hpp>
 #include <cerberus/type.hpp>
 
-namespace cerb {
+namespace cerb
+{
     /**
      * Union which holds target class and provides access to it's bytes
      * @tparam T
@@ -57,19 +58,10 @@ namespace cerb {
             }
         }
 
-        /**
-         * returns stored value as integer.
-         * @return integral representation of stored value.
-         */
-        CERBLIB_DECL auto operator()() const -> decltype(auto)
-        {
-            return getAsInt();
-        }
-
-        constexpr explicit ByteMask(T &&value_) : value(std::move(value_))
+        constexpr explicit ByteMask(T &&value_to_store) : value(std::move(value_to_store))
         {}
 
-        constexpr explicit ByteMask(const T &value_) : value(value_)
+        constexpr explicit ByteMask(const T &value_to_store) : value(value_to_store)
         {}
     };
 
@@ -291,7 +283,8 @@ namespace cerb {
     }
 
 #ifdef _MSC_VER
-    namespace msvc {
+    namespace msvc
+    {
         template<unsigned BitValue, std::unsigned_integral T>
         CERBLIB_DECL auto bitScanForward(T value) -> usize
         {
@@ -423,8 +416,6 @@ namespace cerb {
 
     CERBLIB_DECL auto log2(f32 number) -> isize
     {
-        static_assert(sizeof(f32) == sizeof(u32), "cerb::log2 supports floats and doubles");
-
         if (number <= 0.0f) {
             return -1;
         }
@@ -439,6 +430,10 @@ namespace cerb {
 
     CERBLIB_DECL auto log2(f64 number) -> isize
     {
+        if (number <= 0.0) {
+            return -1;
+        }
+
         const u64 mask = std::bit_cast<u64>(number);
         constexpr i64 f64_exponent_bit = 52;
         constexpr i64 f64_exponent_for_zero_power = 0x3ffU;

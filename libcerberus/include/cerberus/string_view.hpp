@@ -6,17 +6,15 @@
 #include <cerberus/type.hpp>
 #include <string_view>
 
-namespace cerb {
+namespace cerb
+{
     template<CharacterLiteral CharT>
     struct BasicStringView
     {
         using size_type = usize;
         using difference_type = ptrdiff_t;
         using value_type = CharT;
-        using pointer = value_type *;
-        using const_pointer = const value_type *;
-        using reference = value_type &;
-        using const_reference = const value_type &;
+
         using const_iterator = const CharT *;
         using iterator = const_iterator;
         using reverse_iterator = std::reverse_iterator<iterator>;
@@ -25,6 +23,11 @@ namespace cerb {
         CERBLIB_DECL auto size() const -> usize
         {
             return length;
+        }
+
+        CERBLIB_DECL auto empty() const -> bool
+        {
+            return size() == 0;
         }
 
         CERBLIB_DECL auto data() const -> const CharT *
@@ -131,9 +134,7 @@ namespace cerb {
         template<typename T>
         CERBLIB_DECL auto operator==(const T &other) const -> bool
         {
-            static_assert(is_any_of_v<
-                          T, BasicStringView<CharT>, std::basic_string<CharT>,
-                          std::basic_string_view<CharT>>);
+            checkThatTypeIsString<T>();
 
             return std::ranges::equal(
                 *this, BasicStringView<CharT>(std::data(other), std::size(other)));
@@ -147,9 +148,7 @@ namespace cerb {
         template<typename T>
         CERBLIB_DECL auto operator<=>(const T &other) const
         {
-            static_assert(is_any_of_v<
-                          T, BasicStringView<CharT>, std::basic_string<CharT>,
-                          std::basic_string_view<CharT>>);
+            checkThatTypeIsString<T>();
 
             for (size_t i = 0; i < min<size_type>(this->length, std::size(other)); ++i) {
                 if (this->at(i) != other.at(i)) {
@@ -162,7 +161,7 @@ namespace cerb {
 
         constexpr BasicStringView() = default;
 
-        constexpr BasicStringView(const CharT *str) : length(strlen(str)), string(str)
+        constexpr BasicStringView(const CharT *str) : length(strlen(str)), string(str) // NOLINT
         {}
 
         constexpr BasicStringView(const CharT *str, usize length_of_string)
@@ -174,10 +173,18 @@ namespace cerb {
         {}
 
         template<unsigned long Size>
-        constexpr BasicStringView(const CharT (&str)[Size]) : length(Size), string(str)
+        constexpr BasicStringView(const CharT (&str)[Size]) : length(Size), string(str) // NOLINT
         {}
 
     private:
+        template<typename T>
+        constexpr static auto checkThatTypeIsString() -> void
+        {
+            static_assert(is_any_of_v<
+                          T, BasicStringView<CharT>, std::basic_string<CharT>,
+                          std::basic_string_view<CharT>>);
+        }
+
         size_type length{};
         const CharT *string{};
     };
@@ -188,7 +195,8 @@ namespace cerb {
     using u32string_view = BasicStringView<char32_t>;
     using wstring_view = BasicStringView<wchar_t>;
 
-    namespace string_view_literals {
+    namespace string_view_literals
+    {
         consteval auto operator""_sv(const char *string, size_t length) -> BasicStringView<char>
         {
             return { string, length };

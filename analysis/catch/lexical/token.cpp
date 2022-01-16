@@ -1,5 +1,5 @@
 #include "token.hpp"
-#include <cerberus/lexical/token.hpp>
+#include "cerberus/lexical/tokens/token.hpp"
 
 namespace cerb::test {
 

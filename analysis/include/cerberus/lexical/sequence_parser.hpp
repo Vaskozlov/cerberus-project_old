@@ -6,28 +6,26 @@
 #include <cerberus/lexical/lexical_exceptions.hpp>
 #include <cerberus/lexical/location.hpp>
 
-namespace cerb::lex {
+namespace cerb::lex
+{
     template<CharacterLiteral CharT>
     struct SequenceParser
     {
         constexpr static size_t number_of_chars = 1ULL << bitsizeof(CharT);
 
-        using str_view = BasicStringView<CharT>;
-        using constant_bitmap = ConstBitmap<1, number_of_chars>;
-        using text_iterator = GetIteratorType<GeneratorForText<CharT>>;
+        using str_view_t = BasicStringView<CharT>;
+        using constant_bitmap_t = ConstBitmap<1, number_of_chars>;
+        using generator_t = GeneratorForText<CharT>;
 
         constexpr auto reverse() -> void
         {
             available_chars.template reverseBits<0>();
         }
 
-        constexpr SequenceParser(
-            constant_bitmap &bitmap,
-            text_iterator &begin,
-            text_iterator const &end)
-          : available_chars(bitmap), iterator_for_text(begin), end_of_text(end)
+        constexpr SequenceParser(constant_bitmap_t &bitmap, ReferenceWrapper<generator_t> generator)
+          : available_chars(bitmap), text_generator(generator.get())
         {
-            parseSequence();
+            parseCharsInSequence();
         }
 
     private:
@@ -39,20 +37,9 @@ namespace cerb::lex {
 
         constexpr auto incAndCheckThatStringDoesNotEnd() -> void
         {
-            ++iterator_for_text;
-            if (iterator_for_text == end_of_text) {
-                throw DotItemNotASequenceError("Unable to close sequence");
+            if (text_generator.skipLayoutAndGiveChar() == cast('\0')) {
+                throw SequenceError("Unable to close sequence");
             }
-        }
-
-        constexpr auto parseSequence() -> void
-        {
-            if (*iterator_for_text != '[') {
-                throw DotItemNotASequenceError("Unable to match '[' to start sequence");
-            }
-
-            incAndCheckThatStringDoesNotEnd();
-            parseCharsInSequence();
         }
 
         constexpr auto parseCharsInSequence() -> void
@@ -60,13 +47,19 @@ namespace cerb::lex {
             bool is_range_of_chars = false;
             CharT previous_char = cast('\0');
 
-            for (; iterator_for_text != end_of_text; ++iterator_for_text) {
+            if (text_generator.getCharAtCurrentOffset(-1) != cast('[')) {
+                throw SequenceError("Unable to find '[' to start sequence!");
+            }
+
+            incAndCheckThatStringDoesNotEnd();
+
+            for (CharT chr : text_generator) {
                 if (canStartRange()) {
                     is_range_of_chars = true;
                     continue;
                 }
 
-                if (*iterator_for_text == cast('-')) {
+                if (chr == cast('-')) {
                     incAndCheckThatStringDoesNotEnd();
                 }
 
@@ -76,27 +69,26 @@ namespace cerb::lex {
 
                 fillAccordingToRule(is_range_of_chars, previous_char);
 
-                previous_char = *iterator_for_text;
+                previous_char = chr;
                 is_range_of_chars = false;
             }
 
-            throw DotItemNotASequenceError("Unable to close sequence");
+            throw SequenceError("Unable to close sequence");
         }
 
         constexpr auto fillAccordingToRule(bool is_range_of_chars, CharT previous_char) -> void
         {
             if (is_range_of_chars) {
-                fillRange(previous_char, *iterator_for_text);
+                fillRange(previous_char, text_generator.getCharAtCurrentOffset());
             } else {
-                setChar(*iterator_for_text);
+                setChar(text_generator.getCharAtCurrentOffset());
             }
         }
 
         constexpr auto fillRange(CharT first, CharT last) -> void
         {
             if (first > last) {
-                throw DotItemNotASequenceError(
-                    "DotItem::SequenceOfChar error! Range start with lower char!");
+                throw SequenceError("DotItem::SequenceOfChar error! Range start with lower char!");
             }
 
             auto converted_first = static_cast<i32>(first);
@@ -116,13 +108,13 @@ namespace cerb::lex {
         CERBLIB_DECL auto canStartRange() const -> bool
         {
             return logicalAnd(
-                *iterator_for_text == cast('-'),
-                iterator_for_text.getCharAtCurrentOffset(1) != cast('-'));
+                text_generator.getCharAtCurrentOffset(-1) == cast('-'),
+                text_generator.getCharAtCurrentOffset() != cast('-'));
         }
 
         CERBLIB_DECL auto skipCharsOrShouldStop() -> bool
         {
-            switch (*iterator_for_text) {
+            switch (text_generator.getCharAtCurrentOffset(-1)) {
             case cast('['):
                 checkFor2OpenedSequences();
                 break;
@@ -142,7 +134,7 @@ namespace cerb::lex {
             if (doesCharRepeatTwice('[')) {
                 incAndCheckThatStringDoesNotEnd();
             } else {
-                throw DotItemNotASequenceError(
+                throw SequenceError(
                     "Unable to open sequence inside other sequence. If you mean '[' as a "
                     "character use '[[' instead");
             }
@@ -161,13 +153,12 @@ namespace cerb::lex {
         CERBLIB_DECL auto doesCharRepeatTwice(T chr) const -> bool
         {
             return logicalAnd(
-                *iterator_for_text == cast(chr),
-                iterator_for_text.getCharAtCurrentOffset(1) == chr);
+                text_generator.getCharAtCurrentOffset(-1) == cast(chr),
+                text_generator.getCharAtCurrentOffset() == cast(chr));
         }
 
-        constant_bitmap &available_chars{};
-        text_iterator &iterator_for_text{};
-        text_iterator const &end_of_text{};
+        constant_bitmap_t &available_chars;
+        generator_t &text_generator;
     };
 }// namespace cerb::lex
 

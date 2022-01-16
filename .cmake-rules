@@ -18,3 +18,4 @@ if (CERBERUS_STRICT_COMPILATION)
 endif ()
 
 find_package(fmt CONFIG REQUIRED)
+find_package(Threads REQUIRED)

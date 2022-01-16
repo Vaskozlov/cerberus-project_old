@@ -8,46 +8,48 @@
 #include <string>
 
 namespace cerb::lex {
-    template<CharacterLiteral CharT, typename Iterator>
+    template<CharacterLiteral CharT, Iterable T>
     class StringParser
     {
-        template<std::integral T>
-        CERBLIB_DECL static auto cast(T value) -> CharT
+        using str_t = std::basic_string<CharT>;
+
+        template<std::integral U>
+        CERBLIB_DECL static auto cast(U value) -> CharT
         {
             return static_cast<CharT>(value);
         }
 
     public:
-        CERBLIB_DECL auto get() -> std::basic_string<CharT> &
+        CERBLIB_DECL auto get() -> str_t &
         {
             return parsed_string;
         }
 
-        CERBLIB_DECL auto get() const -> std::basic_string<CharT> &
+        CERBLIB_DECL auto get() const -> str_t &
         {
             return parsed_string;
         }
 
-        CERBLIB_DECL auto getIterator() -> Iterator
+        CERBLIB_DECL auto getIterator() -> decltype(auto)
         {
-            return begin_of_string;
+            return iterator_for_value;
         }
 
-        CERBLIB_DECL auto getIterator() const -> Iterator
+        CERBLIB_DECL auto getIterator() const -> decltype(auto)
         {
-            return begin_of_string;
+            return iterator_for_value;
         }
 
-        constexpr auto parseString() -> std::basic_string<CharT> &
+        constexpr auto parseString() -> str_t &
         {
-            if (*begin_of_string != string_char) {
-                throw StringParsingError("Unable to parse a string, because it's not a string!.");
+            if (*iterator_for_value != cast('"')) {
+                throw ParsingError("Given input is not a string!");
             }
 
             incAndCheckThatStringDoesNotEnd();
 
-            for (; begin_of_string != end_of_string; ++begin_of_string) {
-                auto chr = *begin_of_string;
+            for (; iterator_for_value != iterable.end(); ++iterator_for_value) {
+                auto chr = *iterator_for_value;
 
                 if (chr == string_char) {
                     return parsed_string;
@@ -55,7 +57,7 @@ namespace cerb::lex {
 
                 switch (chr) {
                 case '\0':
-                    throw StringParsingError("Unable to find end of string.");
+                    throw ParsingError("Unable to find end of string.");
 
                 case '\\':
                     parseSpecialSymbol();
@@ -67,26 +69,26 @@ namespace cerb::lex {
                 }
             }
 
-            throw StringParsingError("Unable to find end of string.");
+            throw ParsingError("Unable to find end of string.");
         }
 
-        constexpr auto init(CharT string_starter, Iterator &begin, Iterator const &end) -> void
+        constexpr auto init(CharT string_starter, T &iterable_value) -> void
         {
-            begin_of_string = begin;
-            end_of_string = end;
+            iterable = iterable_value;
             string_char = string_starter;
         }
 
         constexpr StringParser() = default;
-        constexpr StringParser(CharT string_starter, Iterator &begin, Iterator const &end)
-          : begin_of_string(begin), end_of_string(end), string_char(string_starter)
+        constexpr StringParser(CharT string_starter, T &iterable_value)
+          : iterable(iterable_value), iterator_for_value(iterable_value.begin()),
+            string_char(string_starter)
         {}
 
     private:
         constexpr auto parseSpecialSymbol() -> void
         {
             incAndCheckThatStringDoesNotEnd();
-            auto chr = *begin_of_string;
+            auto chr = *iterator_for_value;
 
             switch (chr) {
             case cast('t'):
@@ -122,7 +124,7 @@ namespace cerb::lex {
                 break;
 
             default:
-                throw StringParsingError("Unable to match any special symbol");
+                throw ParsingError("Unable to match any special symbol");
             }
         }
 
@@ -151,11 +153,11 @@ namespace cerb::lex {
 
         constexpr auto tryToConvertCharToInt(size_t notation) -> CharT
         {
-            if (!CharsToInt<CharT>.contains(*begin_of_string)) {
+            if (!HexadecimalCharsToInt<CharT>.contains(*iterator_for_value)) {
                 throw std::invalid_argument("Unable to create character by it's value");
             }
 
-            auto number = CharsToInt<CharT>[*begin_of_string];
+            auto number = HexadecimalCharsToInt<CharT>[*iterator_for_value];
 
             if (number >= cast(notation)) {
                 throw std::range_error("Unable to create character by it's value");
@@ -166,17 +168,17 @@ namespace cerb::lex {
 
         constexpr auto incAndCheckThatStringDoesNotEnd() -> void
         {
-            ++begin_of_string;
+            ++iterator_for_value;
 
-            if (begin_of_string == end_of_string) {
-                throw StringParsingError(
+            if (iterator_for_value == iterable.end()) {
+                throw ParsingError(
                     "End of string reached, however special symbol for this have not been found");
             }
         }
 
-        std::basic_string<CharT> parsed_string{};
-        Iterator &begin_of_string{};
-        Iterator const &end_of_string{};
+        str_t parsed_string{};
+        T &iterable;
+        decltype(std::begin(iterable)) iterator_for_value;
         CharT string_char{};
     };
 }// namespace cerb::lex

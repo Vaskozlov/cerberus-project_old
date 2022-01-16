@@ -4,15 +4,16 @@
 #include <exception>
 #include <string_view>
 
-namespace cerb::lex {
-    class StringParsingError : public std::exception
+namespace cerb::lex
+{
+    class ParsingError : public std::exception
     {
-        std::string_view message;
+        std::string_view message{};
 
     public:
-        StringParsingError() = default;
+        ParsingError() = default;
 
-        explicit StringParsingError(std::string_view t_message) : message(t_message)
+        explicit ParsingError(std::string_view t_message) : message(t_message)
         {}
 
         [[nodiscard]] auto what() const noexcept -> const char * override
@@ -21,30 +22,14 @@ namespace cerb::lex {
         }
     };
 
-    class DotItemParsingError : public std::exception
+    class SequenceError : public std::exception
     {
-        std::string_view message;
+        std::string_view message{};
 
     public:
-        DotItemParsingError() = default;
+        SequenceError() = default;
 
-        explicit DotItemParsingError(std::string_view t_message) : message(t_message)
-        {}
-
-        [[nodiscard]] auto what() const noexcept -> const char * override
-        {
-            return message.data();
-        }
-    };
-
-    class DotItemNotASequenceError : public std::exception
-    {
-        std::string_view message;
-
-    public:
-        DotItemNotASequenceError() = default;
-
-        explicit DotItemNotASequenceError(std::string_view t_message) : message(t_message)
+        explicit SequenceError(std::string_view t_message) : message(t_message)
         {}
 
         [[nodiscard]] auto what() const noexcept -> const char * override

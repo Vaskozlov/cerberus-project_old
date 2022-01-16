@@ -5,7 +5,7 @@
 #include <cerberus/cerberus.hpp>
 
 #define CERBERUS_ENUM(name, type, ...)                                                             \
-    class name                                                                                     \
+    class CERBLIB_TRIVIAL name                                                                     \
     {                                                                                              \
         enum struct LocalEnum : type                                                               \
         {                                                                                          \

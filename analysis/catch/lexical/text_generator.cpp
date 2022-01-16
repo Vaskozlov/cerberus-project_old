@@ -1,5 +1,5 @@
 #include "generator_for_text.hpp"
-#include <cerberus/lexical/generator_for_text.hpp>
+#include <cerberus/lexical/text_generator.hpp>
 
 namespace cerb::test {
     auto txtManagerTestOnStr() -> void

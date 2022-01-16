@@ -22,4 +22,6 @@ target_link_libraries(
         fmt::fmt
 )
 
+target_link_libraries(analysis_catch Threads::Threads)
+
 add_test(ANALYSIS_TEST analysis_catch)

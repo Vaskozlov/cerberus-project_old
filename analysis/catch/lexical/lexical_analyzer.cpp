@@ -5,7 +5,7 @@ namespace cerb::test {
     auto lexicalAnalyzerTest(u32) -> int
     {
         lex::LexicalAnalyzer<char, u32> lexical_analyzer{
-            { '\'', 0 }, { '\"', 1 }, { "//", "/*", "*/" }, { { "\"u\"[0-9]+", 2 } }
+            { '\'', 0 }, { '\"', 1 }, { "//", "/*", "*/" }, { { "\"u\"[0-9]+", 2 } }, {}
         };
 
         lexical_analyzer.setStream("None", "/**/ u41095");

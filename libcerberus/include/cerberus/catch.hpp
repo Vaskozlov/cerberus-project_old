@@ -1,8 +1,8 @@
 #ifndef LIBCERBERUS_CATCH_CATCH_HPP
 #define LIBCERBERUS_CATCH_CATCH_HPP
 
-#include "cerberus.hpp"
-#include "pair.hpp"
+#include <cerberus/cerberus.hpp>
+#include <cerberus/pair.hpp>
 #include <fmt/color.h>
 #include <fmt/format.h>
 #include <iostream>

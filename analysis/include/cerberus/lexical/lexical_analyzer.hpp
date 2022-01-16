@@ -1,9 +1,10 @@
 #ifndef CERBERUS_LEXICAL_ANALYZER_HPP
 #define CERBERUS_LEXICAL_ANALYZER_HPP
 
-#include <cerberus/lexical/dot_item.hpp>
-#include <cerberus/lexical/token.hpp>
-#include <cerberus/string_pool.hpp>
+#include <cerberus/lexical/dot_item/dot_item.hpp>
+#include <cerberus/lexical/tokens/token.hpp>
+#include <future>
+#include <memory_resource>
 #include <thread>
 
 namespace cerb::lex {
@@ -11,25 +12,33 @@ namespace cerb::lex {
     class LexicalAnalyzer
     {
         using token_t = Token<CharT, TokenType>;
-        using str_view = BasicStringView<CharT>;
-        using string_pool = StringPool<CharT, TokenType>;
-        using dot_item = DotItem<CharT, TokenType>;
-        using ParameterPack = typename dot_item::ParametersPack;
-        using CommentsTokens = typename dot_item::CommentsTokens;
-        using text_generator = GeneratorForText<CharT>;
-        using text_iterator = GetIteratorType<text_generator>;
-        using string_parser = StringParser<CharT, text_iterator>;
+        using str_view_t = BasicStringView<CharT>;
+        using dot_item_t = DotItem<CharT, TokenType>;
+        using simple_token_t = SimpleToken<CharT, TokenType>;
+        using comments_token_t = CommentsTokens<CharT>;
 
-        struct SimpleToken
-        {
-            CharT separator{};
-            TokenType type{};
-        };
+        using generator_t = typename dot_item_t::generator_t;
+        using parameters_pack_t = typename dot_item_t::parameters_pack_t;
 
         template<std::integral T>
         CERBLIB_DECL static auto cast(T value) -> CharT
         {
             return static_cast<CharT>(value);
+        }
+
+        CERBLIB_DECL auto getSingleLineCommentBegin() const -> str_view_t const &
+        {
+            return analysis_parameters.getSingleLineCommentBegin();
+        }
+
+        CERBLIB_DECL auto getMultilineCommentBegin() const -> str_view_t const &
+        {
+            return analysis_parameters.getMultilineCommentBegin();
+        }
+
+        CERBLIB_DECL auto getMultilineCommentEnd() const -> str_view_t const &
+        {
+            return analysis_parameters.getMultilineCommentEnd();
         }
 
     public:
@@ -38,21 +47,37 @@ namespace cerb::lex {
             return scan();
         }
 
-        constexpr auto setStream(str_view const &filename, str_view const &input) -> void
+        constexpr auto setStream(str_view_t const &filename, str_view_t const &input) -> void
         {
-            input_stream = text_generator(LocationInFile(filename), input);
+            text_generator = { LocationInFile(filename), input };
         }
 
-        constexpr LexicalAnalyzer(
-            SimpleToken const &token_for_char, SimpleToken const &token_for_string,
-            CommentsTokens const &tokens_of_comments,
+        LexicalAnalyzer(
+            simple_token_t const &token_for_char, simple_token_t const &token_for_string,
+            comments_token_t const &tokens_of_comments,
+            std::initializer_list<const Pair<str_view_t, TokenType>> const &items_rules,
             StringPool<CharT, TokenType> const &terminals_pool)
-          : terminals(terminals_pool), comments_tokens(tokens_of_comments),
-            char_token(token_for_char), string_token(token_for_string)
+          : analysis_parameters(
+                terminals_pool, tokens_of_comments, {}, token_for_char, token_for_string)
         {
-            std::ranges::for_each(terminals_pool, [this](const auto &elem) {
-                items_storage.emplace_back(elem.first);
-            });
+            size_t stack_allocation_size =
+                128 + items_rules.size() * sizeof(std::future<void>);
+            auto *stack_buffer = static_cast<u8 *>(alloca(stack_allocation_size));
+
+            std::pmr::monotonic_buffer_resource resource(stack_buffer, stack_allocation_size);
+            std::pmr::vector<std::future<void>> processed_items{ &resource };
+
+            items_storage.reserve(items_rules.size());
+
+            for (const auto &elem : items_rules) {
+                processed_items.emplace_back(std::async(std::launch::async, [&elem, this]() {
+                    items_storage.emplace_back(elem.first, analysis_parameters);
+                }));
+            }
+
+            for (std::future<void> &elem : processed_items) {
+              elem.get();
+            }
         }
 
     private:
@@ -60,8 +85,8 @@ namespace cerb::lex {
         {
             skipLayoutAndComments();
 
-            for (dot_item &item : items_storage) {
-                item.setInput(std::move(input_stream.begin()));
+            for (dot_item_t &item : items_storage) {
+                item.setInput(text_generator);
                 item.scan();
             }
 
@@ -70,22 +95,22 @@ namespace cerb::lex {
 
         constexpr auto skipLayoutAndComments() -> void
         {
-            input_stream.skipLayout();
+            text_generator.skipLayout();
 
             while (hasSkippedComment()) {
-                input_stream.skipLayout();
+                text_generator.skipLayout();
             }
         }
 
         constexpr auto hasSkippedComment() -> bool
         {
-            str_view current_state = input_stream.getStrFromCurrentState();
+            str_view_t current_state = text_generator.getCurrentStateString();
 
-            if (current_state.containsAt(0, comments_tokens.single_line_begin)) {
+            if (current_state.containsAt(0, getSingleLineCommentBegin())) {
                 skipSingleLineComment();
                 return true;
             }
-            if (current_state.containsAt(0, comments_tokens.multiline_begin)) {
+            if (current_state.containsAt(0, getMultilineCommentBegin())) {
                 skipMultilineComment(current_state);
                 return true;
             }
@@ -95,28 +120,28 @@ namespace cerb::lex {
 
         constexpr auto skipSingleLineComment() -> void
         {
-            CharT chr = input_stream.newRawChar();
+            CharT chr = text_generator.newRawChar();
 
             while (logicalAnd(chr != cast('\n'), isEndOfInput(chr))) {
-                chr = input_stream.newRawChar();
+                chr = text_generator.newRawChar();
             }
         }
 
-        constexpr auto skipMultilineComment(str_view const &current_state) -> void
+        constexpr auto skipMultilineComment(str_view_t const &current_state) -> void
         {
             size_t index = 0;
 
-            for (; index < comments_tokens.multiline_begin.size(); ++index) {
-                throwIfEoF(input_stream.newRawChar());
+            for (; index < getMultilineCommentBegin().size(); ++index) {
+                throwIfEoF(text_generator.newRawChar());
             }
 
-            while (!current_state.containsAt(index, comments_tokens.multiline_end)) {
-                throwIfEoF(input_stream.newRawChar());
+            while (!current_state.containsAt(index, getMultilineCommentEnd())) {
+                throwIfEoF(text_generator.newRawChar());
                 ++index;
             }
 
-            for (index = 0; index < comments_tokens.multiline_end.size(); ++index) {
-                throwIfEoF(input_stream.newRawChar());
+            for (index = 0; index < getMultilineCommentEnd().size(); ++index) {
+                throwIfEoF(text_generator.newRawChar());
             }
         }
 
@@ -127,13 +152,9 @@ namespace cerb::lex {
             }
         }
 
-        ParameterPack lexical_analysis_parameters{};
-        std::vector<dot_item> items_storage{};
-        string_pool terminals{};
-        text_generator input_stream{};
-        CommentsTokens comments_tokens{};
-        SimpleToken char_token{};
-        SimpleToken string_token{};
+        parameters_pack_t analysis_parameters{};
+        std::vector<dot_item_t> items_storage{};
+        generator_t text_generator{};
     };
 }// namespace cerb::lex
 

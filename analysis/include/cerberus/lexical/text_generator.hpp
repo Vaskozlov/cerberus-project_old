@@ -1,10 +1,12 @@
-#ifndef CERBERUS_GENERATOR_FOR_TEXT_HPP
-#define CERBERUS_GENERATOR_FOR_TEXT_HPP
+#ifndef CERBERUS_TEXT_GENERATOR_HPP
+#define CERBERUS_TEXT_GENERATOR_HPP
 
 #include <cerberus/lexical/location.hpp>
+#include <cerberus/reference_wrapper.hpp>
 #include <string>
 
-namespace cerb::lex {
+namespace cerb::lex
+{
     template<CharacterLiteral CharT = char>
     class GeneratorForText
     {
@@ -18,6 +20,9 @@ namespace cerb::lex {
         }
 
     public:
+        struct iterator;
+        struct referenced_iterator;
+
         CERBLIB_DECL auto getLine() const -> size_t
         {
             return location.getLine();
@@ -59,7 +64,7 @@ namespace cerb::lex {
                 static_cast<isize>(getOffset()) + offset_for_offset)];
         }
 
-        CERBLIB_DECL auto getStrFromCurrentState() const -> str_view
+        CERBLIB_DECL auto getCurrentStateString() const -> str_view
         {
             return { text_data.begin() + getOffset(), text_data.end() };
         }
@@ -105,73 +110,19 @@ namespace cerb::lex {
             }
         }
 
-        struct iterator
+        CERBLIB_DECL auto begin() -> referenced_iterator
         {
-            constexpr auto operator++() -> iterator &
-            {
-                current_char = generator.skipLayoutAndGiveChar();
-                return *this;
-            }
-
-            constexpr auto operator++(int) -> iterator &
-            {
-                auto save = *this;
-                current_char = generator.skipLayoutAndGiveChar();
-                return save;
-            }
-
-            constexpr auto operator*() const -> CharT
-            {
-                return current_char;
-            }
-
-            constexpr auto operator==(CharT other) const -> bool
-            {
-                return current_char == other;
-            }
-
-            constexpr auto operator==(iterator const &other) const -> bool
-            {
-                return current_char == other.current_char;
-            }
-
-            constexpr auto getCharAtCurrentOffset(i32 offset_for_current_char) const -> CharT
-            {
-                return generator.getCharAtCurrentOffset(offset_for_current_char);
-            }
-
-            constexpr iterator() = default;
-
-            constexpr explicit iterator(CharT chr) : current_char(chr)
-            {}
-
-            constexpr explicit iterator(GeneratorForText const &gen)
-              : generator(gen), current_char(generator.skipLayoutAndGiveChar())
-            {}
-
-        private:
-            GeneratorForText generator{};
-            CharT current_char{};
-        };
-
-        CERBLIB_DECL auto begin() -> iterator
-        {
-            return iterator(*this);
+            return referenced_iterator(ReferenceWrapper(*this));
         }
 
         CERBLIB_DECL auto begin() const -> iterator
         {
-            return iterator(*this);
+            return iterator(ReferenceWrapper(*this));
         }
 
-        CERBLIB_DECL auto end() -> iterator
+        CERBLIB_DECL static auto end() -> CharT
         {
-            return iterator(cast('\0'));
-        }
-
-        CERBLIB_DECL auto end() const -> iterator
-        {
-            return iterator(cast('\0'));
+            return cast('\0');
         }
 
         constexpr GeneratorForText() = default;
@@ -225,6 +176,126 @@ namespace cerb::lex {
         str_view text_data{};
         str_view current_line{};
     };
+
+    template<CharacterLiteral CharT>
+    struct GeneratorForText<CharT>::iterator
+    {
+        constexpr auto operator++() -> iterator &
+        {
+            current_char = generator.skipLayoutAndGiveChar();
+            return *this;
+        }
+
+        constexpr auto operator++(int) -> iterator &
+        {
+            auto save = *this;
+            current_char = generator.skipLayoutAndGiveChar();
+            return save;
+        }
+
+        constexpr auto operator*() const -> CharT
+        {
+            return current_char;
+        }
+
+        constexpr auto operator==(CharT other) const -> bool
+        {
+            return current_char == other;
+        }
+
+        constexpr auto operator==(iterator const &other) const -> bool
+        {
+            return current_char == other.current_char;
+        }
+
+        constexpr iterator() = default;
+        constexpr explicit iterator(CharT chr) : current_char(chr)
+        {}
+        constexpr explicit iterator(ReferenceWrapper<const GeneratorForText> gen)
+          : generator(gen.get()), current_char(generator.skipLayoutAndGiveChar())
+        {}
+
+    private:
+        GeneratorForText generator{};
+        CharT current_char{};
+    };
+
+    template<CharacterLiteral CharT>
+    struct GeneratorForText<CharT>::referenced_iterator
+    {
+        constexpr auto operator++() -> referenced_iterator &
+        {
+            current_char = generator.skipLayoutAndGiveChar();
+            return *this;
+        }
+
+        constexpr auto operator*() const -> CharT
+        {
+            return current_char;
+        }
+
+        constexpr auto operator==(CharT other) const -> bool
+        {
+            return current_char == other;
+        }
+
+        constexpr auto operator==(iterator const &other) const -> bool
+        {
+            return current_char == other.current_char;
+        }
+
+        constexpr auto operator==(referenced_iterator const &other) const -> bool
+        {
+            return current_char == other.current_char;
+        }
+
+        constexpr referenced_iterator() = default;
+        constexpr explicit referenced_iterator(CharT chr) : current_char(chr)
+        {}
+        constexpr explicit referenced_iterator(ReferenceWrapper<GeneratorForText> gen)
+          : generator(gen.get())
+        {
+            if (generator.getOffset() == 0) {
+                current_char = generator.skipLayoutAndGiveChar();
+            } else {
+                current_char = generator.getCharAtCurrentOffset(-1);
+            }
+        }
+
+    private:
+        GeneratorForText &generator;
+        CharT current_char{};
+    };
+
 }// namespace cerb::lex
 
-#endif /* CERBERUS_GENERATOR_FOR_TEXT_HPP */
+namespace cerb::lex::test
+{
+    template<CharacterLiteral CharT>
+    struct TextGenerator
+    {
+        using location_t = LocationInFile;
+        using str_t = std::basic_string<CharT>;
+        using str_view_t = BasicStringView<CharT>;
+
+        template<std::integral U>
+        CERBLIB_DECL static auto cast(U value) -> CharT
+        {
+            return static_cast<CharT>(value);
+        }
+
+        constexpr TextGenerator() = default;
+        constexpr explicit TextGenerator(
+            str_view_t const &files_text, LocationInFile const &current_location = {})
+          : location(current_location), text(files_text)
+        {}
+
+    private:
+        location_t location{};
+        str_t tabs_and_spaces{};
+        str_view_t text{};
+        str_view_t current_line{};
+    };
+}// namespace cerb::lex::test
+
+#endif /* CERBERUS_TEXT_GENERATOR_HPP */

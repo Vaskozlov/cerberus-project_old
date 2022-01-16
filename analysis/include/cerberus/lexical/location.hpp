@@ -4,7 +4,8 @@
 #include <cerberus/lexical/char.hpp>
 #include <cerberus/string_view.hpp>
 
-namespace cerb {
+namespace cerb
+{
     struct LocationInFile
     {
         CERBLIB_DECL auto getLine() const -> size_t

@@ -6,7 +6,7 @@
 
 namespace cerb {
     template<typename T>
-    struct RawPointerWrapper
+    struct CERBLIB_TRIVIAL RawPointerWrapper
     {
         CERBLIB_DECL auto operator*() -> decltype(auto)
         {

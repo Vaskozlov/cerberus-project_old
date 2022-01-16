@@ -1,12 +1,12 @@
-#include "bit.hpp"
-#include "bitmap.hpp"
+#include "bits/bit.hpp"
+#include "bits/bitmap.hpp"
 #include "enum.hpp"
 #include "flat_map.hpp"
-#include "memory.hpp"
+#include "memory/memory.hpp"
+#include "memory/pointer_wrapper.hpp"
 #include "pair.hpp"
-#include "pointer_wrapper.hpp"
-#include "string_pool.hpp"
-#include "string_view.hpp"
+#include "strings/string_pool.hpp"
+#include "strings/string_view.hpp"
 
 auto main() -> int
 {

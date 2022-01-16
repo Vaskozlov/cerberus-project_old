@@ -5,9 +5,10 @@
 #include <cerberus/flat_map.hpp>
 #include <cerberus/type.hpp>
 
-namespace cerb::lex {
+namespace cerb::lex
+{
     template<CharacterLiteral CharT>
-    constexpr FlatMap<CharT, u16, 22> CharsToInt{
+    constexpr FlatMap<CharT, u16, 22> HexadecimalCharsToInt{
         { static_cast<CharT>('0'), 0 },  { static_cast<CharT>('1'), 1 },
         { static_cast<CharT>('2'), 2 },  { static_cast<CharT>('3'), 3 },
         { static_cast<CharT>('4'), 4 },  { static_cast<CharT>('5'), 5 },
