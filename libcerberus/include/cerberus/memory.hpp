@@ -5,9 +5,11 @@
 #include <cerberus/type.hpp>
 #include <iterator>
 
-namespace cerb {
+namespace cerb
+{
 #if CERBLIB_AMD64
-    namespace amd64 {
+    namespace amd64
+    {
         template<typename T>
         constexpr auto fill(T *dest, T value, size_t times) -> void
         {
@@ -149,7 +151,7 @@ namespace cerb {
             }
         }
 #endif
-        std::ranges::fill(dest, value);
+        cerb::ranges::fill(dest, value);
     }
 
     template<typename T>
@@ -210,7 +212,7 @@ namespace cerb {
             }
         }
 #endif
-        return std::ranges::find(iterable_class, value2find);
+        return std::find(iterable_class.begin(), iterable_class.end(), value2find);
     }
 
     template<typename T>

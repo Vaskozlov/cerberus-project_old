@@ -52,7 +52,7 @@ namespace cerb::test {
         {}
     };
 
-    using PairedNumbers = Pair<isize, double>;
+    using PairedNumbers = Pair<ssize_t, double>;
 
     constexpr auto expectTrue(bool condition, const Location &loc = CERBLIB_LOCATION) -> void
     {

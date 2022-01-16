@@ -7,21 +7,22 @@
 #include <cerberus/memory.hpp>
 #include <memory>
 
-namespace cerb {
+namespace cerb
+{
 
     template<size_t AxisN, size_t BitN>
     struct ConstBitmap
     {
         static_assert(AxisN != 0);
 
-        using value_type = usize;
+        using value_type = size_t;
         using const_value_type = value_type;
         using pointer = value_type *;
         using const_pointer = const value_type *;
 
         constexpr static size_t length_of_axis =
             BitN / bitsizeof(value_type) + static_cast<size_t>(BitN % bitsizeof(value_type) != 0);
-        constexpr static usize npos = std::numeric_limits<usize>::max();
+        constexpr static size_t npos = std::numeric_limits<size_t>::max();
 
         using axis_storage_t = std::array<value_type, length_of_axis>;
         using storage_t = std::array<axis_storage_t, AxisN>;
@@ -54,17 +55,17 @@ namespace cerb {
 
         constexpr auto clear() -> void
         {
-            std::ranges::for_each(storage, [](axis_storage_t &axis_storage) {
+            cerb::ranges::for_each(storage, [](axis_storage_t &axis_storage) {
                 fill(axis_storage, static_cast<value_type>(0));
             });
         }
 
-        template<u16 BitValue, usize Axis>
+        template<u16 BitValue, size_t Axis>
         constexpr auto set(size_t index) -> decltype(auto)
         {
             static_assert(Axis < AxisN);
 
-            return bit::set<BitValue, usize>(storage[Axis].begin(), index);
+            return bit::set<BitValue, size_t>(storage[Axis].begin(), index);
         }
 
         template<size_t Axis>
@@ -72,7 +73,7 @@ namespace cerb {
         {
             static_assert(Axis < AxisN);
 
-            return bit::at<usize>(storage[Axis].begin(), index);
+            return bit::at<size_t>(storage[Axis].begin(), index);
         }
 
         template<size_t Axis>
@@ -86,7 +87,7 @@ namespace cerb {
         }
 
         template<bit::ValueOfBit... BitValues>
-        constexpr auto find() -> usize
+        constexpr auto find() -> size_t
         {
             static_assert(AxisN == sizeof...(BitValues));
 
@@ -94,12 +95,12 @@ namespace cerb {
 
             for (; index < storage.size(); ++index) {
                 auto suitable_bits =
-                    bit::applyMaskOnArray<usize, GetIteratorType<storage_t>, BitValues...>(
+                    bit::applyMaskOnArray<size_t, GetIteratorType<storage_t>, BitValues...>(
                         index, storage.begin());
 
                 if (suitable_bits != 0) {
                     auto bit_index =
-                        index * bitsizeof(usize) + bitScanForward<1, usize>(suitable_bits);
+                        index * bitsizeof(size_t) + bitScanForward<1, size_t>(suitable_bits);
                     return bit_index < BitN ? bit_index : npos;
                 }
             }

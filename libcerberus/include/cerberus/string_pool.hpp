@@ -102,7 +102,7 @@ namespace cerb
         constexpr auto doesLevelContainChar(string_storage_const_iterator level, CharT chr) const
             -> bool
         {
-            return std::bit_cast<bool>(level->template at<0>(convert2UnsignedInt(chr)));
+            return cerb::bit_cast<bool>(level->template at<0>(convert2UnsignedInt(chr)));
         }
 
         constexpr auto addStringToBitmap(str_view_t const &string)

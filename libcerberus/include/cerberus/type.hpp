@@ -4,7 +4,8 @@
 #include <memory>
 #include <type_traits>
 
-namespace cerb {
+namespace cerb
+{
     template<typename TargetType, typename... SuitableTypes>
     struct is_any_of
     {
@@ -78,11 +79,16 @@ namespace cerb {
     concept Enum = std::is_enum_v<T>;
 
     template<typename T>
-    concept CanBeStoredInIntegral =
-        is_one_of(sizeof(T), sizeof(u8), sizeof(u16), sizeof(u32), sizeof(u64), sizeof(usize));
+    concept CanBeStoredInIntegral = is_one_of(
+        sizeof(T),
+        sizeof(uint8_t),
+        sizeof(uint16_t),
+        sizeof(uint32_t),
+        sizeof(uint64_t),
+        sizeof(size_t));
 
     template<typename T>
-    concept Trivial = std::is_trivial_v<T> &&(sizeof(T) <= sizeof(usize) * 2);
+    concept Trivial = std::is_trivial_v<T> &&(sizeof(T) <= sizeof(size_t) * 2);
 
     template<typename T>
     concept NotTrivial = !Trivial<T>;
@@ -128,5 +134,7 @@ namespace cerb {
     template<HasGotSizeType T>
     using GetSizeType = typename T::size_type;
 }// namespace cerb
+
+#include <cerberus/features.hpp>
 
 #endif /* LIBCERBERUS_TYPE_HPP */

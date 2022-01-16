@@ -210,15 +210,15 @@ namespace cerb
         if constexpr (std::is_unsigned_v<T>) {
             return number;
         } else if constexpr (sizeof(T) == sizeof(u8)) {
-            return std::bit_cast<u8>(number);
+            return cerb::bit_cast<u8>(number);
         } else if constexpr (sizeof(T) == sizeof(u16)) {
-            return std::bit_cast<u16>(number);
+            return cerb::bit_cast<u16>(number);
         } else if constexpr (sizeof(T) == sizeof(u32)) {
-            return std::bit_cast<u32>(number);
+            return cerb::bit_cast<u32>(number);
         } else if constexpr (sizeof(T) == sizeof(u64)) {
-            return std::bit_cast<u64>(number);
-        } else if constexpr (sizeof(T) == sizeof(usize)) {
-            return std::bit_cast<usize>(number);
+            return cerb::bit_cast<u64>(number);
+        } else if constexpr (sizeof(T) == sizeof(size_t)) {
+            return cerb::bit_cast<size_t>(number);
         }
     }
 
@@ -249,7 +249,7 @@ namespace cerb
      * @param number
      * @return trunked integer
      */
-    template<usize PowerOf2, std::integral T>
+    template<size_t PowerOf2, std::integral T>
     CERBLIB_DECL auto trunk(T number) -> T
     {
         return number & ~(pow2<T>(PowerOf2) - 1);
@@ -262,7 +262,7 @@ namespace cerb
      * @param number
      * @return ceiled integer
      */
-    template<usize PowerOf2, std::integral T>
+    template<size_t PowerOf2, std::integral T>
     CERBLIB_DECL auto ceil(T number) -> T
     {
         return number + (pow2<T>(PowerOf2) - number % pow2<T>(PowerOf2));
@@ -342,7 +342,7 @@ namespace cerb
      * @return
      */
     template<unsigned BitValue, std::unsigned_integral T>
-    CERBLIB_DECL auto bitScanForward(T value) -> usize
+    CERBLIB_DECL auto bitScanForward(T value) -> size_t
     {
         static_assert(BitValue == 0 || BitValue == 1);
 
@@ -350,7 +350,7 @@ namespace cerb
             value = ~value;
         }
         if (value == 0) {
-            return bitsizeof(usize);
+            return bitsizeof(size_t);
         }
 
 #ifdef _MSC_VER
@@ -367,7 +367,7 @@ namespace cerb
 #    endif
         return static_cast<usize>(bit_index);
 #else
-        return static_cast<usize>(__builtin_ctzl(static_cast<usize>(value)));
+        return static_cast<size_t>(__builtin_ctzl(static_cast<size_t>(value)));
 #endif
     }
 
@@ -379,7 +379,7 @@ namespace cerb
      * @return
      */
     template<unsigned BitValue, std::unsigned_integral T>
-    CERBLIB_DECL auto bitScanReverse(T value) -> usize
+    CERBLIB_DECL auto bitScanReverse(T value) -> size_t
     {
         static_assert(BitValue == 0 || BitValue == 1);
 
@@ -387,7 +387,7 @@ namespace cerb
             value = ~value;
         }
         if (value == 0) {
-            return bitsizeof(usize);
+            return bitsizeof(size_t);
         }
 
 #ifdef _MSC_VER
@@ -405,40 +405,40 @@ namespace cerb
         return bit_index;
 #else
         return bitsizeof(unsigned long) - 1UL -
-               static_cast<usize>(__builtin_clzl(static_cast<usize>(value)));
+               static_cast<size_t>(__builtin_clzl(static_cast<size_t>(value)));
 #endif
     }
 
-    CERBLIB_DECL auto log2(std::unsigned_integral auto number) -> usize
+    CERBLIB_DECL auto log2(std::unsigned_integral auto number) -> size_t
     {
         return bitScanForward<1>(number);
     }
 
-    CERBLIB_DECL auto log2(f32 number) -> isize
+    CERBLIB_DECL auto log2(f32 number) -> ssize_t
     {
         if (number <= 0.0f) {
             return -1;
         }
 
-        const u32 mask = std::bit_cast<u32>(number);
+        const u32 mask = cerb::bit_cast<u32>(number);
         constexpr i32 f32_exponent_bit = 23;
         constexpr i32 f32_exponent_for_zero_power = 0x7fU;
         constexpr u32 f32_exponent_mask = 0xFF80'0000;
-        return static_cast<isize>((mask & f32_exponent_mask) >> f32_exponent_bit) -
+        return static_cast<ssize_t>((mask & f32_exponent_mask) >> f32_exponent_bit) -
                f32_exponent_for_zero_power;
     }
 
-    CERBLIB_DECL auto log2(f64 number) -> isize
+    CERBLIB_DECL auto log2(f64 number) -> ssize_t
     {
         if (number <= 0.0) {
             return -1;
         }
 
-        const u64 mask = std::bit_cast<u64>(number);
+        const u64 mask = cerb::bit_cast<u64>(number);
         constexpr i64 f64_exponent_bit = 52;
         constexpr i64 f64_exponent_for_zero_power = 0x3ffU;
         constexpr u64 f64_exponent_mask = 0xFFF0'0000'0000'0000;
-        return static_cast<isize>((mask & f64_exponent_mask) >> f64_exponent_bit) -
+        return static_cast<ssize_t>((mask & f64_exponent_mask) >> f64_exponent_bit) -
                f64_exponent_for_zero_power;
     }
 }// namespace cerb

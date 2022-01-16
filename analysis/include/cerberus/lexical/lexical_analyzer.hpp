@@ -4,10 +4,10 @@
 #include <cerberus/lexical/dot_item/dot_item.hpp>
 #include <cerberus/lexical/tokens/token.hpp>
 #include <future>
-#include <memory_resource>
 #include <thread>
 
-namespace cerb::lex {
+namespace cerb::lex
+{
     template<CharacterLiteral CharT, typename TokenType>
     class LexicalAnalyzer
     {
@@ -60,13 +60,9 @@ namespace cerb::lex {
           : analysis_parameters(
                 terminals_pool, tokens_of_comments, {}, token_for_char, token_for_string)
         {
-            size_t stack_allocation_size =
-                128 + items_rules.size() * sizeof(std::future<void>);
-            auto *stack_buffer = static_cast<u8 *>(alloca(stack_allocation_size));
+            std::vector<std::future<void>> processed_items{};
 
-            std::pmr::monotonic_buffer_resource resource(stack_buffer, stack_allocation_size);
-            std::pmr::vector<std::future<void>> processed_items{ &resource };
-
+            processed_items.reserve(items_rules.size());
             items_storage.reserve(items_rules.size());
 
             for (const auto &elem : items_rules) {
@@ -76,7 +72,7 @@ namespace cerb::lex {
             }
 
             for (std::future<void> &elem : processed_items) {
-              elem.get();
+                elem.get();
             }
         }
 

@@ -11,7 +11,7 @@ namespace cerb
     template<CharacterLiteral CharT>
     struct BasicStringView
     {
-        using size_type = usize;
+        using size_type = size_t;
         using difference_type = ptrdiff_t;
         using value_type = CharT;
 
@@ -20,7 +20,7 @@ namespace cerb
         using reverse_iterator = std::reverse_iterator<iterator>;
         using const_reverse_iterator = std::reverse_iterator<const_iterator>;
 
-        CERBLIB_DECL auto size() const -> usize
+        CERBLIB_DECL auto size() const -> size_t
         {
             return length;
         }
@@ -135,9 +135,9 @@ namespace cerb
         CERBLIB_DECL auto operator==(const T &other) const -> bool
         {
             checkThatTypeIsString<T>();
+            auto other_str = BasicStringView<CharT>(std::data(other), std::size(other));
 
-            return std::ranges::equal(
-                *this, BasicStringView<CharT>(std::data(other), std::size(other)));
+            return cerb::ranges::equal(*this, other_str);
         }
 
         CERBLIB_DECL auto operator<=>(const CharT *other) const -> decltype(auto)
@@ -161,10 +161,10 @@ namespace cerb
 
         constexpr BasicStringView() = default;
 
-        constexpr BasicStringView(const CharT *str) : length(strlen(str)), string(str) // NOLINT
+        constexpr BasicStringView(const CharT *str) : length(strlen(str)), string(str)// NOLINT
         {}
 
-        constexpr BasicStringView(const CharT *str, usize length_of_string)
+        constexpr BasicStringView(const CharT *str, size_t length_of_string)
           : length(length_of_string), string(str)
         {}
 
@@ -173,7 +173,7 @@ namespace cerb
         {}
 
         template<unsigned long Size>
-        constexpr BasicStringView(const CharT (&str)[Size]) : length(Size), string(str) // NOLINT
+        constexpr BasicStringView(const CharT (&str)[Size]) : length(Size), string(str)// NOLINT
         {}
 
     private:

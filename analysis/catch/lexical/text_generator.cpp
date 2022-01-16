@@ -1,7 +1,8 @@
 #include "generator_for_text.hpp"
 #include <cerberus/lexical/text_generator.hpp>
 
-namespace cerb::test {
+namespace cerb::test
+{
     auto txtManagerTestOnStr() -> void
     {
         lex::GeneratorForText<> manager(
@@ -40,6 +41,7 @@ namespace cerb::test {
     {
         txtManagerTestOnStr();
 
+        /*
         std::string str = "Hello,World!It'sateststring.";
         std::string process_str{};
 
@@ -53,6 +55,19 @@ namespace cerb::test {
         }
 
         EXPECT_TRUE(process_str == str);
+        */
+
+        cerb::lex::test::TextGenerator<char> generator("Hello, World!");
+
+        for (size_t i = 0; i < 8; ++i) {
+            if (i == 2) {
+                putchar(generator.getCleanChar());
+                std::cout << std::endl;
+            } else {
+                putchar(generator.getRawChar());
+                std::cout << std::endl;
+            }
+        }
 
         return 0;
     }

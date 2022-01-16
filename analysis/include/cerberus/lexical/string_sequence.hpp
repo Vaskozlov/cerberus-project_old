@@ -21,7 +21,6 @@ namespace cerb::lex {
         using generator_t = typename parent::generator_t;
         using string_parser = StringParser<CharT, generator_t>;
         using parameters_pack_t = typename parent::parameters_pack_t;
-        using generator_reference_t = typename parent::generator_reference_t;
 
         constexpr auto scan() -> ScanStatus override
         {
@@ -36,10 +35,10 @@ namespace cerb::lex {
 
         constexpr StringSequence(
             parameters_pack_t const &parameters_for_analysis, Flags object_flags,
-            generator_reference_t text_generator)
-          : parent(reference(text_generator), parameters_for_analysis), flags(object_flags)
+            ReferenceWrapper<generator_t> generator_for_text)
+          : parent(reference(generator_for_text), parameters_for_analysis), flags(object_flags)
         {
-            string_parser parser_for_string{ static_cast<CharT>('\"'), text_generator.get() };
+            string_parser parser_for_string{ static_cast<CharT>('\"'), generator_for_text.get() };
             parsed_string = std::move(parser_for_string.parseString());
 
             if (flags.isSet(Flags::PREFIX_OR_POSTFIX)) {

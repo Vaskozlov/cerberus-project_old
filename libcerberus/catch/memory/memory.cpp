@@ -3,7 +3,8 @@
 #include <cerberus/pointer_wrapper.hpp>
 #include <vector>
 
-namespace cerb::test {
+namespace cerb::test
+{
 
     constexpr i32 CheckValueI32 = -134;
     constexpr u8 TestU8Value = 255U;
@@ -30,26 +31,27 @@ namespace cerb::test {
         std::array<T, ArraySize> dest{};
 
         copy(src.data(), random_data, ArraySize);
-        EXPECT_TRUE(std::ranges::equal(
-            RawPointerWrapper<T>{ src.data(), ArraySize },
-            RawPointerWrapper<T>{ random_data, ArraySize }));
+        auto raw_ptr_to_scr = RawPointerWrapper<T>{ src.data(), ArraySize };
+        auto raw_ptr_to_data = RawPointerWrapper<T>{ random_data, ArraySize };
+
+        EXPECT_TRUE(cerb::ranges::equal(raw_ptr_to_scr, raw_ptr_to_data));
 
         copy(dest, src);
-        EXPECT_TRUE(std::ranges::equal(src, dest));
+        EXPECT_TRUE(cerb::ranges::equal(src, dest));
     }
 
-    auto generateRandomComplexData(usize size) -> std::unique_ptr<PairedNumbers>
+    auto generateRandomComplexData(size_t size) -> std::unique_ptr<PairedNumbers>
     {
         static std::random_device random_device;
         static std::mt19937 engine(random_device());
 
-        static std::uniform_int_distribution<isize> isize_distribution(
-            std::numeric_limits<isize>::min(), std::numeric_limits<isize>::max());
+        static std::uniform_int_distribution<ssize_t> isize_distribution(
+            std::numeric_limits<ssize_t>::min(), std::numeric_limits<ssize_t>::max());
 
         auto random_complex_data = std::unique_ptr<PairedNumbers>(
             static_cast<PairedNumbers *>(::operator new(size * sizeof(PairedNumbers))));
 
-        for (usize i = 0; i < size; ++i) {
+        for (size_t i = 0; i < size; ++i) {
             random_complex_data.get()[i] = { isize_distribution(engine),
                                              static_cast<double>(isize_distribution(engine)) };
         }
@@ -147,7 +149,7 @@ namespace cerb::test {
         auto random_data_8 = createRandomArrayOfInts<u8>(buffer_size);
         auto random_data_16 = createRandomArrayOfInts<u16>(buffer_size);
         auto random_data_32 = createRandomArrayOfInts<u32>(buffer_size);
-        auto random_data_usize = createRandomArrayOfInts<usize>(buffer_size);
+        auto random_data_usize = createRandomArrayOfInts<size_t>(buffer_size);
         auto random_complex_data = generateRandomComplexData(complex_buffer_size);
 
         copyRandomData2ArrayAndTestMemcpyOnIt<buffer_size>(random_data_8.get());
