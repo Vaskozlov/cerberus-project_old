@@ -5,69 +5,55 @@ namespace cerb::test
 {
     auto txtManagerTestOnStr() -> void
     {
-        lex::GeneratorForText<> manager(
-            LocationInFile{ "None" },
+        lex::TextGenerator<> manager(
             "    "
-            "\t\tHello, World! \nIt's a test \t\t  \nstring.");
+            "\t\tHello, World! \nIt's a test \t\t  \nstring.",
+            "None");
 
         EXPECT_TRUE(
-            manager.getCurrentLine() ==
+            manager.getLineInText() ==
             "    "
             "\t\tHello, World! ");
         EXPECT_TRUE(manager.getFilename() == "None");
-        EXPECT_TRUE(manager.getCharAtCurrentOffset() == ' ');
-        EXPECT_TRUE(manager.skipLayoutAndGiveChar() == 'H');
+        EXPECT_TRUE(manager.getCurrentChar() == '\0');
+        EXPECT_TRUE(manager.getCharWithoutLayout() == 'H');
         EXPECT_TRUE(
             manager.getTabsAndSpaces() ==
             "    "
             "\t\t");
-        EXPECT_TRUE(manager.newRawChar() == 'e');
+        EXPECT_TRUE(manager.getRawChar() == 'e');
         EXPECT_TRUE(manager.getTabsAndSpaces().empty());
-        EXPECT_TRUE(manager.getLine() == 0);
-        EXPECT_TRUE(manager.getCharacterInLine() == 8);
+        EXPECT_TRUE(manager.getLineNumber() == 1);
+        EXPECT_TRUE(manager.getCharNumber() == 8);
 
-        while (manager.newRawChar() != '\n') {
+        while (manager.getRawChar() != '\n') {
             // empty statement
         }
 
-        EXPECT_TRUE(manager.skipLayoutAndGiveChar() == 'I');
-        EXPECT_TRUE(manager.getLine() == 1);
-        EXPECT_TRUE(manager.getCharacterInLine() == 1);
-        EXPECT_TRUE(manager.getOffset() == 22);
-        EXPECT_TRUE(manager.getCurrentLine() == "It's a test \t\t  ");
+        EXPECT_TRUE(manager.getCharWithoutLayout() == 'I');
+        EXPECT_TRUE(manager.getLineNumber() == 2);
+        EXPECT_TRUE(manager.getCharNumber() == 1);
+        EXPECT_TRUE(manager.getOffset() == 21);
+        EXPECT_TRUE(manager.getLineInText() == "It's a test \t\t  ");
     }
 
     auto txtManagerTest(u32) -> int
     {
         txtManagerTestOnStr();
 
-        /*
         std::string str = "Hello,World!It'sateststring.";
         std::string process_str{};
 
-        lex::GeneratorForText<> manager(
-            LocationInFile("None"),
+        lex::TextGenerator<> manager(
             "    "
             "\t\tHello, World! \nIt's a test \t\t  \nstring.");
 
-        for (char elem : manager) {
-            process_str.push_back(elem);
+        while (manager.getCharWithoutLayout() != '\0') {
+            process_str.push_back(manager.getCurrentChar());
         }
 
         EXPECT_TRUE(process_str == str);
-        */
 
-        cerb::lex::test::TextGenerator<char> generator("Hello, World!");
-
-        for (size_t i = 0; i < 8; ++i) {
-            if (i == 2) {
-                putchar(generator.getCleanChar());
-                std::cout << std::endl;
-            } else {
-                putchar(generator.getRawChar());
-                std::cout << std::endl;
-            }
-        }
 
         return 0;
     }

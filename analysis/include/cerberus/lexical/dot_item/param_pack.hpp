@@ -6,7 +6,8 @@
 #include <cerberus/lexical/tokens/simple_token.hpp>
 #include <cerberus/string_pool.hpp>
 
-namespace cerb::lex {
+namespace cerb::lex
+{
     template<CharacterLiteral CharT, typename TokenType>
     struct ParametersPack
     {
@@ -16,7 +17,7 @@ namespace cerb::lex {
         using simple_token_t = SimpleToken<CharT, TokenType>;
         using comments_token_t = CommentsTokens<CharT>;
 
-        using generator_t = GeneratorForText<CharT>;
+        using generator_t = TextGenerator<CharT>;
 
         CERBLIB_DECL auto getSingleLineCommentBegin() const -> str_view_t const &
         {

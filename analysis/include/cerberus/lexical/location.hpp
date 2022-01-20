@@ -43,7 +43,7 @@ namespace cerb
 
         constexpr LocationInFile() = default;
         constexpr explicit LocationInFile(
-            cerb::string_view name_of_file, size_t current_line = 0, size_t current_character = 0,
+            cerb::string_view name_of_file, size_t current_line = 1, size_t current_character = 1,
             size_t chars_from_the_beginning = 0)
           : filename(name_of_file), line(current_line), character(current_character),
             offset(chars_from_the_beginning)

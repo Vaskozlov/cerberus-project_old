@@ -3,7 +3,8 @@
 
 #include <cerberus/cerberus.hpp>
 
-namespace cerb {
+namespace cerb
+{
     template<typename T>
     struct CERBLIB_TRIVIAL ReferenceWrapper
     {
@@ -15,6 +16,16 @@ namespace cerb {
         CERBLIB_DECL auto get() const -> T &
         {
             return reference;
+        }
+
+        CERBLIB_DECL auto operator->() -> T *
+        {
+            return &reference;
+        }
+
+        CERBLIB_DECL auto operator->() const -> T *
+        {
+            return &reference;
         }
 
         constexpr ReferenceWrapper() = default;

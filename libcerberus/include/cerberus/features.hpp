@@ -55,6 +55,12 @@ namespace cerb
         {
             std::for_each(std::begin(object), std::end(object), std::forward<F>(function));
         }
+
+        template<Iterable T, typename U>
+        constexpr auto find(T &object, U const &value) -> decltype(auto)
+        {
+            return std::find(object.begin(), object.end(), value);
+        }
     }// namespace ranges
 
 #elif defined(__GNUC__) || defined(_MSC_VER)
@@ -95,6 +101,12 @@ namespace cerb
         constexpr auto for_each(T &object, F &&function) -> void
         {
             std::ranges::for_each(object, std::forward<F>(function));
+        }
+
+        template<Iterable T, typename U>
+        constexpr auto find(T &object, U const &value) -> decltype(auto)
+        {
+            return std::ranges::find(object, value);
         }
     }// namespace ranges
 

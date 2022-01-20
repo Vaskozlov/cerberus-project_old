@@ -212,7 +212,7 @@ namespace cerb
             }
         }
 #endif
-        return std::find(iterable_class.begin(), iterable_class.end(), value2find);
+        return cerb::ranges::find(iterable_class, value2find);
     }
 
     template<typename T>

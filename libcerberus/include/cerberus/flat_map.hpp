@@ -4,12 +4,13 @@
 #include <cerberus/memory.hpp>
 #include <cerberus/pair.hpp>
 
-namespace cerb {
+namespace cerb
+{
     template<typename Key, typename Value, size_t Size>
     struct FlatMap
     {
         using KeyForFlatMap = AutoCopyType<Key>;
-        using value_type = Pair<Key, Value, HowToComparePair::BY_FIRST_VALUE>;
+        using value_type = Pair<Key, Value, PairComparison::BY_FIRST_VALUE>;
         using storage_t = std::array<value_type, Size>;
         using iterator = typename storage_t::iterator;
         using const_iterator = typename storage_t::const_iterator;
@@ -117,12 +118,12 @@ namespace cerb {
     private:
         CERBLIB_DECL auto findByKey(KeyForFlatMap key) -> iterator
         {
-            return std::find(begin(), end(), key);
+            return cerb::ranges::find(*this, key);
         }
 
         CERBLIB_DECL auto findByKey(KeyForFlatMap key) const -> const_iterator
         {
-            return std::find(cbegin(), cend(), key);
+            return cerb::ranges::find(*this, key);
         }
 
         constexpr auto throwIfFull() const -> void

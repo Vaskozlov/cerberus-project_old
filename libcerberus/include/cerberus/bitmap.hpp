@@ -9,7 +9,6 @@
 
 namespace cerb
 {
-
     template<size_t AxisN, size_t BitN>
     struct ConstBitmap
     {

@@ -4,7 +4,8 @@
 #include <cerberus/memory.hpp>
 #include <cerberus/type.hpp>
 
-namespace cerb {
+namespace cerb
+{
     template<typename T>
     struct CERBLIB_TRIVIAL RawPointerWrapper
     {

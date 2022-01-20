@@ -28,7 +28,7 @@ namespace cerb::test {
 
     auto byFirstValuePairTest() -> void
     {
-        auto pair = makePair<HowToComparePair::BY_FIRST_VALUE>(10, 10);
+        auto pair = makePair<PairComparison::BY_FIRST_VALUE>(10, 10);
 
         EXPECT_TRUE(logicalAnd(pair.first == 10, pair.second == 10));
         EXPECT_TRUE(pair == std::make_pair(10, 10));
@@ -51,7 +51,7 @@ namespace cerb::test {
 
     auto bySecondValuePairTest() -> void
     {
-        auto pair = makePair<HowToComparePair::BY_SECOND_VALUE>(10, 10);
+        auto pair = makePair<PairComparison::BY_SECOND_VALUE>(10, 10);
 
         EXPECT_TRUE(logicalAnd(pair.first == 10, pair.second == 10));
         EXPECT_TRUE(pair == std::make_pair(10, 10));

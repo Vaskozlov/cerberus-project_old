@@ -6,8 +6,8 @@
 #include <string>
 #include <vector>
 
-namespace cerb::lex {
-
+namespace cerb::lex
+{
     template<CharacterLiteral CharT, typename TokenType>
     struct Token
     {
@@ -89,9 +89,9 @@ namespace cerb::lex {
         constexpr Token() = default;
         constexpr Token(
             TokenType type_of_token, LocationInFile const &location_in_file,
-            str_view_t const &repr_of_token, GeneratorForText<CharT> const &txt_manager)
+            str_view_t const &repr_of_token, TextGenerator<CharT> const &txt_manager)
           : location(location_in_file), tabs_and_spaces(txt_manager.getTabsAndSpaces()),
-            repr(repr_of_token), line(txt_manager.getCurrentLine()), type(type_of_token)
+            repr(repr_of_token), line(txt_manager.getLineInText()), type(type_of_token)
         {}
 
     private:

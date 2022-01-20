@@ -4,22 +4,23 @@
 #include <cerberus/bits.hpp>
 #include <cerberus/cerberus.hpp>
 
-namespace cerb {
-    enum struct HowToComparePair
+namespace cerb
+{
+    enum struct PairComparison
     {
         DEFAULT,
         BY_FIRST_VALUE,
         BY_SECOND_VALUE
     };
 
-    template<typename T1, typename T2, HowToComparePair ComparisonRule = HowToComparePair::DEFAULT>
+    template<typename T1, typename T2, PairComparison ComparisonRule = PairComparison::DEFAULT>
     struct CERBLIB_TRIVIAL Pair
     {
         constexpr auto operator==(const Pairable auto &other) const -> bool
         {
-            if constexpr (ComparisonRule == HowToComparePair::DEFAULT) {
+            if constexpr (ComparisonRule == PairComparison::DEFAULT) {
                 return safeEqual<T1>(first, other.first) && safeEqual<T2>(second, other.second);
-            } else if constexpr (ComparisonRule == HowToComparePair::BY_FIRST_VALUE) {
+            } else if constexpr (ComparisonRule == PairComparison::BY_FIRST_VALUE) {
                 return safeEqual<T1>(first, other.first);
             } else {
                 return safeEqual<T2>(second, other.second);
@@ -29,24 +30,24 @@ namespace cerb {
         constexpr auto operator==(const auto &other) const -> bool
         {
             static_assert(
-                ComparisonRule == HowToComparePair::BY_FIRST_VALUE ||
-                ComparisonRule == HowToComparePair::BY_SECOND_VALUE);
+                ComparisonRule == PairComparison::BY_FIRST_VALUE ||
+                ComparisonRule == PairComparison::BY_SECOND_VALUE);
 
-            if constexpr (ComparisonRule == HowToComparePair::BY_FIRST_VALUE) {
+            if constexpr (ComparisonRule == PairComparison::BY_FIRST_VALUE) {
                 return safeEqual<T1>(first, other);
-            } else if constexpr (ComparisonRule == HowToComparePair::BY_SECOND_VALUE) {
+            } else if constexpr (ComparisonRule == PairComparison::BY_SECOND_VALUE) {
                 return safeEqual<T2>(second, other);
             }
         }
 
         constexpr auto operator<=>(const Pairable auto &other) const
         {
-            if constexpr (ComparisonRule == HowToComparePair::DEFAULT) {
+            if constexpr (ComparisonRule == PairComparison::DEFAULT) {
                 if (safeEqual<T1>(first, other.first)) {
                     return second <=> other.second;
                 }
                 return first <=> other.first;
-            } else if constexpr (ComparisonRule == HowToComparePair::BY_FIRST_VALUE) {
+            } else if constexpr (ComparisonRule == PairComparison::BY_FIRST_VALUE) {
                 return first <=> other.first;
             } else {
                 return second <=> other.second;
@@ -56,12 +57,12 @@ namespace cerb {
         constexpr auto operator<=>(const auto &other) const
         {
             static_assert(
-                ComparisonRule == HowToComparePair::BY_FIRST_VALUE ||
-                ComparisonRule == HowToComparePair::BY_SECOND_VALUE);
+                ComparisonRule == PairComparison::BY_FIRST_VALUE ||
+                ComparisonRule == PairComparison::BY_SECOND_VALUE);
 
-            if constexpr (ComparisonRule == HowToComparePair::BY_FIRST_VALUE) {
+            if constexpr (ComparisonRule == PairComparison::BY_FIRST_VALUE) {
                 return first <=> other;
-            } else if constexpr (ComparisonRule == HowToComparePair::BY_SECOND_VALUE) {
+            } else if constexpr (ComparisonRule == PairComparison::BY_SECOND_VALUE) {
                 return second <=> other;
             }
         }
@@ -96,7 +97,7 @@ namespace cerb {
         T2 second{};
     };
 
-    template<HowToComparePair ComparisonRule = HowToComparePair::DEFAULT, Pairable T>
+    template<PairComparison ComparisonRule = PairComparison::DEFAULT, Pairable T>
     constexpr auto makePair(T &&pair) -> decltype(auto)
     {
         return cerb::Pair<decltype(pair.first), decltype(pair.second), ComparisonRule>{
@@ -104,7 +105,7 @@ namespace cerb {
         };
     }
 
-    template<HowToComparePair ComparisonRule = HowToComparePair::DEFAULT, Pairable T>
+    template<PairComparison ComparisonRule = PairComparison::DEFAULT, Pairable T>
     constexpr auto makePair(const T &pair) -> decltype(auto)
     {
         return cerb::Pair<decltype(pair.first), decltype(pair.second), ComparisonRule>{
@@ -112,13 +113,13 @@ namespace cerb {
         };
     }
 
-    template<HowToComparePair ComparisonRule = HowToComparePair::DEFAULT, typename T1, typename T2>
+    template<PairComparison ComparisonRule = PairComparison::DEFAULT, typename T1, typename T2>
     constexpr auto makePair(T1 &&first, T2 &&second) -> Pair<T1, T2, ComparisonRule>
     {
         return { std::forward<T1>(first), std::forward<T2>(second) };
     }
 
-    template<HowToComparePair ComparisonRule = HowToComparePair::DEFAULT, typename T1, typename T2>
+    template<PairComparison ComparisonRule = PairComparison::DEFAULT, typename T1, typename T2>
     constexpr auto makePair(const T1 &first, const T2 &second) -> Pair<T1, T2, ComparisonRule>
     {
         return { first, second };
