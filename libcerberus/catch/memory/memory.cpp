@@ -34,10 +34,10 @@ namespace cerb::test
         auto raw_ptr_to_scr = RawPointerWrapper<T>{ src.data(), ArraySize };
         auto raw_ptr_to_data = RawPointerWrapper<T>{ random_data, ArraySize };
 
-        EXPECT_TRUE(cerb::ranges::equal(raw_ptr_to_scr, raw_ptr_to_data));
+        EXPECT_TRUE(std::ranges::equal(raw_ptr_to_scr, raw_ptr_to_data));
 
         copy(dest, src);
-        EXPECT_TRUE(cerb::ranges::equal(src, dest));
+        EXPECT_TRUE(std::ranges::equal(src, dest));
     }
 
     auto generateRandomComplexData(size_t size) -> std::unique_ptr<PairedNumbers>

@@ -118,12 +118,12 @@ namespace cerb
     private:
         CERBLIB_DECL auto findByKey(KeyForFlatMap key) -> iterator
         {
-            return cerb::ranges::find(*this, key);
+            return std::find(begin(), end(), key);
         }
 
         CERBLIB_DECL auto findByKey(KeyForFlatMap key) const -> const_iterator
         {
-            return cerb::ranges::find(*this, key);
+            return std::find(begin(), end(), key);
         }
 
         constexpr auto throwIfFull() const -> void

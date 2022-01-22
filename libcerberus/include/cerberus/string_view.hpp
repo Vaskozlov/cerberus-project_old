@@ -137,7 +137,7 @@ namespace cerb
             checkThatTypeIsString<T>();
             auto other_str = BasicStringView<CharT>(std::data(other), std::size(other));
 
-            return cerb::ranges::equal(*this, other_str);
+            return std::ranges::equal(*this, other_str);
         }
 
         CERBLIB_DECL auto operator<=>(const CharT *other) const -> decltype(auto)

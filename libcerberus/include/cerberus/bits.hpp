@@ -210,15 +210,15 @@ namespace cerb
         if constexpr (std::is_unsigned_v<T>) {
             return number;
         } else if constexpr (sizeof(T) == sizeof(u8)) {
-            return cerb::bit_cast<u8>(number);
+            return std::bit_cast<u8>(number);
         } else if constexpr (sizeof(T) == sizeof(u16)) {
-            return cerb::bit_cast<u16>(number);
+            return std::bit_cast<u16>(number);
         } else if constexpr (sizeof(T) == sizeof(u32)) {
-            return cerb::bit_cast<u32>(number);
+            return std::bit_cast<u32>(number);
         } else if constexpr (sizeof(T) == sizeof(u64)) {
-            return cerb::bit_cast<u64>(number);
+            return std::bit_cast<u64>(number);
         } else if constexpr (sizeof(T) == sizeof(size_t)) {
-            return cerb::bit_cast<size_t>(number);
+            return std::bit_cast<size_t>(number);
         }
     }
 
@@ -420,7 +420,7 @@ namespace cerb
             return -1;
         }
 
-        const u32 mask = cerb::bit_cast<u32>(number);
+        const u32 mask = std::bit_cast<u32>(number);
         constexpr i32 f32_exponent_bit = 23;
         constexpr i32 f32_exponent_for_zero_power = 0x7fU;
         constexpr u32 f32_exponent_mask = 0xFF80'0000;
@@ -434,7 +434,7 @@ namespace cerb
             return -1;
         }
 
-        const u64 mask = cerb::bit_cast<u64>(number);
+        const u64 mask = std::bit_cast<u64>(number);
         constexpr i64 f64_exponent_bit = 52;
         constexpr i64 f64_exponent_for_zero_power = 0x3ffU;
         constexpr u64 f64_exponent_mask = 0xFFF0'0000'0000'0000;

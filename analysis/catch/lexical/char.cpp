@@ -12,7 +12,7 @@ namespace cerb::test {
         for (u16 i = 1; i <= 255; ++i) {
             auto chr = static_cast<u8>(i);
             EXPECT_FALSE(lex::isEndOfInput(chr));
-            EXPECT_FALSE(lex::isEndOfInput(cerb::bit_cast<char>(chr)));
+            EXPECT_FALSE(lex::isEndOfInput(std::bit_cast<char>(chr)));
         }
     }
 

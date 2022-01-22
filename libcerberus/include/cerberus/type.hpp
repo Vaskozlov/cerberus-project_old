@@ -135,7 +135,4 @@ namespace cerb
     using GetSizeType = typename T::size_type;
 }// namespace cerb
 
-// temporary include. Will be deleted when libc++ will support C++20 standard fully
-#include <cerberus/features.hpp>
-
 #endif /* LIBCERBERUS_TYPE_HPP */

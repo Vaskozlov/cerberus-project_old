@@ -11,7 +11,14 @@ else ()
 
     if (CMAKE_CXX_COMPILER_ID MATCHES "Clang")
         add_compile_options(-stdlib=libc++ -fcoroutines-ts -Wfloat-equal -Wcast-align)
-        add_link_options(-stdlib=libc++ -lc++abi)
+
+        if (USE_LIBCPP)
+            add_compile_options(-stdlib=libc++ -lc++abi)
+            add_link_options(-stdlib=libc++ -lc++abi)
+        else()
+            add_compile_options(-stdlib=libstdc++)
+            add_link_options(-stdlib=libstdc++)
+        endif()
     elseif (CMAKE_CXX_COMPILER_ID MATCHES "GNU")
         add_compile_options(-pthread)
         add_compile_options(

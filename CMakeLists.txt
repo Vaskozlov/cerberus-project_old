@@ -4,6 +4,7 @@ project(cerberus VERSION 0.0.1.0 LANGUAGES CXX)
 enable_testing()
 
 option(CERBERUS_STRICT_COMPILATION "Enable -Werror strict compilation" OFF)
+option(USE_LIBCPP "Use libc++ when compiling with clang" OFF)
 
 message(STATUS "CC " ${CMAKE_C_COMPILER})
 message(STATUS "CXX " ${CMAKE_CXX_COMPILER})

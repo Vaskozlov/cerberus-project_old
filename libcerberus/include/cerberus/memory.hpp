@@ -151,7 +151,7 @@ namespace cerb
             }
         }
 #endif
-        cerb::ranges::fill(dest, value);
+        std::ranges::fill(dest, value);
     }
 
     template<typename T>
@@ -212,7 +212,7 @@ namespace cerb
             }
         }
 #endif
-        return cerb::ranges::find(iterable_class, value2find);
+        return std::ranges::find(iterable_class, value2find);
     }
 
     template<typename T>
