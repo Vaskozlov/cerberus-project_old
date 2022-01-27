@@ -2,83 +2,47 @@
 #define LIBCERBERUS_CATCH_CATCH_HPP
 
 #include <cerberus/cerberus.hpp>
+#include <cerberus/exception.hpp>
+#include <cerberus/location.hpp>
 #include <cerberus/pair.hpp>
 #include <fmt/color.h>
 #include <fmt/format.h>
 #include <iostream>
 #include <random>
-#include <string_view>
 
-#define CERBLIB_LOCATION cerb::test::Location(__FILE__, __LINE__)
 #define EXPECT_TRUE(value) expectTrue(value, CERBLIB_LOCATION)
 #define EXPECT_FALSE(value) expectFalse(value, CERBLIB_LOCATION)
 
-namespace cerb::test {
-    class ConstexprFailure : public std::exception
-    {
-        std::string_view message;
-
-    public:
-        ConstexprFailure() = default;
-
-        explicit ConstexprFailure(std::string_view t_message) : message(t_message)
-        {}
-
-        [[nodiscard]] auto what() const noexcept -> const char * override
-        {
-            return message.data();
-        }
-    };
-
-    class Location
-    {
-        std::string_view filename{};
-        size_t line{};
-
-    public:
-        CERBLIB_DECL auto getLine() const -> size_t
-        {
-            return line;
-        }
-
-        CERBLIB_DECL auto getFilename() const -> std::string_view
-        {
-            return filename;
-        }
-
-        constexpr Location() = default;
-        constexpr Location(std::string_view filename_of_location, std::size_t line_of_location)
-          : filename(filename_of_location), line(line_of_location)
-        {}
-    };
+namespace cerb::test
+{
+    CERBERUS_EXCEPTION(RuntimeError);
+    CERBERUS_EXCEPTION(CompileTimeError);
 
     using PairedNumbers = Pair<ssize_t, double>;
 
-    constexpr auto expectTrue(bool condition, const Location &loc = CERBLIB_LOCATION) -> void
+    constexpr auto failure(bool condition, Location const &loc = CERBLIB_LOCATION) -> void
     {
-        if (!condition) {
-            if (std::is_constant_evaluated()) {
-                throw ConstexprFailure("Cerberus test failure!");
-            } else {
-                fmt::print(
-                    fmt::fg(fmt::color::red), "Cerberus test failure with code: {}! ", condition);
-                fmt::print("File: {}, getLine: {}\n", loc.getFilename(), loc.getLine());
-                exit(1);
-            }
+        if (std::is_constant_evaluated()) {
+            throw CompileTimeError("Cerberus test failure!");
+        } else {
+            fmt::print(
+                fmt::fg(fmt::color::red), "Cerberus test failure with code: {}! ", condition);
+            fmt::print("File: {}, getLine: {}\n", loc.getFilename(), loc.getLine());
+            throw RuntimeError();
         }
     }
 
-    constexpr auto expectFalse(bool condition, const Location &loc = CERBLIB_LOCATION) -> void
+    constexpr auto expectTrue(bool condition, Location const &loc = CERBLIB_LOCATION) -> void
+    {
+        if (not condition) {
+            failure(condition, loc);
+        }
+    }
+
+    constexpr auto expectFalse(bool condition, Location const &loc = CERBLIB_LOCATION) -> void
     {
         if (condition) {
-            if (std::is_constant_evaluated()) {
-                throw ConstexprFailure("Cerberus test failure!");
-            } else {
-                fmt::print(
-                    fmt::fg(fmt::color::red), "Cerberus test failure with code: {}! ", condition);
-                fmt::print("File: {}, getLine: {}\n", loc.getFilename(), loc.getLine());
-                exit(1);
-            }
+            failure(condition, loc);
         }
     }
 

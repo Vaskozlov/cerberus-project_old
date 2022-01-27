@@ -29,7 +29,7 @@ namespace cerb::test
         lex::Token<char, int> token{ 10, manager.getLocation(), "It's", manager };
 
         EXPECT_TRUE(token.getType() == 10);
-        EXPECT_TRUE(token.getLine() == 1);
+        EXPECT_TRUE(token.getLine() == 2);
         EXPECT_TRUE(token.getCharacter() == 1);
         EXPECT_TRUE(token.getOffset() == 21);
         EXPECT_TRUE(token.getFilename() == "");

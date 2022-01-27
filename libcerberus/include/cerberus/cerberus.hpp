@@ -142,8 +142,7 @@ namespace cerb
     using f32 = float;
     using f64 = double;
 
-    using ssize_t = ssize_t;
-    using size_t = size_t;
+    using ssize_t = intmax_t;
 
     template<auto Begin, auto End, auto Inc>
     constexpr auto constexprFor(auto &&function) -> void
@@ -157,7 +156,7 @@ namespace cerb
     template<typename F, typename... Ts>
     CERBLIB_DECL auto forEach(F &&function, Ts &&...args)
     {
-        [[maybe_unused]] const auto _ = { ([&function]<typename T>(T &&value) {
+        [[maybe_unused]] auto const _ = { ([&function]<typename T>(T &&value) {
             function(std::forward<T>(value));
             return 0;
         })(std::forward<Ts>(args))... };
@@ -178,7 +177,7 @@ namespace cerb
     }
 
     template<typename T>
-    constexpr auto cmov(bool condition, const T &on_true, const T &on_false) -> T
+    constexpr auto cmov(bool condition, T const &on_true, T const &on_false) -> T
     {
         return condition ? on_true : on_false;
     }

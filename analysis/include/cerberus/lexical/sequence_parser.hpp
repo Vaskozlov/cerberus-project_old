@@ -4,7 +4,7 @@
 #include <cerberus/bitmap.hpp>
 #include <cerberus/lexical/char.hpp>
 #include <cerberus/lexical/lexical_exceptions.hpp>
-#include <cerberus/lexical/location.hpp>
+#include <cerberus/lexical/file_location.hpp>
 
 namespace cerb::lex
 {
@@ -15,7 +15,7 @@ namespace cerb::lex
 
         using str_view_t = BasicStringView<CharT>;
         using constant_bitmap_t = ConstBitmap<1, number_of_chars>;
-        using generator_t = GeneratorForText<CharT>;
+        using generator_t = TextGenerator<CharT>;
 
         constexpr auto reverse() -> void
         {

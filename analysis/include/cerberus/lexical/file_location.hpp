@@ -1,5 +1,5 @@
-#ifndef CERBERUS_LOCATION_HPP
-#define CERBERUS_LOCATION_HPP
+#ifndef CERBERUS_FILE_LOCATION_HPP
+#define CERBERUS_FILE_LOCATION_HPP
 
 #include <cerberus/lexical/char.hpp>
 #include <cerberus/string_view.hpp>
@@ -57,4 +57,4 @@ namespace cerb
     };
 }// namespace cerb
 
-#endif /* CERBERUS_LOCATION_HPP */
+#endif /* CERBERUS_FILE_LOCATION_HPP */

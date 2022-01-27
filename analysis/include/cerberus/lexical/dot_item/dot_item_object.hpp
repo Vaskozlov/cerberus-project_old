@@ -6,21 +6,22 @@
 #include <cerberus/lexical/lexical_exceptions.hpp>
 #include <cerberus/reference_wrapper.hpp>
 
-namespace cerb::lex {
+namespace cerb::lex
+{
     template<CharacterLiteral CharT, typename TokenType>
     struct DotItemObject
     {
         using str_view_t = BasicStringView<CharT>;
 
-        using generator_t = GeneratorForText<CharT>;
+        using generator_t = TextGenerator<CharT>;
         using string_pool_t = StringPool<CharT, TokenType>;
 
         using parameters_pack_t = ParametersPack<CharT, TokenType>;
         using generator_reference_t = ReferenceWrapper<generator_t>;
 
-        CERBERUS_ENUM(Flags, u32, NONE = 0b1, REVERSE = 0b10, PREFIX_OR_POSTFIX = 0b100);// NOLINT
-        CERBERUS_ENUM(Rule, u32, NONE = 0, STAR = 1, PLUS = 2, QUESTION = 3);            // NOLINT
-        CERBERUS_ENUM(ScanStatus, u32, REDUCED = 0b1, ERROR = 0b10);                     // NOLINT
+        CERBERUS_ENUM(Flags, u16, NONE = 0b1, REVERSE = 0b10, PREFIX_OR_POSTFIX = 0b100);// NOLINT
+        CERBERUS_ENUM(Rule, u16, NONE = 0, STAR = 1, PLUS = 2, QUESTION = 3);            // NOLINT
+        CERBERUS_ENUM(ScanStatus, u16, REDUCED = 0b1, ERROR = 0b10);                     // NOLINT
 
         constexpr virtual auto scan() -> ScanStatus = 0;
 

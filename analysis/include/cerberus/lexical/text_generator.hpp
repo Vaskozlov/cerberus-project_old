@@ -2,7 +2,7 @@
 #define CERBERUS_TEXT_GENERATOR_HPP
 
 #include <cerberus/enum.hpp>
-#include <cerberus/lexical/location.hpp>
+#include <cerberus/lexical/file_location.hpp>
 #include <cerberus/reference_wrapper.hpp>
 #include <string>
 
@@ -13,14 +13,9 @@ namespace cerb::lex
     {
         using location_t = LocationInFile;
 
+        using chars_enum = CharsEnum<CharT>;
         using str_t = std::basic_string<CharT>;
         using str_view_t = BasicStringView<CharT>;
-
-        template<std::integral U>
-        CERBLIB_DECL static auto cast2Char(U value) -> CharT
-        {
-            return static_cast<CharT>(value);
-        }
 
     public:
         CERBLIB_DECL auto getOffset() const -> size_t
@@ -61,7 +56,7 @@ namespace cerb::lex
         CERBLIB_DECL auto getCurrentChar() const -> CharT
         {
             if (not initialized) {
-                return cast2Char('\0');
+                return chars_enum::EoF;
             }
 
             return text[getOffset()];
@@ -75,12 +70,12 @@ namespace cerb::lex
                 initialized = true;
                 tryToAppendTabOrSpace();
             } else {
-                if (text[offset] == cast2Char('\0')) {
-                    return cast2Char('\0');
+                if (isEndOfInput(text[offset])) {
+                    return chars_enum::EoF;
                 }
 
-                callFunctionForNewChar();
-                updateLineIfNeed();
+                updateLocation();
+                tryToUpdateLine();
                 offset = getOffset();
             }
 
@@ -102,14 +97,14 @@ namespace cerb::lex
             str_view_t const &filename = {})
           : location(filename, 1, 1, 0), text(text_data)
         {
-            setLineOfText();
+            setCurrentWorkingLine();
         }
 
     private:
-        constexpr auto updateLineIfNeed() -> void
+        constexpr auto tryToUpdateLine() -> void
         {
-            if (text[getOffset() - 1] == cast2Char('\n')) {
-                setLineOfText();
+            if (text[getOffset() - 1] == chars_enum::NewLine) {
+                setCurrentWorkingLine();
             }
         }
 
@@ -118,16 +113,16 @@ namespace cerb::lex
             auto offset = getOffset();
             auto chr = text[offset];
 
-            if (logicalOr(chr == cast2Char('\t'), chr == cast2Char(' '))) {
+            if (logicalOr(chr == chars_enum::Tab, chr == chars_enum::Space)) {
                 tabs_and_spaces.push_back(chr);
             }
         }
 
-        constexpr auto callFunctionForNewChar() -> void
+        constexpr auto updateLocation() -> void
         {
             auto offset = getOffset() + 1;
 
-            if (text[offset] == cast2Char('\n')) {
+            if (text[offset] == chars_enum::NewLine) {
                 processNewLine();
             } else {
                 processNewChar();
@@ -162,15 +157,15 @@ namespace cerb::lex
         CERBLIB_DECL auto needToClearTabsAndSpaces() const -> bool
         {
             return logicalAnd(
-                not tabs_and_spaces.empty(), text[getOffset()] != cast2Char('\t'),
-                text[getOffset()] != cast2Char(' '));
+                not tabs_and_spaces.empty(), text[getOffset()] != chars_enum::Tab,
+                text[getOffset()] != chars_enum::Space);
         }
 
-        constexpr auto setLineOfText() -> void
+        constexpr auto setCurrentWorkingLine() -> void
         {
             auto offset = getOffset();
             auto begin_of_line = text.begin() + offset;
-            auto end_of_line = text.begin() + text.find(cast2Char('\n'), offset);
+            auto end_of_line = text.begin() + text.find(chars_enum::NewLine, offset);
 
             line_of_text = { begin_of_line, end_of_line };
         }

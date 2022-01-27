@@ -2,11 +2,20 @@
 #define CERBERUS_CHAR_HPP
 
 #include <cerberus/cerberus.hpp>
+#include <cerberus/enum.hpp>
 #include <cerberus/flat_map.hpp>
 #include <cerberus/type.hpp>
 
 namespace cerb::lex
 {
+    template<CharacterLiteral CharT>
+    CERBERUS_ENUM(
+        CharsEnum, CharT, EoF = static_cast<CharT>('\0'), Tab = static_cast<CharT>('\t'),// NOLINT
+        NewLine = static_cast<CharT>('\n'), CarriageReturn = static_cast<CharT>('\r'),
+        Space = static_cast<CharT>(' '), Underscore = static_cast<CharT>('_'),
+        DQM = static_cast<CharT>('\"'), Apostrophe = static_cast<CharT>('\''),
+        Backslash = static_cast<CharT>('\\'));
+
     template<CharacterLiteral CharT>
     constexpr FlatMap<CharT, u16, 22> HexadecimalCharsToInt{
         { static_cast<CharT>('0'), 0 },  { static_cast<CharT>('1'), 1 },
@@ -22,31 +31,37 @@ namespace cerb::lex
         { static_cast<CharT>('E'), 14 }, { static_cast<CharT>('F'), 15 }
     };
 
+    using char_enum_t = CharsEnum<char>;
+    using char8_enum_t = CharsEnum<char8_t>;
+    using char16_enum_t = CharsEnum<char16_t>;
+    using char32_enum_t = CharsEnum<char32_t>;
+    using wchar_enum_t = CharsEnum<wchar_t>;
+
     template<CharacterLiteral CharT>
     CERBLIB_DECL auto isEndOfInput(CharT chr) -> bool
     {
-        return chr == static_cast<CharT>(0);
+        return chr == CharsEnum<CharT>::EoF;
     }
 
     template<CharacterLiteral CharT>
     CERBLIB_DECL auto isUnderscore(CharT chr) -> bool
     {
-        return chr == static_cast<CharT>('_');
+        return chr == CharsEnum<CharT>::Underscore;
     }
 
     template<CharacterLiteral CharT>
     CERBLIB_DECL auto isLayout(CharT chr) -> bool
     {
-        return logicalAnd(chr > static_cast<CharT>(0), chr <= static_cast<CharT>(' '));
+        return logicalAnd(chr > CharsEnum<CharT>::EoF, chr <= CharsEnum<CharT>::Space);
     }
 
     template<CharacterLiteral CharT>
     CERBLIB_DECL auto isLayoutOrEndOfInput(CharT chr) -> bool
     {
         if constexpr (std::is_unsigned_v<CharT>) {
-            return chr <= static_cast<CharT>(' ');
+            return chr <= CharsEnum<CharT>::Space;
         } else {
-            return logicalAnd(chr >= static_cast<CharT>(0), chr <= static_cast<CharT>(' '));
+            return logicalAnd(chr >= CharsEnum<CharT>::EoF, chr <= CharsEnum<CharT>::Space);
         }
     }
 

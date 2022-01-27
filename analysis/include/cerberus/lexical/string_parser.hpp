@@ -2,15 +2,18 @@
 #define CERBERUS_STRING_PARSER_HPP
 
 #include <cerberus/flat_map.hpp>
+#include <cerberus/lexical/char.hpp>
 #include <cerberus/lexical/lexical_exceptions.hpp>
-#include <cerberus/lexical/location.hpp>
+#include <cerberus/lexical/file_location.hpp>
 #include <cerberus/string_view.hpp>
 #include <string>
 
-namespace cerb::lex {
+namespace cerb::lex
+{
     template<CharacterLiteral CharT, Iterable T>
     class StringParser
     {
+        using chars_enum = CharsEnum<CharT>;
         using str_t = std::basic_string<CharT>;
 
         template<std::integral U>
@@ -42,7 +45,7 @@ namespace cerb::lex {
 
         constexpr auto parseString() -> str_t &
         {
-            if (*iterator_for_value != cast('"')) {
+            if (*iterator_for_value != chars_enum::DQM) {
                 throw ParsingError("Given input is not a string!");
             }
 
@@ -56,10 +59,10 @@ namespace cerb::lex {
                 }
 
                 switch (chr) {
-                case '\0':
+                case chars_enum::EoF:
                     throw ParsingError("Unable to find end of string.");
 
-                case '\\':
+                case chars_enum::Backslash:
                     parseSpecialSymbol();
                     break;
 
@@ -92,23 +95,23 @@ namespace cerb::lex {
 
             switch (chr) {
             case cast('t'):
-                parsed_string.push_back(cast('\t'));
+                parsed_string.push_back(chars_enum::Tab);
                 break;
 
             case 'n':
-                parsed_string.push_back(cast('\n'));
+                parsed_string.push_back(chars_enum::NewLine);
                 break;
 
             case cast('r'):
-                parsed_string.push_back('\r');
+                parsed_string.push_back(chars_enum::CarriageReturn);
                 break;
 
             case cast('\''):
-                parsed_string.push_back('\'');
+                parsed_string.push_back(chars_enum::Apostrophe);
                 break;
 
             case cast('\"'):
-                parsed_string.push_back('\"');
+                parsed_string.push_back(chars_enum::DQM);
                 break;
 
             case cast('0'):
@@ -128,17 +131,17 @@ namespace cerb::lex {
             }
         }
 
-        constexpr auto parseOctalSymbol(size_t length) -> CharT
+        CERBLIB_DECL auto parseOctalSymbol(size_t length) -> CharT
         {
             return convertString2Int(8, length);
         }
 
-        constexpr auto parseHexSymbol(size_t length) -> CharT
+        CERBLIB_DECL auto parseHexSymbol(size_t length) -> CharT
         {
             return convertString2Int(16, length);
         }
 
-        constexpr auto convertString2Int(size_t notation, size_t length) -> CharT
+        CERBLIB_DECL auto convertString2Int(size_t notation, size_t length) -> CharT
         {
             CharT resulted_char = cast(0);
 
@@ -153,11 +156,11 @@ namespace cerb::lex {
 
         constexpr auto tryToConvertCharToInt(size_t notation) -> CharT
         {
-            if (!HexadecimalCharsToInt<CharT>.contains(*iterator_for_value)) {
+            if (not hexadecimal_chars.contains(*iterator_for_value)) {
                 throw std::invalid_argument("Unable to create character by it's value");
             }
 
-            auto number = HexadecimalCharsToInt<CharT>[*iterator_for_value];
+            auto number = hexadecimal_chars[*iterator_for_value];
 
             if (number >= cast(notation)) {
                 throw std::range_error("Unable to create character by it's value");
@@ -175,6 +178,8 @@ namespace cerb::lex {
                     "End of string reached, however special symbol for this have not been found");
             }
         }
+
+        static constexpr auto hexadecimal_chars = HexadecimalCharsToInt<CharT>;
 
         str_t parsed_string{};
         T &iterable;
