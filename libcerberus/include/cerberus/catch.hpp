@@ -20,29 +20,33 @@ namespace cerb::test
 
     using PairedNumbers = Pair<ssize_t, double>;
 
-    constexpr auto failure(bool condition, Location const &loc = CERBLIB_LOCATION) -> void
+    inline auto failure(bool condition, Location const &loc = CERBLIB_LOCATION) -> void
     {
-        if (std::is_constant_evaluated()) {
-            throw CompileTimeError("Cerberus test failure!");
-        } else {
-            fmt::print(
-                fmt::fg(fmt::color::red), "Cerberus test failure with code: {}! ", condition);
-            fmt::print("File: {}, getLine: {}\n", loc.getFilename(), loc.getLine());
-            throw RuntimeError();
-        }
+        fmt::print(
+            fmt::fg(fmt::color::red), "Cerberus test failure with code: {}! ", condition);
+        fmt::print("File: {}, getLine: {}\n", loc.getFilename(), loc.getLine());
+        throw RuntimeError();
     }
 
     constexpr auto expectTrue(bool condition, Location const &loc = CERBLIB_LOCATION) -> void
     {
         if (not condition) {
-            failure(condition, loc);
+            if (std::is_constant_evaluated()) {
+                throw CompileTimeError("Cerberus test failure!");
+            } else {
+                failure(condition, loc);
+            }
         }
     }
 
     constexpr auto expectFalse(bool condition, Location const &loc = CERBLIB_LOCATION) -> void
     {
         if (condition) {
-            failure(condition, loc);
+            if (std::is_constant_evaluated()) {
+                throw CompileTimeError("Cerberus test failure!");
+            } else {
+                failure(condition, loc);
+            }
         }
     }
 
