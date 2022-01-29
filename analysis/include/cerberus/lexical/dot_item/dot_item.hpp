@@ -51,7 +51,7 @@ namespace cerb::lex {
         constexpr auto scan() -> ScanStatus
         {
             for (auto &object : objects) {
-                CERBLIB_IGNORE object->scan();
+                CERBLIB_IGNORE(object->scan())
             }
 
             return ScanStatus{};

@@ -19,7 +19,7 @@ namespace cerb::lex {
         using ScanStatus = typename parent::ScanStatus;
 
         using generator_t = typename parent::generator_t;
-        using string_parser = StringParser<CharT, generator_t>;
+        using string_parser = StringParser<CharT>;
         using parameters_pack_t = typename parent::parameters_pack_t;
 
         constexpr auto scan() -> ScanStatus override

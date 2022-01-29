@@ -3,18 +3,20 @@
 
 #include <cerberus/flat_map.hpp>
 #include <cerberus/lexical/char.hpp>
-#include <cerberus/lexical/lexical_exceptions.hpp>
 #include <cerberus/lexical/file_location.hpp>
+#include <cerberus/lexical/lexical_exceptions.hpp>
+#include <cerberus/lexical/text_generator.hpp>
 #include <cerberus/string_view.hpp>
 #include <string>
 
 namespace cerb::lex
 {
-    template<CharacterLiteral CharT, Iterable T>
+    template<CharacterLiteral CharT>
     class StringParser
     {
         using chars_enum = CharsEnum<CharT>;
         using str_t = std::basic_string<CharT>;
+        using generator_t = TextGenerator<CharT>;
 
         template<std::integral U>
         CERBLIB_DECL static auto cast(U value) -> CharT
@@ -33,26 +35,14 @@ namespace cerb::lex
             return parsed_string;
         }
 
-        CERBLIB_DECL auto getIterator() -> decltype(auto)
-        {
-            return iterator_for_value;
-        }
-
-        CERBLIB_DECL auto getIterator() const -> decltype(auto)
-        {
-            return iterator_for_value;
-        }
-
         constexpr auto parseString() -> str_t &
         {
-            if (*iterator_for_value != chars_enum::DQM) {
+            if (generator.getCurrentChar() != string_char) {
                 throw ParsingError("Given input is not a string!");
             }
 
-            incAndCheckThatStringDoesNotEnd();
-
-            for (; iterator_for_value != iterable.end(); ++iterator_for_value) {
-                auto chr = *iterator_for_value;
+            while (generator.getRawChar() != chars_enum::EoF) {
+                CharT chr = generator.getCurrentChar();
 
                 if (chr == string_char) {
                     return parsed_string;
@@ -75,23 +65,21 @@ namespace cerb::lex
             throw ParsingError("Unable to find end of string.");
         }
 
-        constexpr auto init(CharT string_starter, T &iterable_value) -> void
+        constexpr auto reinit(CharT string_starter, generator_t &text_generator) -> void
         {
-            iterable = iterable_value;
+            generator = text_generator;
             string_char = string_starter;
         }
 
-        constexpr StringParser() = default;
-        constexpr StringParser(CharT string_starter, T &iterable_value)
-          : iterable(iterable_value), iterator_for_value(iterable_value.begin()),
-            string_char(string_starter)
+        constexpr StringParser(CharT string_starter, generator_t &text_generator)
+          : generator(text_generator), string_char(string_starter)
         {}
 
     private:
         constexpr auto parseSpecialSymbol() -> void
         {
             incAndCheckThatStringDoesNotEnd();
-            auto chr = *iterator_for_value;
+            auto chr = generator.getCurrentChar();
 
             switch (chr) {
             case cast('t'):
@@ -143,7 +131,7 @@ namespace cerb::lex
 
         CERBLIB_DECL auto convertString2Int(size_t notation, size_t length) -> CharT
         {
-            CharT resulted_char = cast(0);
+            CharT resulted_char = chars_enum::EoF;
 
             for (size_t i = 0; i < length; ++i) {
                 incAndCheckThatStringDoesNotEnd();
@@ -154,13 +142,13 @@ namespace cerb::lex
             return resulted_char;
         }
 
-        constexpr auto tryToConvertCharToInt(size_t notation) -> CharT
+        CERBLIB_DECL auto tryToConvertCharToInt(size_t notation) -> CharT
         {
-            if (not hexadecimal_chars.contains(*iterator_for_value)) {
+            if (not hexadecimal_chars.contains(generator.getCurrentChar())) {
                 throw std::invalid_argument("Unable to create character by it's value");
             }
 
-            auto number = hexadecimal_chars[*iterator_for_value];
+            auto number = hexadecimal_chars[generator.getCurrentChar()];
 
             if (number >= cast(notation)) {
                 throw std::range_error("Unable to create character by it's value");
@@ -171,9 +159,7 @@ namespace cerb::lex
 
         constexpr auto incAndCheckThatStringDoesNotEnd() -> void
         {
-            ++iterator_for_value;
-
-            if (iterator_for_value == iterable.end()) {
+            if (generator.getRawChar() == chars_enum::EoF) {
                 throw ParsingError(
                     "End of string reached, however special symbol for this have not been found");
             }
@@ -182,8 +168,7 @@ namespace cerb::lex
         static constexpr auto hexadecimal_chars = HexadecimalCharsToInt<CharT>;
 
         str_t parsed_string{};
-        T &iterable;
-        decltype(std::begin(iterable)) iterator_for_value;
+        generator_t &generator;
         CharT string_char{};
     };
 }// namespace cerb::lex

@@ -58,7 +58,10 @@
 #endif /* CERBLIB_DEPRECATED_SUGGEST */
 
 #ifndef CERBLIB_IGNORE
-#    define CERBLIB_IGNORE [[maybe_unused]] auto _ =
+#    define CERBLIB_IGNORE(X)                                                                      \
+        {                                                                                          \
+            [[maybe_unused]] auto _ = (X);                                                         \
+        }
 #endif /* CERBLIB_IGNORE */
 
 #ifndef CERBLIB_DO_PRAGMA

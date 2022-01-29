@@ -62,7 +62,7 @@ namespace cerb::lex
             return text[getOffset()];
         }
 
-        CERBLIB_DECL auto getRawChar() -> CharT
+        constexpr auto getRawChar() -> CharT
         {
             auto offset = getOffset();
 
@@ -94,7 +94,7 @@ namespace cerb::lex
         constexpr TextGenerator() = default;
         constexpr explicit TextGenerator(
             str_view_t const &text_data,
-            str_view_t const &filename = {})
+            cerb::string_view const &filename = {})
           : location(filename, 1, 1, 0), text(text_data)
         {
             setCurrentWorkingLine();
