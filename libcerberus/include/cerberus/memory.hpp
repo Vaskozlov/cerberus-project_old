@@ -52,12 +52,9 @@ namespace cerb
             }
         }
 
-        template<typename T>
+        template<CanBeStoredInIntegral T>
         constexpr auto find(const T *location, T value, size_t limit) -> const T *
         {
-            /* we can find only types, which can be stored in register */
-            static_assert(CanBeStoredInIntegral<T>);
-
             ++limit;
 
             if constexpr (sizeof(T) == sizeof(u8)) {

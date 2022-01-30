@@ -1,4 +1,4 @@
-#include "generator_for_text.hpp"
+#include "text_generator.hpp"
 #include <cerberus/lexical/text_generator.hpp>
 
 namespace cerb::test

@@ -1,7 +1,7 @@
 #include "char.hpp"
-#include "generator_for_text.hpp"
 #include "lexical_analyzer.hpp"
 #include "string_parser.hpp"
+#include "text_generator.hpp"
 #include "token.hpp"
 
 auto main() -> int
