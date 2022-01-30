@@ -4,7 +4,8 @@
 #include <cerberus/lexical/dot_item/dot_item_object.hpp>
 #include <cerberus/lexical/sequence_parser.hpp>
 
-namespace cerb::lex {
+namespace cerb::lex
+{
     template<CharacterLiteral CharT, typename TokenType>
     struct Sequence final : public DotItemObject<CharT, TokenType>
     {

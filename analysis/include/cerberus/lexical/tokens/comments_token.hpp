@@ -3,7 +3,8 @@
 
 #include <cerberus/string_view.hpp>
 
-namespace cerb::lex {
+namespace cerb::lex
+{
     template<CharacterLiteral CharT>
     struct CommentsTokens
     {

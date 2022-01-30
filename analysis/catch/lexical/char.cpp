@@ -1,7 +1,8 @@
 #include "char.hpp"
 #include <cerberus/lexical/char.hpp>
 
-namespace cerb::test {
+namespace cerb::test
+{
     auto endOfInputTest() -> void
     {
         EXPECT_TRUE(lex::isEndOfInput('\0'));

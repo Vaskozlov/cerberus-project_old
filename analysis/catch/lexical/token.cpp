@@ -3,7 +3,6 @@
 
 namespace cerb::test
 {
-
     auto tokenTest(u32) -> int
     {
         lex::TextGenerator<> manager(

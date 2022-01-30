@@ -22,8 +22,7 @@ namespace cerb::test
 
     inline auto failure(bool condition, Location const &loc = CERBLIB_LOCATION) -> void
     {
-        fmt::print(
-            fmt::fg(fmt::color::red), "Cerberus test failure with code: {}! ", condition);
+        fmt::print(fmt::fg(fmt::color::red), "Cerberus test failure with code: {}! ", condition);
         fmt::print("File: {}, getLine: {}\n", loc.getFilename(), loc.getLine());
         throw RuntimeError();
     }

@@ -3,7 +3,8 @@
 
 #include <cerberus/catch.hpp>
 
-namespace cerb::test {
+namespace cerb::test
+{
     auto txtManagerTest(u32 = 1) -> int;
 }
 

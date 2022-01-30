@@ -1,6 +1,6 @@
 #include "char.hpp"
-#include "lexical_analyzer.hpp"
 #include "generator_for_text.hpp"
+#include "lexical_analyzer.hpp"
 #include "string_parser.hpp"
 #include "token.hpp"
 

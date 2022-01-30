@@ -5,7 +5,8 @@
 #include <cerberus/lexical/string_parser.hpp>
 #include <string>
 
-namespace cerb::lex {
+namespace cerb::lex
+{
     template<CharacterLiteral CharT, typename TokenType>
     struct StringSequence final : public DotItemObject<CharT, TokenType>
     {
@@ -58,12 +59,12 @@ namespace cerb::lex {
 
         CERBLIB_DECL auto reversedCharScan(CharT chr) const -> bool
         {
-            return not(chr == text_generator.getCharAtCurrentOffset());
+            return not(chr == text_generator.getCurrentChar());
         }
 
         CERBLIB_DECL auto ordinaryCharScan(CharT chr) const -> bool
         {
-            return chr == text_generator.getCharAtCurrentOffset();
+            return chr == text_generator.getCurrentChar();
         }
 
         str_t parsed_string{};

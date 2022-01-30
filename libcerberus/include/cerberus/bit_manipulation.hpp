@@ -4,7 +4,8 @@
 #include <cerberus/cerberus.hpp>
 #include <cerberus/type.hpp>
 
-namespace cerb::bit {
+namespace cerb::bit
+{
     enum struct ValueOfBit
     {
         ONE,

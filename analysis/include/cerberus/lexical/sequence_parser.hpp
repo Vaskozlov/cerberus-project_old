@@ -3,8 +3,8 @@
 
 #include <cerberus/bitmap.hpp>
 #include <cerberus/lexical/char.hpp>
-#include <cerberus/lexical/lexical_exceptions.hpp>
 #include <cerberus/lexical/file_location.hpp>
+#include <cerberus/lexical/lexical_exceptions.hpp>
 
 namespace cerb::lex
 {
@@ -13,6 +13,7 @@ namespace cerb::lex
     {
         constexpr static size_t number_of_chars = 1ULL << bitsizeof(CharT);
 
+        using chars_enum = CharsEnum<CharT>;
         using str_view_t = BasicStringView<CharT>;
         using constant_bitmap_t = ConstBitmap<1, number_of_chars>;
         using generator_t = TextGenerator<CharT>;
@@ -37,7 +38,7 @@ namespace cerb::lex
 
         constexpr auto incAndCheckThatStringDoesNotEnd() -> void
         {
-            if (text_generator.skipLayoutAndGiveChar() == cast('\0')) {
+            if (text_generator.getCharWithoutLayout() == chars_enum::EoF) {
                 throw SequenceError("Unable to close sequence");
             }
         }
@@ -45,22 +46,17 @@ namespace cerb::lex
         constexpr auto parseCharsInSequence() -> void
         {
             bool is_range_of_chars = false;
-            CharT previous_char = cast('\0');
+            CharT previous_char = chars_enum::EoF;
+            auto chr = text_generator.getCurrentChar();
 
-            if (text_generator.getCharAtCurrentOffset(-1) != cast('[')) {
+            if (chr != cast('[')) {
                 throw SequenceError("Unable to find '[' to start sequence!");
             }
 
-            incAndCheckThatStringDoesNotEnd();
-
-            for (CharT chr : text_generator) {
-                if (canStartRange()) {
+            while ((chr = text_generator.getCharWithoutLayout()) != chars_enum::EoF) {
+                if (tryToStartRangeOrSkipExtraStartSymbol()) {
                     is_range_of_chars = true;
                     continue;
-                }
-
-                if (chr == cast('-')) {
-                    incAndCheckThatStringDoesNotEnd();
                 }
 
                 if (skipCharsOrShouldStop()) {
@@ -79,9 +75,9 @@ namespace cerb::lex
         constexpr auto fillAccordingToRule(bool is_range_of_chars, CharT previous_char) -> void
         {
             if (is_range_of_chars) {
-                fillRange(previous_char, text_generator.getCharAtCurrentOffset());
+                fillRange(previous_char, text_generator.getCurrentChar());
             } else {
-                setChar(text_generator.getCharAtCurrentOffset());
+                setChar(text_generator.getCurrentChar());
             }
         }
 
@@ -105,16 +101,28 @@ namespace cerb::lex
             available_chars.template set<1, 0>(convert2UnsignedInt(chr));
         }
 
-        CERBLIB_DECL auto canStartRange() const -> bool
+        CERBLIB_DECL auto tryToStartRangeOrSkipExtraStartSymbol() -> bool
         {
-            return logicalAnd(
-                text_generator.getCharAtCurrentOffset(-1) == cast('-'),
-                text_generator.getCharAtCurrentOffset() != cast('-'));
+            if (text_generator.getCurrentChar() == cast('-')) {
+                return skipExtraSymbolOrAllowToStartRange();
+            }
+
+            return false;
+        }
+
+        CERBLIB_DECL auto skipExtraSymbolOrAllowToStartRange() -> bool
+        {
+            if (text_generator.getCurrentChar(1) != cast('-')) {
+                return true;
+            } else {
+                incAndCheckThatStringDoesNotEnd();
+                return false;
+            }
         }
 
         CERBLIB_DECL auto skipCharsOrShouldStop() -> bool
         {
-            switch (text_generator.getCharAtCurrentOffset(-1)) {
+            switch (text_generator.getCurrentChar()) {
             case cast('['):
                 checkFor2OpenedSequences();
                 break;
@@ -153,8 +161,8 @@ namespace cerb::lex
         CERBLIB_DECL auto doesCharRepeatTwice(T chr) const -> bool
         {
             return logicalAnd(
-                text_generator.getCharAtCurrentOffset(-1) == cast(chr),
-                text_generator.getCharAtCurrentOffset() == cast(chr));
+                text_generator.getCurrentChar() == cast(chr),
+                text_generator.getCurrentChar(1) == cast(chr));
         }
 
         constant_bitmap_t &available_chars;

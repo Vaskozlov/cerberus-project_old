@@ -6,7 +6,8 @@
 #include <cerberus/lexical/string_sequence.hpp>
 #include <cerberus/lexical/tokens/token.hpp>
 
-namespace cerb::lex {
+namespace cerb::lex
+{
     template<CharacterLiteral CharT, typename TokenType>
     struct DotItem
     {
@@ -21,6 +22,7 @@ namespace cerb::lex {
         using object_t = DotItemObject<CharT, TokenType>;
         using parameters_pack_t = ParametersPack<CharT, TokenType>;
 
+        using chars_enum = CharsEnum<CharT>;
         using ScanStatus = typename object_t::ScanStatus;
         using generator_t = typename object_t::generator_t;
         using generator_reference_t = typename object_t::generator_reference_t;
@@ -59,7 +61,7 @@ namespace cerb::lex {
 
         explicit constexpr DotItem(
             str_view_t regex, parameters_pack_t const &parameters_for_analysis)
-          : generator_for_text(LocationInFile{ "DotItem generator" }, regex),
+          : generator_for_text(regex, "DotItem generator"),
             analysis_parameters(parameters_for_analysis)
         {
             parseRegex();
@@ -91,8 +93,8 @@ namespace cerb::lex {
 
         constexpr auto parseRegex()
         {
-            for (CharT chr : generator_for_text) {
-                switch (chr) {
+            while (generator_for_text.getCharWithoutLayout() != chars_enum::EoF) {
+                switch (generator_for_text.getCurrentChar()) {
                 case '[':
                     startNewSequenceOfChar();
                     endNewSequenceOfChar();
@@ -175,8 +177,6 @@ namespace cerb::lex {
         {
             getLastSequence().setRule(Rule::QUESTION);
         }
-
-        constexpr static auto generator_end = generator_t::end();
 
         generator_t generator_for_text;
         storage_t objects;

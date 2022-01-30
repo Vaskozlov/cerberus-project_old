@@ -53,13 +53,19 @@ namespace cerb::lex
             return tabs_and_spaces;
         }
 
-        CERBLIB_DECL auto getCurrentChar() const -> CharT
+        CERBLIB_DECL auto getCurrentChar(ssize_t offset = 0) const -> CharT
         {
             if (not initialized) {
                 return chars_enum::EoF;
             }
 
-            return text[getOffset()];
+            auto real_offset = static_cast<ssize_t>(getOffset()) + offset;
+            return text[static_cast<size_t>(real_offset)];
+        }
+
+        CERBLIB_DECL auto getCurrentString() const -> str_view_t
+        {
+            return { text.begin() + getOffset(), text.end() };
         }
 
         constexpr auto getRawChar() -> CharT
@@ -89,6 +95,13 @@ namespace cerb::lex
             }
 
             return text[getOffset()];
+        }
+
+        constexpr auto skipLayout() -> void
+        {
+            while (isLayout(getCurrentChar(1))) {
+                getRawChar();
+            }
         }
 
         constexpr TextGenerator() = default;

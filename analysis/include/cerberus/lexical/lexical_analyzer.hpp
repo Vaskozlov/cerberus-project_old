@@ -11,6 +11,7 @@ namespace cerb::lex
     template<CharacterLiteral CharT, typename TokenType>
     class LexicalAnalyzer
     {
+        using chars_enum = CharsEnum<CharT>;
         using token_t = Token<CharT, TokenType>;
         using str_view_t = BasicStringView<CharT>;
         using dot_item_t = DotItem<CharT, TokenType>;
@@ -49,7 +50,7 @@ namespace cerb::lex
 
         constexpr auto setStream(str_view_t const &filename, str_view_t const &input) -> void
         {
-            text_generator = { LocationInFile(filename), input };
+            text_generator = generator_t{ input, filename };
         }
 
         LexicalAnalyzer(
@@ -100,7 +101,7 @@ namespace cerb::lex
 
         constexpr auto hasSkippedComment() -> bool
         {
-            str_view_t current_state = text_generator.getCurrentStateString();
+            str_view_t current_state = text_generator.getCurrentString();
 
             if (current_state.containsAt(0, getSingleLineCommentBegin())) {
                 skipSingleLineComment();
@@ -116,10 +117,10 @@ namespace cerb::lex
 
         constexpr auto skipSingleLineComment() -> void
         {
-            CharT chr = text_generator.newRawChar();
+            CharT chr = text_generator.getRawChar();
 
-            while (logicalAnd(chr != cast('\n'), isEndOfInput(chr))) {
-                chr = text_generator.newRawChar();
+            while (logicalAnd(chr != chars_enum::NewLine, chr != chars_enum::EoF)) {
+                chr = text_generator.getRawChar();
             }
         }
 
@@ -128,16 +129,16 @@ namespace cerb::lex
             size_t index = 0;
 
             for (; index < getMultilineCommentBegin().size(); ++index) {
-                throwIfEoF(text_generator.newRawChar());
+                throwIfEoF(text_generator.getRawChar());
             }
 
             while (!current_state.containsAt(index, getMultilineCommentEnd())) {
-                throwIfEoF(text_generator.newRawChar());
+                throwIfEoF(text_generator.getRawChar());
                 ++index;
             }
 
             for (index = 0; index < getMultilineCommentEnd().size(); ++index) {
-                throwIfEoF(text_generator.newRawChar());
+                throwIfEoF(text_generator.getRawChar());
             }
         }
 
