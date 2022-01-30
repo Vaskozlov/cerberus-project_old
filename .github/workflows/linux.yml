@@ -13,12 +13,6 @@ jobs:
             cxx: g++
             version: 11
             dependencies: libfmt-dev gcc-11 g++-11
-          - name: Linux CLANG
-              os: ubuntu-latest
-              cc: clang
-              cxx: clang++
-              version: 13
-              dependencies: libfmt-dev gcc-11 g++-11 clang-13
     name: CMake (${{ matrix.config.name }})
     runs-on: ${{ matrix.config.os }}
     steps:
@@ -36,8 +30,8 @@ jobs:
           brew install ${{ matrix.config.dependencies }}
       - name: Build
         run: |
-          cmake -B build -DCMAKE_BUILD_TYPE=Release -DCERBERUS_STRICT_COMPILATION=ON -DUSE_LIBCPP=OFF
-          cmake --build build -j3
+          cmake -B build -DCMAKE_BUILD_TYPE=Release -DCERBERUS_STRICT_COMPILATION=ON
+          cmake --build build -j3 -G Ninja
       - name: Test
         run: |
           ctest
