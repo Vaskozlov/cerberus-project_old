@@ -57,6 +57,13 @@
 #    define CERBLIB_DEPRECATED_SUGGEST(ALT) [[deprecated(ALT)]]
 #endif /* CERBLIB_DEPRECATED_SUGGEST */
 
+#ifndef CERBLIB_IGNORE
+#    define CERBLIB_IGNORE(X)                                                                      \
+        {                                                                                          \
+            [[maybe_unused]] auto _ = (X);                                                         \
+        }
+#endif /* CERBLIB_IGNORE */
+
 #ifndef CERBLIB_DO_PRAGMA
 #    ifdef _MSC_VER
 #        define CERBLIB_DO_PRAGMA(x) __pragma(#        x)
@@ -115,6 +122,7 @@
 
 #include <algorithm>
 #include <array>
+#include <bit>
 #include <cinttypes>
 #include <cstddef>
 #include <limits>
@@ -122,7 +130,8 @@
 #include <type_traits>
 #include <utility>
 
-namespace cerb {
+namespace cerb
+{
     using u8 = uint8_t;
     using u16 = uint16_t;
     using u32 = uint32_t;
@@ -136,52 +145,7 @@ namespace cerb {
     using f32 = float;
     using f64 = double;
 
-    using isize = intmax_t;
-    using usize = uintmax_t;
-
-    using size_t = std::size_t;
-
-#if defined(__WINDOWS__) || defined(__WIN32__)
-    constexpr auto endl = "\n\r";
-#else
-    constexpr auto endl = '\n';
-#endif
-
-    /**
-     * Just an empty type.
-     */
-    class EmptyType
-    {
-        CERBLIB_CLANG_DISABLE_WARNING("-Wunused-private-field")
-        u8 empty{};
-        CERBLIB_CLANG_ENABLE_WARNING
-
-    public:
-        constexpr EmptyType() noexcept = default;
-
-        constexpr auto operator()() const -> EmptyType
-        {
-            return {};
-        }
-    };
-
-    constexpr EmptyType Empty{};
-
-    template<typename F, typename... Ts>
-    constexpr auto call(F &&function, Ts &&...args) -> decltype(auto)
-    {
-        if constexpr (std::is_same_v<F, EmptyType>) {
-            return;
-        } else {
-            return function(std::forward<Ts...>(args)...);
-        }
-    }
-
-    template<typename T>
-    CERBLIB_DECL auto getLimit(const T & /*unused*/) -> std::numeric_limits<T>
-    {
-        return std::numeric_limits<T>();
-    }
+    using ssize_t = intmax_t;
 
     template<auto Begin, auto End, auto Inc>
     constexpr auto constexprFor(auto &&function) -> void
@@ -192,24 +156,31 @@ namespace cerb {
         }
     }
 
-    /**
-     * iterates through parameter pack
-     * @tparam Ts
-     * @param function which will be called for each argument
-     * @param args arguments to iterate throw
-     * @return
-     */
     template<typename F, typename... Ts>
     CERBLIB_DECL auto forEach(F &&function, Ts &&...args)
     {
-        [[maybe_unused]] const auto iterator = { ([&function]<typename T>(T &&value) {
-            call(std::forward<F>(function), std::forward<T>(value));
+        [[maybe_unused]] auto const _ = { ([&function]<typename T>(T &&value) {
+            function(std::forward<T>(value));
             return 0;
         })(std::forward<Ts>(args))... };
     }
 
+    template<typename... Ts>
+    CERBLIB_DECL auto logicalAnd(bool first, Ts... other) -> bool
+    {
+        forEach([&first](bool value) { first &= value; }, other...);
+        return first;
+    }
+
+    template<typename... Ts>
+    CERBLIB_DECL auto logicalOr(bool first, Ts... other) -> bool
+    {
+        forEach([&first](bool value) { first |= value; }, other...);
+        return first;
+    }
+
     template<typename T>
-    constexpr auto cmov(bool condition, const T &on_true, const T &on_false) -> T
+    constexpr auto cmov(bool condition, T const &on_true, T const &on_false) -> T
     {
         return condition ? on_true : on_false;
     }

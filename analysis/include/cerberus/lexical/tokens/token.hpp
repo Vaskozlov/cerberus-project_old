@@ -1,20 +1,28 @@
 #ifndef CERBERUS_TOKEN_HPP
 #define CERBERUS_TOKEN_HPP
 
-#include <cerberus/lexical/location.hpp>
+#include <cerberus/lexical/text_generator.hpp>
+#include <cerberus/lexical/tokens/postfix_prefix.hpp>
 #include <string>
+#include <vector>
 
-namespace cerb::lex {
-
+namespace cerb::lex
+{
     template<CharacterLiteral CharT, typename TokenType>
     struct Token
     {
+        using str_t = std::basic_string<CharT>;
+        using str_view_t = BasicStringView<CharT>;
+        using prefix_storage_t = std::vector<str_view_t>;
+
+        using variant_t = typename PostfixPrefix<CharT>::PrefixOrPostfixVariant;
+
         CERBLIB_DECL auto getType() const -> TokenType
         {
             return type;
         }
 
-        CERBLIB_DECL auto getRepr() const -> BasicStringView<CharT> const &
+        CERBLIB_DECL auto getRepr() const -> str_view_t const &
         {
             return repr;
         }
@@ -26,7 +34,7 @@ namespace cerb::lex {
 
         CERBLIB_DECL auto getCharacter() const -> size_t
         {
-            return location.getCharacter();
+            return location.getCharacterInLine();
         }
 
         CERBLIB_DECL auto getOffset() const -> size_t
@@ -44,7 +52,7 @@ namespace cerb::lex {
             return location;
         }
 
-        CERBLIB_DECL auto getTabsAndSpaces() const -> std::basic_string<CharT> const &
+        CERBLIB_DECL auto getTabsAndSpaces() const -> str_t const &
         {
             return tabs_and_spaces;
         }
@@ -69,20 +77,31 @@ namespace cerb::lex {
             return type <=> other;
         }
 
+        constexpr auto addPrefix(str_view_t const &prefix_repr) -> void
+        {
+            prefixes_and_postfixes.emplace_back(prefix_repr, variant_t::PREFIX);
+        }
+
+        constexpr auto addPostfix(str_view_t const &prefix_repr) -> void
+        {
+            prefixes_and_postfixes.emplace_back(prefix_repr, variant_t::POSTFIX);
+        }
+
         constexpr Token() = default;
         constexpr Token(
             TokenType type_of_token, LocationInFile const &location_in_file,
-            BasicStringView<CharT> const &repr_of_token, TextGenerator<CharT> const &txt_manager)
-          : location(location_in_file), repr(repr_of_token), line(txt_manager.getCurrentLine()),
-            tabs_and_spaces(txt_manager.getTabsAndSpaces()), type(type_of_token)
+            str_view_t const &repr_of_token, TextGenerator<CharT> const &txt_manager)
+          : location(location_in_file), tabs_and_spaces(txt_manager.getTabsAndSpaces()),
+            repr(repr_of_token), line(txt_manager.getLineInText()), type(type_of_token)
         {}
 
     private:
-        LocationInFile location;
-        BasicStringView<CharT> repr;
-        BasicStringView<CharT> line;
-        std::basic_string<CharT> tabs_and_spaces;
-        TokenType type;
+        LocationInFile location{};
+        str_t tabs_and_spaces{};
+        prefix_storage_t prefixes_and_postfixes{};
+        str_view_t repr{};
+        str_view_t line{};
+        TokenType type{};
     };
 }// namespace cerb::lex
 

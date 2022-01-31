@@ -1,7 +1,9 @@
 #include "string_view.hpp"
+#include <cerberus/string_view.hpp>
 #include <string>
 
-namespace cerb::test {
+namespace cerb::test
+{
 
     auto basicStringViewTestEqualStrings(u32 argc) -> void
     {

@@ -1,8 +1,10 @@
 #include "memory.hpp"
+#include <algorithm>
 #include <cerberus/pointer_wrapper.hpp>
 #include <vector>
 
-namespace cerb::test {
+namespace cerb::test
+{
 
     constexpr i32 CheckValueI32 = -134;
     constexpr u8 TestU8Value = 255U;
@@ -28,26 +30,28 @@ namespace cerb::test {
         std::array<T, ArraySize> src{};
         std::array<T, ArraySize> dest{};
 
-        memcpy(src.data(), random_data, ArraySize);
-        EXPECT_TRUE(areObjectsInClassEqual<RawPointerWrapper<T>>(
-            { src.data(), ArraySize }, { random_data, ArraySize }));
+        copy(src.data(), random_data, ArraySize);
+        auto raw_ptr_to_scr = RawPointerWrapper<T>{ src.data(), ArraySize };
+        auto raw_ptr_to_data = RawPointerWrapper<T>{ random_data, ArraySize };
 
-        memcpy(dest, src);
-        EXPECT_TRUE(areObjectsInClassEqual(src, dest));
+        EXPECT_TRUE(std::ranges::equal(raw_ptr_to_scr, raw_ptr_to_data));
+
+        copy(dest, src);
+        EXPECT_TRUE(std::ranges::equal(src, dest));
     }
 
-    auto generateRandomComplexData(usize size) -> std::unique_ptr<PairedNumbers>
+    auto generateRandomComplexData(size_t size) -> std::unique_ptr<PairedNumbers>
     {
         static std::random_device random_device;
         static std::mt19937 engine(random_device());
 
-        static std::uniform_int_distribution<isize> isize_distribution(
-            std::numeric_limits<isize>::min(), std::numeric_limits<isize>::max());
+        static std::uniform_int_distribution<ssize_t> isize_distribution(
+            std::numeric_limits<ssize_t>::min(), std::numeric_limits<ssize_t>::max());
 
         auto random_complex_data = std::unique_ptr<PairedNumbers>(
             static_cast<PairedNumbers *>(::operator new(size * sizeof(PairedNumbers))));
 
-        for (usize i = 0; i < size; ++i) {
+        for (size_t i = 0; i < size; ++i) {
             random_complex_data.get()[i] = { isize_distribution(engine),
                                              static_cast<double>(isize_distribution(engine)) };
         }
@@ -63,14 +67,14 @@ namespace cerb::test {
         std::array<u64, 512> data_64{};
         std::array<PairedNumbers, 512> data_complex{};
 
-        cerb::memset<u8>(data_8.data(), TestU8Value, 512);
-        cerb::memset<u16>(data_16.data(), TestU16Value, 512);
-        cerb::memset<u32>(data_32.data(), TestU32Value, 512);
-        cerb::memset<u64>(data_64.data(), TestU64Value, 512);
-        cerb::memset<PairedNumbers>(data_complex.data(), TestComplexValue, 512);
+        fill<u8>(data_8.data(), TestU8Value, 512);
+        fill<u16>(data_16.data(), TestU16Value, 512);
+        fill<u32>(data_32.data(), TestU32Value, 512);
+        fill<u64>(data_64.data(), TestU64Value, 512);
+        fill<PairedNumbers>(data_complex.data(), TestComplexValue, 512);
 
         std::array<i32, 512> array_32{};
-        cerb::memset(array_32, CheckValueI32);
+        fill(array_32, CheckValueI32);
 
         EXPECT_TRUE(arrayStoresSameValues(data_8, TestU8Value));
         EXPECT_TRUE(arrayStoresSameValues(data_16, TestU16Value));
@@ -106,33 +110,33 @@ namespace cerb::test {
 
         EXPECT_FALSE(const_result);
 
-        cerb::memset<u8>(data_8.get(), TestU8Value, buffer_size);
+        fill(data_8.get(), TestU8Value, buffer_size);
         EXPECT_TRUE(arrayStoresSameValues(data_8, TestU8Value));
 
-        cerb::memset<u16>(data_16.get(), TestU16Value, buffer_size);
+        fill(data_16.get(), TestU16Value, buffer_size);
         EXPECT_TRUE(arrayStoresSameValues(data_16, TestU16Value));
 
-        cerb::memset<u32>(data_32.get(), TestU32Value, buffer_size);
+        fill(data_32.get(), TestU32Value, buffer_size);
         EXPECT_TRUE(arrayStoresSameValues(data_32, TestU32Value));
 
-        cerb::memset<u64>(data_64.get(), TestU64Value, buffer_size);
+        fill(data_64.get(), TestU64Value, buffer_size);
         EXPECT_TRUE(arrayStoresSameValues(data_64, TestU64Value));
 
-        cerb::memset<PairedNumbers>(data_complex.get(), TestComplexValue, buffer_size);
+        fill<PairedNumbers>(data_complex.get(), TestComplexValue, buffer_size);
         EXPECT_TRUE(arrayStoresSameValues(data_complex, TestComplexValue));
 
-        cerb::memset(array_32, CheckValueI32);
+        fill(array_32, CheckValueI32);
         EXPECT_TRUE(arrayStoresSameValues(array_32, CheckValueI32));
 
-        cerb::memset(array_str, long_string);
+        fill(array_str, long_string);
         EXPECT_TRUE(arrayStoresSameValues(array_str, long_string));
 
         vector_str.resize(complex_buffer_size);
-        cerb::memset(vector_str, long_string);
+        fill(vector_str, long_string);
         EXPECT_TRUE(arrayStoresSameValues(vector_str, long_string));
 
         complex_vector.resize(complex_buffer_size);
-        cerb::memset(complex_vector, TestComplexValue);
+        fill(complex_vector, TestComplexValue);
         EXPECT_TRUE(arrayStoresSameValues(complex_vector, TestComplexValue));
     }
 
@@ -145,7 +149,7 @@ namespace cerb::test {
         auto random_data_8 = createRandomArrayOfInts<u8>(buffer_size);
         auto random_data_16 = createRandomArrayOfInts<u16>(buffer_size);
         auto random_data_32 = createRandomArrayOfInts<u32>(buffer_size);
-        auto random_data_usize = createRandomArrayOfInts<usize>(buffer_size);
+        auto random_data_usize = createRandomArrayOfInts<size_t>(buffer_size);
         auto random_complex_data = generateRandomComplexData(complex_buffer_size);
 
         copyRandomData2ArrayAndTestMemcpyOnIt<buffer_size>(random_data_8.get());

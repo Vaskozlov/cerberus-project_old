@@ -6,30 +6,28 @@
 #include <cerberus/type.hpp>
 #include <string_view>
 
-namespace cerb {
+namespace cerb
+{
     template<CharacterLiteral CharT>
     struct BasicStringView
     {
-        using size_type = usize;
+        using size_type = size_t;
         using difference_type = ptrdiff_t;
         using value_type = CharT;
-        using pointer = value_type *;
-        using const_pointer = const value_type *;
-        using reference = value_type &;
-        using const_reference = const value_type &;
+
         using const_iterator = const CharT *;
         using iterator = const_iterator;
         using reverse_iterator = std::reverse_iterator<iterator>;
         using const_reverse_iterator = std::reverse_iterator<const_iterator>;
 
-    private:
-        size_type length{};
-        const CharT *string{};
-
-    public:
-        CERBLIB_DECL auto size() const -> usize
+        CERBLIB_DECL auto size() const -> size_t
         {
             return length;
+        }
+
+        CERBLIB_DECL auto empty() const -> bool
+        {
+            return size() == 0;
         }
 
         CERBLIB_DECL auto data() const -> const CharT *
@@ -99,12 +97,12 @@ namespace cerb {
 
         CERBLIB_DECL auto find(CharT chr) const -> size_t
         {
-            return cerb::find(string, chr, length);
+            return ptrdiff(begin(), cerb::find(*this, chr));
         }
 
         CERBLIB_DECL auto find(CharT chr, size_t position) const -> size_t
         {
-            return cerb::find(string + position, chr, length - position);
+            return ptrdiff(begin(), cerb::find(string + position, chr, length - position));
         }
 
         CERBLIB_DECL auto strView() const -> std::basic_string_view<CharT>
@@ -123,7 +121,7 @@ namespace cerb {
             return { cbegin() + from, max<size_t>(size, length - from) };
         }
 
-        CERBLIB_DECL auto containsAt(size_t index, BasicStringView const &str) -> bool
+        CERBLIB_DECL auto containsAt(size_t index, BasicStringView const &str) const -> bool
         {
             return BasicStringView(begin() + index, str.size()).operator==(str);
         }
@@ -136,12 +134,10 @@ namespace cerb {
         template<typename T>
         CERBLIB_DECL auto operator==(const T &other) const -> bool
         {
-            static_assert(is_any_of_v<
-                          T, BasicStringView<CharT>, std::basic_string<CharT>,
-                          std::basic_string_view<CharT>>);
+            checkThatTypeIsString<T>();
+            auto other_str = BasicStringView<CharT>(std::data(other), std::size(other));
 
-            return cerb::areObjectsInClassEqual(
-                *this, BasicStringView<CharT>(std::data(other), std::size(other)));
+            return std::ranges::equal(*this, other_str);
         }
 
         CERBLIB_DECL auto operator<=>(const CharT *other) const -> decltype(auto)
@@ -152,9 +148,7 @@ namespace cerb {
         template<typename T>
         CERBLIB_DECL auto operator<=>(const T &other) const
         {
-            static_assert(is_any_of_v<
-                          T, BasicStringView<CharT>, std::basic_string<CharT>,
-                          std::basic_string_view<CharT>>);
+            checkThatTypeIsString<T>();
 
             for (size_t i = 0; i < min<size_type>(this->length, std::size(other)); ++i) {
                 if (this->at(i) != other.at(i)) {
@@ -167,55 +161,67 @@ namespace cerb {
 
         constexpr BasicStringView() = default;
 
-        constexpr BasicStringView(const CharT *str) : length(strlen(str)), string(str)
+        constexpr BasicStringView(const CharT *str) : length(strlen(str)), string(str)// NOLINT
         {}
 
-        constexpr BasicStringView(const CharT *str, usize length_of_string)
+        constexpr BasicStringView(const CharT *str, size_t length_of_string)
           : length(length_of_string), string(str)
         {}
 
         constexpr BasicStringView(iterator first, iterator last)
-          : length(static_cast<ptrdiff_t>(last - first)), string(first)
+          : length(ptrdiff(first, last)), string(first)
         {}
 
         template<unsigned long Size>
-        constexpr BasicStringView(const CharT (&str)[Size]) : length(Size), string(str)
+        constexpr BasicStringView(const CharT (&str)[Size]) : length(Size), string(str)// NOLINT
         {}
+
+    private:
+        template<typename T>
+        constexpr static auto checkThatTypeIsString() -> void
+        {
+            static_assert(is_any_of_v<
+                          T, BasicStringView<CharT>, std::basic_string<CharT>,
+                          std::basic_string_view<CharT>>);
+        }
+
+        size_type length{};
+        const CharT *string{};
     };
 
-    using string_view = cerb::BasicStringView<char>;
-    using u8string_view = cerb::BasicStringView<char8_t>;
-    using u16string_view = cerb::BasicStringView<char16_t>;
-    using u32string_view = cerb::BasicStringView<char32_t>;
-    using wstring_view = cerb::BasicStringView<wchar_t>;
+    using string_view = BasicStringView<char>;
+    using u8string_view = BasicStringView<char8_t>;
+    using u16string_view = BasicStringView<char16_t>;
+    using u32string_view = BasicStringView<char32_t>;
+    using wstring_view = BasicStringView<wchar_t>;
 
-    namespace string_view_literals {
-        consteval auto operator""_sv(const char *string, size_t length)
-            -> cerb::BasicStringView<char>
+    namespace string_view_literals
+    {
+        consteval auto operator""_sv(const char *string, size_t length) -> BasicStringView<char>
         {
             return { string, length };
         }
 
         consteval auto operator""_sv(const char8_t *string, size_t length)
-            -> cerb::BasicStringView<char8_t>
+            -> BasicStringView<char8_t>
         {
             return { string, length };
         }
 
         consteval auto operator""_sv(const char16_t *string, size_t length)
-            -> cerb::BasicStringView<char16_t>
+            -> BasicStringView<char16_t>
         {
             return { string, length };
         }
 
         consteval auto operator""_sv(const char32_t *string, size_t length)
-            -> cerb::BasicStringView<char32_t>
+            -> BasicStringView<char32_t>
         {
             return { string, length };
         }
 
         consteval auto operator""_sv(const wchar_t *string, size_t length)
-            -> cerb::BasicStringView<wchar_t>
+            -> BasicStringView<wchar_t>
         {
             return { string, length };
         }

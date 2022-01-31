@@ -1,40 +1,37 @@
 #include "token.hpp"
-#include <cerberus/lexical/token.hpp>
+#include "cerberus/lexical/tokens/token.hpp"
 
-namespace cerb::test {
-    using SimpleTokenType = unsigned;
-
+namespace cerb::test
+{
     auto tokenTest(u32) -> int
     {
-        TextGenerator<> manager(
-            LocationInFile("None"),
+        lex::TextGenerator<> manager(
             "    "
             "\t\tHello, World! \nIt's a test \t\t  \nstring.");
 
         EXPECT_TRUE(
-            manager.getCurrentLine() ==
+            manager.getLineInText() ==
             "    "
             "\t\tHello, World! ");
-        EXPECT_TRUE(manager.nextYieldedChar() == ' ');
-        EXPECT_TRUE(manager.skipLayoutAndGiveNewChar() == 'H');
+        EXPECT_TRUE(manager.getCharWithoutLayout() == 'H');
         EXPECT_TRUE(
             manager.getTabsAndSpaces() ==
             "    "
             "\t\t");
-        EXPECT_TRUE(manager.newChar() == 'e');
+        EXPECT_TRUE(manager.getRawChar() == 'e');
 
-        while (manager.newChar() != '\n') {
+        while (manager.getRawChar() != '\n') {
             // empty statement
         }
 
-        EXPECT_TRUE(manager.skipLayoutAndGiveNewChar() == 'I');
-        lex::Token<char, SimpleTokenType> token{ 10, manager.getLocation(), "It's", manager };
+        EXPECT_TRUE(manager.getCharWithoutLayout() == 'I');
+        lex::Token<char, int> token{ 10, manager.getLocation(), "It's", manager };
 
         EXPECT_TRUE(token.getType() == 10);
-        EXPECT_TRUE(token.getLine() == 1);
+        EXPECT_TRUE(token.getLine() == 2);
         EXPECT_TRUE(token.getCharacter() == 1);
-        EXPECT_TRUE(token.getOffset() == 22);
-        EXPECT_TRUE(token.getFilename() == "None");
+        EXPECT_TRUE(token.getOffset() == 21);
+        EXPECT_TRUE(token.getFilename() == "");
         EXPECT_TRUE(token.getTabsAndSpaces().empty());
         EXPECT_TRUE(token.getRepr() == "It's");
 

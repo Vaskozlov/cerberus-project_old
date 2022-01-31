@@ -4,14 +4,15 @@
 #include <memory>
 #include <type_traits>
 
-namespace cerb {
+namespace cerb
+{
     template<typename TargetType, typename... SuitableTypes>
     struct is_any_of
     {
         template<typename CurrentType2Check, typename... OtherTypes2Check>
         CERBLIB_DECL static auto check(bool result = false) -> bool
         {
-            result = result || std::is_same_v<TargetType, CurrentType2Check>;
+            result = logicalOr(result, std::is_same_v<TargetType, CurrentType2Check>);
 
             if constexpr (sizeof...(OtherTypes2Check) != 0) {
                 result = check<OtherTypes2Check...>(result);
@@ -31,7 +32,7 @@ namespace cerb {
         forEach(
             [&result, &target_value]<typename U>(const U &value) {
                 if constexpr (std::convertible_to<U, T>) {
-                    result = result || (static_cast<T>(value) == target_value);
+                    result = logicalOr(result, static_cast<T>(value) == target_value);
                 }
             },
             std::forward<Ts>(suitable_values)...);
@@ -75,11 +76,19 @@ namespace cerb {
     };
 
     template<typename T>
-    concept CanBeStoredInIntegral =
-        is_one_of(sizeof(T), sizeof(u8), sizeof(u16), sizeof(u32), sizeof(u64), sizeof(usize));
+    concept Enum = std::is_enum_v<T>;
 
     template<typename T>
-    concept Trivial = std::is_trivial_v<T> &&(sizeof(T) <= sizeof(usize) * 2);
+    concept CanBeStoredInIntegral = is_one_of(
+        sizeof(T),
+        sizeof(uint8_t),
+        sizeof(uint16_t),
+        sizeof(uint32_t),
+        sizeof(uint64_t),
+        sizeof(size_t));
+
+    template<typename T>
+    concept Trivial = std::is_trivial_v<T> &&(sizeof(T) <= sizeof(size_t) * 2);
 
     template<typename T>
     concept NotTrivial = !Trivial<T>;

@@ -1,7 +1,8 @@
 #include "bitmap.hpp"
 #include <cerberus/bitmap.hpp>
 
-namespace cerb::test {
+namespace cerb::test
+{
     auto bitmapTestSet() -> void
     {
         ConstBitmap<2, 512> bitmap;

@@ -1,5 +1,7 @@
 #include "char.hpp"
-#include "location.hpp"
+#include "lexical_analyzer.hpp"
+#include "string_parser.hpp"
+#include "text_generator.hpp"
 #include "token.hpp"
 
 auto main() -> int
@@ -9,6 +11,8 @@ auto main() -> int
     lexicalCharTest();
     txtManagerTest();
     tokenTest();
+    lexicalAnalyzerTest();
+    stringParserTest();
 
     return 0;
 }

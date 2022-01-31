@@ -5,7 +5,8 @@
 #include <cerberus/cerberus.hpp>
 #include <cerberus/type.hpp>
 
-namespace cerb {
+namespace cerb
+{
     /**
      * Union which holds target class and provides access to it's bytes
      * @tparam T
@@ -57,19 +58,10 @@ namespace cerb {
             }
         }
 
-        /**
-         * returns stored value as integer.
-         * @return integral representation of stored value.
-         */
-        CERBLIB_DECL auto operator()() const -> decltype(auto)
-        {
-            return getAsInt();
-        }
-
-        constexpr explicit ByteMask(T &&value_) : value(std::move(value_))
+        constexpr explicit ByteMask(T &&value_to_store) : value(std::move(value_to_store))
         {}
 
-        constexpr explicit ByteMask(const T &value_) : value(value_)
+        constexpr explicit ByteMask(const T &value_to_store) : value(value_to_store)
         {}
     };
 
@@ -103,7 +95,7 @@ namespace cerb {
                 }
                 if (elem == '1') {
                     m_expected |= current_bit;
-                } else if (elem == 'x' || elem == 'X') {
+                } else if (logicalOr(elem == 'x', elem == 'X')) {
                     m_mask &= ~current_bit;
                 }
                 current_bit >>= 1U;
@@ -118,6 +110,13 @@ namespace cerb {
             return lhs;
         } else {
             T rhs = max<T>(std::forward<Ts>(args)...);
+
+#ifdef __clang__
+            if constexpr (std::integral<T>) {
+                std::array temporary = { lhs, rhs };
+                return temporary[lhs < rhs];
+            }
+#endif
             return lhs > rhs ? lhs : rhs;
         }
     }
@@ -129,6 +128,13 @@ namespace cerb {
             return lhs;
         } else {
             T rhs = min<T>(std::forward<Ts>(args)...);
+
+#ifdef __clang__
+            if constexpr (std::integral<T>) {
+                std::array temporary = { lhs, rhs };
+                return temporary[lhs > rhs];
+            }
+#endif
             return lhs < rhs ? lhs : rhs;
         }
     }
@@ -196,10 +202,10 @@ namespace cerb {
         return mask.value;
     }
 
-    template<std::integral T>
+    template<typename T>
     CERBLIB_DECL auto convert2UnsignedInt(T number) -> decltype(auto)
     {
-        static_assert(CanBeStoredInIntegral<T>);
+        static_assert((std::integral<T> || std::is_enum_v<T>)&&CanBeStoredInIntegral<T>);
 
         if constexpr (std::is_unsigned_v<T>) {
             return number;
@@ -211,8 +217,8 @@ namespace cerb {
             return std::bit_cast<u32>(number);
         } else if constexpr (sizeof(T) == sizeof(u64)) {
             return std::bit_cast<u64>(number);
-        } else if constexpr (sizeof(T) == sizeof(usize)) {
-            return std::bit_cast<usize>(number);
+        } else if constexpr (sizeof(T) == sizeof(size_t)) {
+            return std::bit_cast<size_t>(number);
         }
     }
 
@@ -243,7 +249,7 @@ namespace cerb {
      * @param number
      * @return trunked integer
      */
-    template<usize PowerOf2, std::integral T>
+    template<size_t PowerOf2, std::integral T>
     CERBLIB_DECL auto trunk(T number) -> T
     {
         return number & ~(pow2<T>(PowerOf2) - 1);
@@ -256,7 +262,7 @@ namespace cerb {
      * @param number
      * @return ceiled integer
      */
-    template<usize PowerOf2, std::integral T>
+    template<size_t PowerOf2, std::integral T>
     CERBLIB_DECL auto ceil(T number) -> T
     {
         return number + (pow2<T>(PowerOf2) - number % pow2<T>(PowerOf2));
@@ -277,9 +283,10 @@ namespace cerb {
     }
 
 #ifdef _MSC_VER
-    namespace private_ {
+    namespace msvc
+    {
         template<unsigned BitValue, std::unsigned_integral T>
-        CERBLIB_DECL auto bitScanForward(T value) -> usize
+        CERBLIB_DECL auto bitScanForward(T value) -> size_t
         {
             static_assert(BitValue == 0 || BitValue == 1);
 
@@ -287,7 +294,7 @@ namespace cerb {
                 value = ~value;
             }
 
-            usize bit_index = 0;
+            size_t bit_index = 0;
             constexpr T mask = 0b1;
 
             CERBLIB_UNROLL_N(2)
@@ -298,11 +305,11 @@ namespace cerb {
                 value >>= 1;
             }
 
-            return bitsizeof(usize);
+            return bitsizeof(size_t);
         }
 
         template<unsigned BitValue, std::unsigned_integral T>
-        CERBLIB_DECL auto bitScanReverse(T value) -> usize
+        CERBLIB_DECL auto bitScanReverse(T value) -> size_t
         {
             static_assert(std::is_unsigned_v<T>);
             static_assert(BitValue == 0 || BitValue == 1);
@@ -311,7 +318,7 @@ namespace cerb {
                 value = ~value;
             }
 
-            usize bit_index = bitsizeof(T) - 1;
+            size_t bit_index = bitsizeof(T) - 1;
             constexpr T mask = static_cast<T>(1) << (bitsizeof(T) - 1);
 
             CERBLIB_UNROLL_N(2)
@@ -322,9 +329,9 @@ namespace cerb {
                 value <<= 1;
             }
 
-            return bitsizeof(usize);
+            return bitsizeof(size_t);
         }
-    }  // namespace private_
+    }  // namespace msvc
 #endif /* _MSC_VER */
 
     /**
@@ -335,7 +342,7 @@ namespace cerb {
      * @return
      */
     template<unsigned BitValue, std::unsigned_integral T>
-    CERBLIB_DECL auto bitScanForward(T value) -> usize
+    CERBLIB_DECL auto bitScanForward(T value) -> size_t
     {
         static_assert(BitValue == 0 || BitValue == 1);
 
@@ -343,25 +350,24 @@ namespace cerb {
             value = ~value;
         }
         if (value == 0) {
-            return bitsizeof(usize);
+            return bitsizeof(size_t);
         }
 
 #ifdef _MSC_VER
         if (std::is_constant_evaluated()) {
-            return private_::bitScanForward<BitValue>(value);
+            return msvc::bitScanForward<BitValue>(value);
         }
 
         unsigned long bit_index;
 
 #    if defined(_WIN32) && !defined(_WIN64)
-        _BitScanForward(&bit_index, static_cast<usize>(value));
+        _BitScanForward(&bit_index, static_cast<size_t>(value));
 #    else
-        _BitScanForward64(&bit_index, static_cast<usize>(value));
+        _BitScanForward64(&bit_index, static_cast<size_t>(value));
 #    endif
-
-        return static_cast<usize>(bit_index);
+        return static_cast<size_t>(bit_index);
 #else
-        return static_cast<usize>(__builtin_ctzl(static_cast<usize>(value)));
+        return static_cast<size_t>(__builtin_ctzl(static_cast<size_t>(value)));
 #endif
     }
 
@@ -373,7 +379,7 @@ namespace cerb {
      * @return
      */
     template<unsigned BitValue, std::unsigned_integral T>
-    CERBLIB_DECL auto bitScanReverse(T value) -> usize
+    CERBLIB_DECL auto bitScanReverse(T value) -> size_t
     {
         static_assert(BitValue == 0 || BitValue == 1);
 
@@ -381,38 +387,35 @@ namespace cerb {
             value = ~value;
         }
         if (value == 0) {
-            return bitsizeof(usize);
+            return bitsizeof(size_t);
         }
 
 #ifdef _MSC_VER
         if (std::is_constant_evaluated()) {
-            return private_::bitScanReverse<BitValue>(value);
+            return msvc::bitScanReverse<BitValue>(value);
         }
 
         unsigned long bit_index;
 
 #    if defined(_WIN32) && !defined(_WIN64)
-        _BitScanReverse(&bit_index, static_cast<usize>(value));
+        _BitScanReverse(&bit_index, static_cast<size_t>(value));
 #    else
-        _BitScanReverse64(&bit_index, static_cast<usize>(value));
+        _BitScanReverse64(&bit_index, static_cast<size_t>(value));
 #    endif
-
         return bit_index;
 #else
         return bitsizeof(unsigned long) - 1UL -
-               static_cast<usize>(__builtin_clzl(static_cast<usize>(value)));
+               static_cast<size_t>(__builtin_clzl(static_cast<size_t>(value)));
 #endif
     }
 
-    CERBLIB_DECL auto log2(std::unsigned_integral auto number) -> usize
+    CERBLIB_DECL auto log2(std::unsigned_integral auto number) -> size_t
     {
         return bitScanForward<1>(number);
     }
 
-    CERBLIB_DECL auto log2(f32 number) -> isize
+    CERBLIB_DECL auto log2(f32 number) -> ssize_t
     {
-        static_assert(sizeof(f32) == sizeof(u32), "cerb::log2 supports floats and doubles");
-
         if (number <= 0.0f) {
             return -1;
         }
@@ -421,17 +424,21 @@ namespace cerb {
         constexpr i32 f32_exponent_bit = 23;
         constexpr i32 f32_exponent_for_zero_power = 0x7fU;
         constexpr u32 f32_exponent_mask = 0xFF80'0000;
-        return static_cast<isize>((mask & f32_exponent_mask) >> f32_exponent_bit) -
+        return static_cast<ssize_t>((mask & f32_exponent_mask) >> f32_exponent_bit) -
                f32_exponent_for_zero_power;
     }
 
-    CERBLIB_DECL auto log2(f64 number) -> isize
+    CERBLIB_DECL auto log2(f64 number) -> ssize_t
     {
+        if (number <= 0.0) {
+            return -1;
+        }
+
         const u64 mask = std::bit_cast<u64>(number);
         constexpr i64 f64_exponent_bit = 52;
         constexpr i64 f64_exponent_for_zero_power = 0x3ffU;
         constexpr u64 f64_exponent_mask = 0xFFF0'0000'0000'0000;
-        return static_cast<isize>((mask & f64_exponent_mask) >> f64_exponent_bit) -
+        return static_cast<ssize_t>((mask & f64_exponent_mask) >> f64_exponent_bit) -
                f64_exponent_for_zero_power;
     }
 }// namespace cerb

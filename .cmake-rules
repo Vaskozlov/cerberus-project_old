@@ -1,20 +1,39 @@
 if (MSVC)
-    add_compile_options(/std:c++latest /W4 /Zc:__cplusplus)
+    set(CMAKE_CXX_STANDARD 20)
+    add_compile_options(/W4 /Zc:__cplusplus)
+
+    if (CERBERUS_STRICT_COMPILATION)
+        add_compile_options(/WX)
+    endif ()
 else ()
     add_compile_options(
             -std=c++20
-            -Wall -Wextra -Wpedantic -Wshadow -Wshadow -Wnon-virtual-dtor
-            -Wold-style-cast -Wcast-align -Woverloaded-virtual
-            -Wconversion -Wsign-conversion -Wformat=2
-            -Wredundant-decls -Wuninitialized -Wfloat-equal -Wfloat-conversion)
-endif ()
+            -Wall -Wextra -Wpedantic -Wshadow -pedantic
+            -Wold-style-cast -Wnon-virtual-dtor -Woverloaded-virtual
+            -Wconversion -Wsign-conversion -Wformat=2 -Wredundant-decls
+            -Wuninitialized -Wfloat-conversion -Wdouble-promotion)
 
-if (CERBERUS_STRICT_COMPILATION)
-    if (MSVC)
-        add_compile_options(/WX)
-    else ()
+    if (CMAKE_CXX_COMPILER_ID MATCHES "Clang")
+        add_compile_options(-stdlib=libc++ -fcoroutines-ts -Wfloat-equal -Wcast-align)
+
+        if (USE_LIBCPP)
+            add_compile_options(-stdlib=libc++ -lc++abi)
+            add_link_options(-stdlib=libc++ -lc++abi)
+        else ()
+            add_compile_options(-stdlib=libstdc++)
+            add_link_options(-stdlib=libstdc++)
+        endif ()
+
+    elseif (CMAKE_CXX_COMPILER_ID MATCHES "GNU")
+        add_compile_options(
+                -Wcast-align=strict -Wduplicated-branches -Wlogical-op
+                -Wnull-dereference -Wuseless-cast)
+    endif ()
+
+    if (CERBERUS_STRICT_COMPILATION)
         add_compile_options(-Werror)
     endif ()
 endif ()
 
 find_package(fmt CONFIG REQUIRED)
+find_package(Threads REQUIRED)

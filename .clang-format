@@ -21,7 +21,7 @@ BraceWrapping:
     AfterClass: true
     AfterEnum: true
     AfterFunction: true
-    AfterNamespace: false
+    AfterNamespace: true
     AfterObjCDeclaration: false
     AfterStruct: true
     AfterUnion: false

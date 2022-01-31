@@ -1,83 +1,50 @@
 #ifndef LIBCERBERUS_CATCH_CATCH_HPP
 #define LIBCERBERUS_CATCH_CATCH_HPP
 
-#include "cerberus.hpp"
-#include "pair.hpp"
+#include <cerberus/cerberus.hpp>
+#include <cerberus/exception.hpp>
+#include <cerberus/location.hpp>
+#include <cerberus/pair.hpp>
 #include <fmt/color.h>
 #include <fmt/format.h>
 #include <iostream>
 #include <random>
-#include <string_view>
 
-#define CERBLIB_LOCATION cerb::test::Location(__FILE__, __LINE__)
 #define EXPECT_TRUE(value) expectTrue(value, CERBLIB_LOCATION)
 #define EXPECT_FALSE(value) expectFalse(value, CERBLIB_LOCATION)
 
-namespace cerb::test {
-    class constexpr_failure : public std::exception
+namespace cerb::test
+{
+    CERBERUS_EXCEPTION(RuntimeError);
+    CERBERUS_EXCEPTION(CompileTimeError);
+
+    using PairedNumbers = Pair<ssize_t, double>;
+
+    inline auto failure(bool condition, Location const &loc = CERBLIB_LOCATION) -> void
     {
-        std::string_view message;
+        fmt::print(fmt::fg(fmt::color::red), "Cerberus test failure with code: {}! ", condition);
+        fmt::print("File: {}, getLine: {}\n", loc.getFilename(), loc.getLine());
+        throw RuntimeError();
+    }
 
-    public:
-        constexpr_failure() = default;
-
-        explicit constexpr_failure(std::string_view t_message) : message(t_message)
-        {}
-
-        [[nodiscard]] auto what() const noexcept -> const char * override
-        {
-            return message.data();
-        }
-    };
-
-    class Location
+    constexpr auto expectTrue(bool condition, Location const &loc = CERBLIB_LOCATION) -> void
     {
-        std::string_view filename{};
-        size_t line{};
-
-    public:
-        CERBLIB_DECL auto getLine() const -> size_t
-        {
-            return line;
-        }
-
-        CERBLIB_DECL auto getFilename() const -> std::string_view
-        {
-            return filename;
-        }
-
-        constexpr Location() = default;
-        constexpr Location(std::string_view filename_of_location, std::size_t line_of_location)
-          : filename(filename_of_location), line(line_of_location)
-        {}
-    };
-
-    using PairedNumbers = Pair<isize, double>;
-
-    constexpr auto expectTrue(bool condition, const Location &loc = CERBLIB_LOCATION) -> void
-    {
-        if (!condition) {
+        if (not condition) {
             if (std::is_constant_evaluated()) {
-                throw constexpr_failure("Cerberus test failure!");
+                throw CompileTimeError("Cerberus test failure!");
             } else {
-                fmt::print(
-                    fmt::fg(fmt::color::red), "Cerberus test failure with code: {}! ", condition);
-                fmt::print("File: {}, getLine: {}\n", loc.getFilename(), loc.getLine());
-                exit(1);
+                failure(condition, loc);
             }
         }
     }
 
-    constexpr auto expectFalse(bool condition, const Location &loc = CERBLIB_LOCATION) -> void
+    constexpr auto expectFalse(bool condition, Location const &loc = CERBLIB_LOCATION) -> void
     {
         if (condition) {
             if (std::is_constant_evaluated()) {
-                throw constexpr_failure("Cerberus test failure!");
+                throw CompileTimeError("Cerberus test failure!");
             } else {
-                fmt::print(
-                    fmt::fg(fmt::color::red), "Cerberus test failure with code: {}! ", condition);
-                fmt::print("File: {}, getLine: {}\n", loc.getFilename(), loc.getLine());
-                exit(1);
+                failure(condition, loc);
             }
         }
     }
