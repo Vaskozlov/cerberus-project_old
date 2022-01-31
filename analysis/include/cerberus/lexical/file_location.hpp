@@ -13,14 +13,14 @@ namespace cerb
             return line;
         }
 
-        CERBLIB_DECL auto getCharacterInLine() const -> size_t
-        {
-            return character;
-        }
-
         CERBLIB_DECL auto getOffset() const -> size_t
         {
             return offset;
+        }
+
+        CERBLIB_DECL auto getCharacterInLine() const -> size_t
+        {
+            return character;
         }
 
         CERBLIB_DECL auto getFilename() const -> cerb::string_view const &
@@ -30,15 +30,15 @@ namespace cerb
 
         constexpr auto newChar() -> void
         {
-            ++character;
             ++offset;
+            ++character;
         }
 
         constexpr auto newLine() -> void
         {
-            character = 0;
             ++line;
             ++offset;
+            character = 0;
         }
 
         constexpr LocationInFile() = default;

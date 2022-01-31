@@ -8,27 +8,24 @@
 
 namespace cerb::lex
 {
+
+#define CCAST(x) static_cast<CharT>(x)
+
     template<CharacterLiteral CharT>
     CERBERUS_ENUM(
-        CharsEnum, CharT, EoF = static_cast<CharT>('\0'), Tab = static_cast<CharT>('\t'),// NOLINT
-        NewLine = static_cast<CharT>('\n'), CarriageReturn = static_cast<CharT>('\r'),
-        Space = static_cast<CharT>(' '), Underscore = static_cast<CharT>('_'),
-        DQM = static_cast<CharT>('\"'), Apostrophe = static_cast<CharT>('\''),
-        Backslash = static_cast<CharT>('\\'));
+        CharsEnum, CharT, EoF = CCAST('\0'), Tab = CCAST('\t'),// NOLINT
+        NewLine = CCAST('\n'), CarriageReturn = CCAST('\r'), Space = CCAST(' '),
+        Underscore = CCAST('_'), DQM = CCAST('\"'), Apostrophe = CCAST('\''),
+        Backslash = CCAST('\\'));
 
     template<CharacterLiteral CharT>
     constexpr FlatMap<CharT, u16, 22> HexadecimalCharsToInt{
-        { static_cast<CharT>('0'), 0 },  { static_cast<CharT>('1'), 1 },
-        { static_cast<CharT>('2'), 2 },  { static_cast<CharT>('3'), 3 },
-        { static_cast<CharT>('4'), 4 },  { static_cast<CharT>('5'), 5 },
-        { static_cast<CharT>('6'), 6 },  { static_cast<CharT>('7'), 7 },
-        { static_cast<CharT>('8'), 8 },  { static_cast<CharT>('9'), 9 },
-        { static_cast<CharT>('a'), 10 }, { static_cast<CharT>('b'), 11 },
-        { static_cast<CharT>('c'), 12 }, { static_cast<CharT>('d'), 13 },
-        { static_cast<CharT>('e'), 14 }, { static_cast<CharT>('f'), 15 },
-        { static_cast<CharT>('A'), 10 }, { static_cast<CharT>('B'), 11 },
-        { static_cast<CharT>('C'), 12 }, { static_cast<CharT>('D'), 13 },
-        { static_cast<CharT>('E'), 14 }, { static_cast<CharT>('F'), 15 }
+        { CCAST('0'), 0 },  { CCAST('1'), 1 },  { CCAST('2'), 2 },  { CCAST('3'), 3 },
+        { CCAST('4'), 4 },  { CCAST('5'), 5 },  { CCAST('6'), 6 },  { CCAST('7'), 7 },
+        { CCAST('8'), 8 },  { CCAST('9'), 9 },  { CCAST('a'), 10 }, { CCAST('b'), 11 },
+        { CCAST('c'), 12 }, { CCAST('d'), 13 }, { CCAST('e'), 14 }, { CCAST('f'), 15 },
+        { CCAST('A'), 10 }, { CCAST('B'), 11 }, { CCAST('C'), 12 }, { CCAST('D'), 13 },
+        { CCAST('E'), 14 }, { CCAST('F'), 15 }
     };
 
     using char_enum_t = CharsEnum<char>;
@@ -68,13 +65,13 @@ namespace cerb::lex
     template<CharacterLiteral CharT>
     CERBLIB_DECL auto isUCLetter(CharT chr) -> bool
     {
-        return logicalAnd(chr >= static_cast<CharT>('A'), chr <= static_cast<CharT>('Z'));
+        return logicalAnd(chr >= CCAST('A'), chr <= CCAST('Z'));
     }
 
     template<CharacterLiteral CharT>
     CERBLIB_DECL auto isLCLetter(CharT chr) -> bool
     {
-        return logicalAnd(chr >= static_cast<CharT>('a'), chr <= static_cast<CharT>('z'));
+        return logicalAnd(chr >= CCAST('a'), chr <= CCAST('z'));
     }
 
     template<CharacterLiteral CharT>
@@ -86,7 +83,7 @@ namespace cerb::lex
     template<CharacterLiteral CharT>
     CERBLIB_DECL auto isDigit(CharT chr) -> bool
     {
-        return logicalAnd(chr >= static_cast<CharT>('0'), chr <= static_cast<CharT>('9'));
+        return logicalAnd(chr >= CCAST('0'), chr <= CCAST('9'));
     }
 
     template<CharacterLiteral CharT>
@@ -94,6 +91,9 @@ namespace cerb::lex
     {
         return logicalOr(isLetter(chr), isDigit(chr));
     }
+
+#undef CCAST
+
 }// namespace cerb::lex
 
 #endif /* CERBERUS_CHAR_HPP */

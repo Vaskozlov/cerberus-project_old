@@ -3,9 +3,11 @@
 
 namespace cerb::test
 {
+    using namespace lex;
+
     auto txtManagerTestOnStr() -> void
     {
-        lex::TextGenerator<> manager(
+        TextGenerator<> manager(
             "    "
             "\t\tHello, World! \nIt's a test \t\t  \nstring.",
             "None");
@@ -44,7 +46,7 @@ namespace cerb::test
         std::string str = "Hello,World!It'sateststring.";
         std::string process_str{};
 
-        lex::TextGenerator<> manager(
+        TextGenerator<> manager(
             "    "
             "\t\tHello, World! \nIt's a test \t\t  \nstring.");
 
@@ -53,7 +55,6 @@ namespace cerb::test
         }
 
         EXPECT_TRUE(process_str == str);
-
 
         return 0;
     }

@@ -14,7 +14,7 @@ namespace cerb::lex
     template<CharacterLiteral CharT>
     class StringParser
     {
-        using chars_enum = CharsEnum<CharT>;
+        using chars_enum_t = CharsEnum<CharT>;
         using str_t = std::basic_string<CharT>;
         using generator_t = TextGenerator<CharT>;
 
@@ -41,7 +41,7 @@ namespace cerb::lex
                 throw ParsingError("Given input is not a string!");
             }
 
-            while (generator.getRawChar() != chars_enum::EoF) {
+            while (not isEndOfInput(generator.getRawChar())) {
                 CharT chr = generator.getCurrentChar();
 
                 if (chr == string_char) {
@@ -49,10 +49,10 @@ namespace cerb::lex
                 }
 
                 switch (chr) {
-                case chars_enum::EoF:
+                case chars_enum_t::EoF:
                     throw ParsingError("Unable to find end of string.");
 
-                case chars_enum::Backslash:
+                case chars_enum_t::Backslash:
                     parseSpecialSymbol();
                     break;
 
@@ -83,23 +83,23 @@ namespace cerb::lex
 
             switch (chr) {
             case cast('t'):
-                parsed_string.push_back(chars_enum::Tab);
+                parsed_string.push_back(chars_enum_t::Tab);
                 break;
 
             case 'n':
-                parsed_string.push_back(chars_enum::NewLine);
+                parsed_string.push_back(chars_enum_t::NewLine);
                 break;
 
             case cast('r'):
-                parsed_string.push_back(chars_enum::CarriageReturn);
+                parsed_string.push_back(chars_enum_t::CarriageReturn);
                 break;
 
             case cast('\''):
-                parsed_string.push_back(chars_enum::Apostrophe);
+                parsed_string.push_back(chars_enum_t::Apostrophe);
                 break;
 
             case cast('\"'):
-                parsed_string.push_back(chars_enum::DQM);
+                parsed_string.push_back(chars_enum_t::DQM);
                 break;
 
             case cast('0'):
@@ -131,7 +131,7 @@ namespace cerb::lex
 
         CERBLIB_DECL auto convertString2Int(size_t notation, size_t length) -> CharT
         {
-            CharT resulted_char = chars_enum::EoF;
+            CharT resulted_char = chars_enum_t::EoF;
 
             for (size_t i = 0; i < length; ++i) {
                 incAndCheckThatStringDoesNotEnd();
@@ -159,7 +159,7 @@ namespace cerb::lex
 
         constexpr auto incAndCheckThatStringDoesNotEnd() -> void
         {
-            if (generator.getRawChar() == chars_enum::EoF) {
+            if (isEndOfInput(generator.getRawChar())) {
                 throw ParsingError(
                     "End of string reached, however special symbol for this have not been found");
             }

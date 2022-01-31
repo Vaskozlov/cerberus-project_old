@@ -3,14 +3,16 @@
 
 namespace cerb::test
 {
+    using namespace lex;
+
     auto lexicalAnalyzerTest(u32) -> int
     {
-        lex::LexicalAnalyzer<char, u32> lexical_analyzer{
+        LexicalAnalyzer<char, u32> lexical_analyzer{
             { '\'', 0 }, { '\"', 1 }, { "//", "/*", "*/" }, { { "\"u\"[0-9-]+", 2 } }, {}
         };
 
         lexical_analyzer.setStream("None", "/**/ u41095");
-        CERBLIB_IGNORE(lexical_analyzer.yield());
+        CERBLIB_IGNORE(lexical_analyzer.yield())
 
         return 0;
     }

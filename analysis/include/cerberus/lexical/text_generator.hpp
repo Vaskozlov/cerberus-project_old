@@ -12,8 +12,7 @@ namespace cerb::lex
     class TextGenerator
     {
         using location_t = LocationInFile;
-
-        using chars_enum = CharsEnum<CharT>;
+        using chars_enum_t = CharsEnum<CharT>;
         using str_t = std::basic_string<CharT>;
         using str_view_t = BasicStringView<CharT>;
 
@@ -56,7 +55,7 @@ namespace cerb::lex
         CERBLIB_DECL auto getCurrentChar(ssize_t offset = 0) const -> CharT
         {
             if (not initialized) {
-                return chars_enum::EoF;
+                return chars_enum_t::EoF;
             }
 
             auto real_offset = static_cast<ssize_t>(getOffset()) + offset;
@@ -77,7 +76,7 @@ namespace cerb::lex
                 tryToAppendTabOrSpace();
             } else {
                 if (isEndOfInput(text[offset])) {
-                    return chars_enum::EoF;
+                    return chars_enum_t::EoF;
                 }
 
                 updateLocation();
@@ -116,7 +115,7 @@ namespace cerb::lex
     private:
         constexpr auto tryToUpdateLine() -> void
         {
-            if (text[getOffset() - 1] == chars_enum::NewLine) {
+            if (text[getOffset() - 1] == chars_enum_t::NewLine) {
                 setCurrentWorkingLine();
             }
         }
@@ -126,7 +125,7 @@ namespace cerb::lex
             auto offset = getOffset();
             auto chr = text[offset];
 
-            if (logicalOr(chr == chars_enum::Tab, chr == chars_enum::Space)) {
+            if (logicalOr(chr == chars_enum_t::Tab, chr == chars_enum_t::Space)) {
                 tabs_and_spaces.push_back(chr);
             }
         }
@@ -135,7 +134,7 @@ namespace cerb::lex
         {
             auto offset = getOffset() + 1;
 
-            if (text[offset] == chars_enum::NewLine) {
+            if (text[offset] == chars_enum_t::NewLine) {
                 processNewLine();
             } else {
                 processNewChar();
@@ -170,15 +169,15 @@ namespace cerb::lex
         CERBLIB_DECL auto needToClearTabsAndSpaces() const -> bool
         {
             return logicalAnd(
-                not tabs_and_spaces.empty(), text[getOffset()] != chars_enum::Tab,
-                text[getOffset()] != chars_enum::Space);
+                not tabs_and_spaces.empty(), text[getOffset()] != chars_enum_t::Tab,
+                text[getOffset()] != chars_enum_t::Space);
         }
 
         constexpr auto setCurrentWorkingLine() -> void
         {
             auto offset = getOffset();
             auto begin_of_line = text.begin() + offset;
-            auto end_of_line = text.begin() + text.find(chars_enum::NewLine, offset);
+            auto end_of_line = text.begin() + text.find(chars_enum_t::NewLine, offset);
 
             line_of_text = { begin_of_line, end_of_line };
         }

@@ -13,6 +13,7 @@ namespace cerb::lex
     {
         using str_t = std::basic_string<CharT>;
         using str_view_t = BasicStringView<CharT>;
+        using prefix_storage_t = std::vector<str_view_t>;
 
         using variant_t = typename PostfixPrefix<CharT>::PrefixOrPostfixVariant;
 
@@ -97,7 +98,7 @@ namespace cerb::lex
     private:
         LocationInFile location{};
         str_t tabs_and_spaces{};
-        std::vector<str_view_t> prefixes_and_postfixes{};
+        prefix_storage_t prefixes_and_postfixes{};
         str_view_t repr{};
         str_view_t line{};
         TokenType type{};

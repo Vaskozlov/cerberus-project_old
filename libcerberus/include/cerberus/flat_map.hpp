@@ -12,6 +12,7 @@ namespace cerb
         using KeyForFlatMap = AutoCopyType<Key>;
         using value_type = Pair<Key, Value, PairComparison::BY_FIRST_VALUE>;
         using storage_t = std::array<value_type, Size>;
+
         using iterator = typename storage_t::iterator;
         using const_iterator = typename storage_t::const_iterator;
         using reverse_iterator = typename storage_t::reverse_iterator;

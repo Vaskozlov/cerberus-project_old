@@ -6,8 +6,8 @@ namespace cerb::lex
     template<CharacterLiteral CharT, typename TokenType>
     struct SimpleToken
     {
-        CharT separator{};
         TokenType type{};
+        CharT separator{};
     };
 }// namespace cerb::lex
 

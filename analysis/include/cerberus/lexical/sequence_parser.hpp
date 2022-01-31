@@ -11,12 +11,12 @@ namespace cerb::lex
     template<CharacterLiteral CharT>
     struct SequenceParser
     {
-        constexpr static size_t number_of_chars = 1ULL << bitsizeof(CharT);
+        constexpr static size_t number_of_chars = pow2<size_t>(bitsizeof(CharT));
 
-        using chars_enum = CharsEnum<CharT>;
+        using chars_enum_t = CharsEnum<CharT>;
+        using generator_t = TextGenerator<CharT>;
         using str_view_t = BasicStringView<CharT>;
         using constant_bitmap_t = ConstBitmap<1, number_of_chars>;
-        using generator_t = TextGenerator<CharT>;
 
         constexpr auto reverse() -> void
         {
@@ -38,7 +38,7 @@ namespace cerb::lex
 
         constexpr auto incAndCheckThatStringDoesNotEnd() -> void
         {
-            if (text_generator.getCharWithoutLayout() == chars_enum::EoF) {
+            if (text_generator.getCharWithoutLayout() == chars_enum_t::EoF) {
                 throw SequenceError("Unable to close sequence");
             }
         }
@@ -46,14 +46,14 @@ namespace cerb::lex
         constexpr auto parseCharsInSequence() -> void
         {
             bool is_range_of_chars = false;
-            CharT previous_char = chars_enum::EoF;
-            auto chr = text_generator.getCurrentChar();
+            CharT previous_char = chars_enum_t::EoF;
+            CharT chr = text_generator.getCurrentChar();
 
             if (chr != cast('[')) {
                 throw SequenceError("Unable to find '[' to start sequence!");
             }
 
-            while ((chr = text_generator.getCharWithoutLayout()) != chars_enum::EoF) {
+            while ((chr = text_generator.getCharWithoutLayout()) != chars_enum_t::EoF) {
                 if (tryToStartRangeOrSkipExtraStartSymbol()) {
                     is_range_of_chars = true;
                     continue;
@@ -112,12 +112,12 @@ namespace cerb::lex
 
         CERBLIB_DECL auto skipExtraSymbolOrAllowToStartRange() -> bool
         {
-            if (text_generator.getCurrentChar(1) != cast('-')) {
-                return true;
-            } else {
+            if (text_generator.getCurrentChar(1) == cast('-')) {
                 incAndCheckThatStringDoesNotEnd();
                 return false;
             }
+
+            return true;
         }
 
         CERBLIB_DECL auto skipCharsOrShouldStop() -> bool

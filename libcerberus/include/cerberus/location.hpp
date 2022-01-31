@@ -19,7 +19,7 @@ namespace cerb
             return line;
         }
 
-        CERBLIB_DECL auto getFilename() const -> std::string_view
+        CERBLIB_DECL auto getFilename() const -> std::string_view const &
         {
             return filename;
         }

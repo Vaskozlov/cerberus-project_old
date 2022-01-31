@@ -11,23 +11,20 @@ namespace cerb::lex
     template<CharacterLiteral CharT, typename TokenType>
     struct DotItem
     {
+        using chars_enum_t = CharsEnum<CharT>;
         using str_view_t = BasicStringView<CharT>;
-
         using sequence_t = Sequence<CharT, TokenType>;
         using string_sequence_t = StringSequence<CharT, TokenType>;
 
-        using Rule = typename sequence_t::Rule;
-        using Flags = typename sequence_t::Flags;
-
         using object_t = DotItemObject<CharT, TokenType>;
+        using storage_t = std::vector<std::unique_ptr<object_t>>;
         using parameters_pack_t = ParametersPack<CharT, TokenType>;
 
-        using chars_enum = CharsEnum<CharT>;
-        using ScanStatus = typename object_t::ScanStatus;
         using generator_t = typename object_t::generator_t;
-        using generator_reference_t = typename object_t::generator_reference_t;
 
-        using storage_t = std::vector<std::unique_ptr<object_t>>;
+        using Rule = typename sequence_t::Rule;
+        using Flags = typename sequence_t::Flags;
+        using ScanStatus = typename object_t::ScanStatus;
 
         template<std::integral U>
         CERBLIB_DECL static auto cast(U value) -> CharT
@@ -75,25 +72,25 @@ namespace cerb::lex
 
         CERBLIB_DECL auto getLastSequence() -> object_t &
         {
-            if (objects.empty()) {
-                throw ParsingError("Unable to find an sequences");
+            if (not objects.empty()) [[likely]] {
+                return *objects.back();
             }
 
-            return *objects.back();
+            throw ParsingError("Unable to find an sequences");
         }
 
         CERBLIB_DECL auto getLastSequence() const -> object_t &
         {
-            if (objects.empty()) {
-                throw ParsingError("Unable to find an sequences");
+            if (not objects.empty()) [[likely]] {
+                return *objects.back();
             }
 
-            return *objects.back();
+            throw ParsingError("Unable to find an sequences");
         }
 
         constexpr auto parseRegex()
         {
-            while (generator_for_text.getCharWithoutLayout() != chars_enum::EoF) {
+            while (generator_for_text.getCharWithoutLayout() != chars_enum_t::EoF) {
                 switch (generator_for_text.getCurrentChar()) {
                 case '[':
                     startNewSequenceOfChar();

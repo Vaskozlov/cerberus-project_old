@@ -14,12 +14,11 @@ namespace cerb
 
         using str_view_t = BasicStringView<CharT>;
         using bitmap = ConstBitmap<1, number_of_chars>;
-
+        using strings_storage_t = std::vector<bitmap>;
         using tokens_storage_t = std::map<str_view_t, TokenType>;
+
         using node_type = typename tokens_storage_t::node_type;
         using value_type = typename tokens_storage_t::value_type;
-
-        using strings_storage_t = std::vector<bitmap>;
         using string_storage_const_iterator = typename strings_storage_t::const_iterator;
 
         constexpr auto insert(str_view_t &&string) -> decltype(auto)
