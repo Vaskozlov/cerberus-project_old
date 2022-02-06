@@ -18,6 +18,11 @@ namespace cerb
             return reference;
         }
 
+        CERBLIB_DECL operator T &() const noexcept
+        {
+            return reference;
+        }
+
         CERBLIB_DECL auto operator->() -> T *
         {
             return &reference;
@@ -37,13 +42,13 @@ namespace cerb
     };
 
     template<typename T>
-    CERBLIB_DECL auto reference(T &ref) -> ReferenceWrapper<T>
+    CERBLIB_DECL auto ref(T &ref) -> ReferenceWrapper<T>
     {
         return ReferenceWrapper(ref);
     }
 
     template<typename T>
-    CERBLIB_DECL auto reference(ReferenceWrapper<T> ref) -> ReferenceWrapper<T>
+    CERBLIB_DECL auto ref(ReferenceWrapper<T> ref) -> ReferenceWrapper<T>
     {
         return ref;
     }

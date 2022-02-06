@@ -27,7 +27,7 @@ namespace cerb::lex
 
         constexpr auto setGenerator(ReferenceWrapper<generator_t> new_generator) -> void
         {
-            text_generator = new_generator.get();
+            text_generator = new_generator;
         }
 
         constexpr auto setRule(Rule rule) -> void
@@ -51,7 +51,7 @@ namespace cerb::lex
         constexpr explicit DotItemObject(
             generator_reference_t generator_for_text,
             parameters_pack_t const &parameters_for_analysis)
-          : text_generator(generator_for_text.get()), analysis_parameters(parameters_for_analysis)
+          : text_generator(generator_for_text), analysis_parameters(parameters_for_analysis)
         {}
 
     protected:

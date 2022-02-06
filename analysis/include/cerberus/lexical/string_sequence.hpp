@@ -37,9 +37,9 @@ namespace cerb::lex
         constexpr StringSequence(
             parameters_pack_t const &parameters_for_analysis, Flags object_flags,
             ReferenceWrapper<generator_t> generator_for_text)
-          : parent(reference(generator_for_text), parameters_for_analysis), flags(object_flags)
+          : parent(generator_for_text, parameters_for_analysis), flags(object_flags)
         {
-            string_parser parser_for_string{ CharsEnum<CharT>::DQM, generator_for_text.get() };
+            string_parser parser_for_string{ CharsEnum<CharT>::DQM, generator_for_text };
             parsed_string = std::move(parser_for_string.parseString());
 
             if (flags.isSet(Flags::PREFIX_OR_POSTFIX)) {

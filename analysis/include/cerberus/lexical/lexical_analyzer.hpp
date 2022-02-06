@@ -58,10 +58,10 @@ namespace cerb::lex
 
         LexicalAnalyzer(
             simple_token_t const &token_for_char, simple_token_t const &token_for_string,
-            comments_token_t const &tokens_of_comments, initializer_list_t const &items_rules,
+            comments_token_t const &tokens_for_comments, initializer_list_t const &items_rules,
             string_pool_t const &terminals_pool)
           : analysis_parameters(
-                terminals_pool, tokens_of_comments, {}, token_for_char, token_for_string)
+                terminals_pool, tokens_for_comments, {}, token_for_char, token_for_string)
         {
             std::vector<std::future<void>> processed_items{};
 
@@ -150,7 +150,7 @@ namespace cerb::lex
 
         constexpr auto skipBeginOfMultilineComment(ReferenceWrapper<size_t> index) -> void
         {
-            for (; index.get() < getMultilineCommentBegin().size(); ++index.get()) {
+            for (; index < getMultilineCommentBegin().size(); ++index) {
                 throwIfEoF(text_generator.getRawChar());
             }
         }
@@ -158,9 +158,9 @@ namespace cerb::lex
         constexpr auto skipBodyOfMultilineComment(
             str_view_t const &current_state, ReferenceWrapper<size_t> index) -> void
         {
-            while (not current_state.containsAt(index.get(), getMultilineCommentEnd())) {
+            while (not current_state.containsAt(index, getMultilineCommentEnd())) {
                 throwIfEoF(text_generator.getRawChar());
-                ++index.get();
+                ++index;
             }
         }
 

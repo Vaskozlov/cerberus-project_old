@@ -14,7 +14,6 @@ namespace cerb::lex
         using str_t = std::basic_string<CharT>;
         using str_view_t = BasicStringView<CharT>;
         using prefix_storage_t = std::vector<str_view_t>;
-
         using variant_t = typename PostfixPrefix<CharT>::PrefixOrPostfixVariant;
 
         CERBLIB_DECL auto getType() const -> TokenType

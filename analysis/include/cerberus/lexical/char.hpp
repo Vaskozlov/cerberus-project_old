@@ -8,7 +8,6 @@
 
 namespace cerb::lex
 {
-
 #define CCAST(x) static_cast<CharT>(x)
 
     template<CharacterLiteral CharT>
@@ -63,13 +62,13 @@ namespace cerb::lex
     }
 
     template<CharacterLiteral CharT>
-    CERBLIB_DECL auto isUCLetter(CharT chr) -> bool
+    CERBLIB_DECL auto isUcLetter(CharT chr) -> bool
     {
         return logicalAnd(chr >= CCAST('A'), chr <= CCAST('Z'));
     }
 
     template<CharacterLiteral CharT>
-    CERBLIB_DECL auto isLCLetter(CharT chr) -> bool
+    CERBLIB_DECL auto isLcLetter(CharT chr) -> bool
     {
         return logicalAnd(chr >= CCAST('a'), chr <= CCAST('z'));
     }
@@ -77,7 +76,7 @@ namespace cerb::lex
     template<CharacterLiteral CharT>
     CERBLIB_DECL auto isLetter(CharT chr) -> bool
     {
-        return logicalOr(isUCLetter(chr), isLCLetter(chr));
+        return logicalOr(isUcLetter(chr), isLcLetter(chr));
     }
 
     template<CharacterLiteral CharT>

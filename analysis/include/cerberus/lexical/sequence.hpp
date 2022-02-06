@@ -29,7 +29,7 @@ namespace cerb::lex
         constexpr Sequence(
             parameters_pack_t const &parameters_for_analysis, Flags flags,
             ReferenceWrapper<generator_t> generator)
-          : parent_t(reference(generator), parameters_for_analysis)
+          : parent_t(generator, parameters_for_analysis)
         {
             sequence_parser_t parser_of_sequence{ available_chars, generator };
 
