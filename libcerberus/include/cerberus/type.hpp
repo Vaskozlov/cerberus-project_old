@@ -76,6 +76,12 @@ namespace cerb
     };
 
     template<typename T>
+    concept LessComparable = requires(T lhs, T rhs)
+    {
+        lhs < rhs;
+    };
+
+    template<typename T>
     concept Enum = std::is_enum_v<T>;
 
     template<typename T>

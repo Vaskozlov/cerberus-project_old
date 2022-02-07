@@ -16,9 +16,11 @@ namespace cerb::lex
         using sequence_t = Sequence<CharT, TokenType>;
         using string_sequence_t = StringSequence<CharT, TokenType>;
 
+        using token_t = Token<CharT, TokenType>;
         using object_t = DotItemObject<CharT, TokenType>;
         using storage_t = std::vector<std::unique_ptr<object_t>>;
         using parameters_pack_t = ParametersPack<CharT, TokenType>;
+        using dot_item_pack_t = DotItemParameters<CharT, TokenType>;
 
         using generator_t = typename object_t::generator_t;
 
@@ -34,23 +36,25 @@ namespace cerb::lex
 
         constexpr auto setInput(generator_t &&new_generator) -> void
         {
-            generator_for_text = std::move(new_generator);
+            getTextGenerator() = std::move(new_generator);
         }
 
         constexpr auto setInput(generator_t const &new_generator) -> void
         {
-            generator_for_text = new_generator;
+            getTextGenerator() = new_generator;
         }
 
         constexpr auto updateGeneratorFromPack() -> void
         {
-            generator_for_text = analysis_parameters.generator_for_text;
+            getTextGenerator() = analysis_parameters.generator_for_text;
         }
 
         constexpr auto scan() -> ScanStatus
         {
             for (auto &object : objects) {
-                CERBLIB_IGNORE(object->scan())
+                if (object->scan() == ScanStatus::ERROR) {
+                    return ScanStatus::ERROR;
+                }
             }
 
             return ScanStatus{};
@@ -58,13 +62,32 @@ namespace cerb::lex
 
         explicit constexpr DotItem(
             str_view_t regex, parameters_pack_t const &parameters_for_analysis)
-          : generator_for_text(regex, "DotItem generator"),
-            analysis_parameters(parameters_for_analysis)
+          : dot_item_pack(regex, "DotItem generator"), analysis_parameters(parameters_for_analysis)
         {
             parseRegex();
         }
 
     private:
+        CERBLIB_DECL auto getRecognizedToken() -> token_t &
+        {
+            return dot_item_pack.recognized_token;
+        }
+
+        CERBLIB_DECL auto getRecognizedToken() const -> token_t &
+        {
+            return dot_item_pack.recognized_token;
+        }
+
+        CERBLIB_DECL auto getTextGenerator() -> generator_t &
+        {
+            return dot_item_pack.text_generator;
+        }
+
+        CERBLIB_DECL auto getTextGenerator() const -> generator_t &
+        {
+            return dot_item_pack.text_generator;
+        }
+
         constexpr auto clearFlags()
         {
             flags_for_sequence = Flags::NONE;
@@ -90,8 +113,10 @@ namespace cerb::lex
 
         constexpr auto parseRegex()
         {
-            while (generator_for_text.getCharWithoutLayout() != chars_enum_t::EoF) {
-                switch (generator_for_text.getCurrentChar()) {
+            generator_t &text_generator = getTextGenerator();
+
+            while (text_generator.getCharWithoutLayout() != chars_enum_t::EoF) {
+                switch (text_generator.getCurrentChar()) {
                 case '[':
                     startNewSequenceOfChar();
                     endNewSequenceOfChar();
@@ -130,8 +155,7 @@ namespace cerb::lex
         constexpr auto startNewSequenceOfChar() -> void
         {
             std::unique_ptr<object_t> new_sequence = std::make_unique<sequence_t>(
-                analysis_parameters, flags_for_sequence, ReferenceWrapper(generator_for_text));
-            new_sequence->setGenerator(ReferenceWrapper(generator_for_text));
+                analysis_parameters, flags_for_sequence, ReferenceWrapper(dot_item_pack));
 
             objects.push_back(std::move(new_sequence));
         }
@@ -154,8 +178,7 @@ namespace cerb::lex
         constexpr auto processString() -> void
         {
             std::unique_ptr<object_t> new_string_sequence = std::make_unique<string_sequence_t>(
-                analysis_parameters, flags_for_sequence, ReferenceWrapper(generator_for_text));
-            new_string_sequence->setGenerator(ReferenceWrapper(generator_for_text));
+                analysis_parameters, flags_for_sequence, ReferenceWrapper(dot_item_pack));
 
             objects.push_back(std::move(new_string_sequence));
         }
@@ -175,8 +198,8 @@ namespace cerb::lex
             getLastSequence().setRule(Rule::QUESTION);
         }
 
-        generator_t generator_for_text;
         storage_t objects;
+        dot_item_pack_t dot_item_pack{};
         parameters_pack_t const &analysis_parameters;
         Flags flags_for_sequence;
     };

@@ -8,7 +8,7 @@
 
 namespace cerb::lex
 {
-    template<CharacterLiteral CharT, typename TokenType>
+    template<CharacterLiteral CharT, LessComparable TokenType>
     struct Token
     {
         using str_t = std::basic_string<CharT>;

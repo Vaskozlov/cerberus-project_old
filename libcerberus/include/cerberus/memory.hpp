@@ -82,16 +82,8 @@ namespace cerb
             return location;
         }
 
-        /**
-         * Compares to arrays with the size of @length. Must not be called directly.
-         * @tparam T
-         * @param dest
-         * @param src
-         * @param length
-         * @return true if they are equal, false otherwise
-         */
         template<typename T>
-        constexpr auto memcmp(const T *dest, const T *src, size_t length) -> bool
+        constexpr auto memcmp(T const *dest, const T *src, size_t length) -> bool
         {
             ++length;
 
@@ -182,7 +174,7 @@ namespace cerb
             }
         }
 #endif
-        std::copy(src.begin(), src.end(), dest.begin());
+        std::ranges::copy(src, dest);
     }
 
     template<typename T>
