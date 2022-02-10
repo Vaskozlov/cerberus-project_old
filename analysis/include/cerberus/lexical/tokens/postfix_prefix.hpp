@@ -11,7 +11,8 @@ namespace cerb::lex
     {
         using str_view_t = BasicStringView<CharT>;
 
-        CERBERUS_ENUM(PrefixOrPostfixVariant, u8, NONE = 0, PREFIX = 1, POSTFIX = 2);// NOLINT
+        // NOLINTNEXTLINE
+        CERBERUS_ENUM(PrefixOrPostfixVariant, u8, NONE = 0, PREFIX = 1, POSTFIX = 2);
 
         str_view_t repr{};
         PrefixOrPostfixVariant variant{ PrefixOrPostfixVariant::NONE };

@@ -10,7 +10,7 @@ namespace cerb::test {
         EXPECT_TRUE(logicalAnd(pair.first == 10, pair.second == 10));
         EXPECT_TRUE(pair == std::make_pair(10, 10));
 
-        const auto pair_2 = pair;
+        auto const pair_2 = pair;
 
         EXPECT_TRUE(pair == pair_2);
 
@@ -74,8 +74,8 @@ namespace cerb::test {
 
     auto stringAndVectorPairTest() -> void
     {
-        const char *str = "Hello, World! It's a long string!";
-        const std::initializer_list<int> data = { 10, 20, 30, 40 };
+        char const *str = "Hello, World! It's a long string!";
+        std::initializer_list<int> const data = { 10, 20, 30, 40 };
         Pair<std::string, std::vector<int>> pair = { str, data };
 
         EXPECT_TRUE(

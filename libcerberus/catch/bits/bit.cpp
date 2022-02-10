@@ -32,7 +32,7 @@ namespace cerb::test
 
         EXPECT_FALSE([&counter]() {
             forEach(
-                [&counter](const auto &elem) {
+                [&counter](int elem) {
                     EXPECT_TRUE(elem == counter * 10);
                     ++counter;
                 },

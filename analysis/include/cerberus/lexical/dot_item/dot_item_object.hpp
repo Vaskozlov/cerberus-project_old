@@ -105,7 +105,7 @@ namespace cerb::lex
             return not repr_of_terminal.empty();
         }
 
-        constexpr auto constructUnexpectedToken(TokenType token_type, str_view_t const &repr)
+        constexpr auto constructUnexpectedToken(TokenType token_type, str_view_t const &)
             -> void
         {
             getRecognizedToken() = token_t{

@@ -10,35 +10,36 @@ namespace cerb
     {
         CERBLIB_DECL auto get() -> T &
         {
-            return reference;
+            return *reference;
         }
 
         CERBLIB_DECL auto get() const -> T &
         {
-            return reference;
+            return *reference;
         }
 
+        // NOLINTNEXTLINE
         CERBLIB_DECL operator T &() const noexcept
         {
-            return reference;
+            return *reference;
         }
 
         CERBLIB_DECL auto operator->() -> T *
         {
-            return &reference;
+            return reference;
         }
 
         CERBLIB_DECL auto operator->() const -> T *
         {
-            return &reference;
+            return reference;
         }
 
         constexpr ReferenceWrapper() = default;
-        constexpr explicit ReferenceWrapper(T &ref) : reference(ref)
+        constexpr explicit ReferenceWrapper(T &ref) : reference(&ref)
         {}
 
     private:
-        T &reference;
+        T *reference{};
     };
 
     template<typename T>

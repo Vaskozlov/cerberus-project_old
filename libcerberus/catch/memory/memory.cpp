@@ -5,7 +5,6 @@
 
 namespace cerb::test
 {
-
     constexpr i32 CheckValueI32 = -134;
     constexpr u8 TestU8Value = 255U;
     constexpr u16 TestU16Value = 1024U;
@@ -13,9 +12,9 @@ namespace cerb::test
     constexpr u64 TestU64Value = static_cast<u64>(1U) << 51;
     constexpr PairedNumbers TestComplexValue = { -1515, 4019441.0 };
 
-    constexpr auto arrayStoresSameValues(const auto &array, auto expected_value) -> bool
+    constexpr auto arrayStoresSameValues(auto const &array, auto expected_value) -> bool
     {
-        for (size_t i = 0; i < array.size(); ++i) {
+        for (size_t i = 0; i < std::size(array); ++i) {
             if (array[i] != expected_value) {
                 return false;
             }

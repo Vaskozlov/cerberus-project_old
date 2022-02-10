@@ -36,7 +36,7 @@ namespace cerb::test
         EXPECT_TRUE([&]() {
             auto str_view_begin = str_view.cbegin();
 
-            for (const char chr : standard_str_view) {
+            for (char chr : standard_str_view) {
                 if (*str_view_begin != chr) {
                     return false;
                 }

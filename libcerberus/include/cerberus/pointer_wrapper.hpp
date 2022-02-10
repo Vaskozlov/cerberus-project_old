@@ -45,16 +45,17 @@ namespace cerb
             return static_cast<U *>(pointer);
         }
 
-        CERBLIB_DECL auto operator==(const RawPointerWrapper &other) -> bool
+        CERBLIB_DECL auto operator==(RawPointerWrapper const &other) -> bool
         {
-            return areObjectsInClassEqual(*this, other);
+            return equal(*this, other);
         }
 
-        CERBLIB_DECL auto operator<=>(const RawPointerWrapper &other) -> decltype(auto)
+        template<Iterable U>
+        CERBLIB_DECL auto operator<=>(U const &other) -> decltype(auto)
         {
             for (size_t i = 0; i < min<size_t>(size(), other.size()); ++i) {
-                if (*(pointer + i) != *(other.pointer + i)) {
-                    return *(pointer + i) <=> *(other.pointer + i);
+                if (*(pointer + i) != other[i]) {
+                    return *(pointer + i) <=> other[i];
                 }
             }
 
@@ -103,12 +104,12 @@ namespace cerb
             return reverse_iterator(pointer);
         }
 
-        CERBLIB_DECL auto operator[](size_t index) -> decltype(auto)
+        CERBLIB_DECL auto operator[](size_t index) -> T &
         {
             return pointer[index];
         }
 
-        CERBLIB_DECL auto operator[](size_t index) const -> decltype(auto)
+        CERBLIB_DECL auto operator[](size_t index) const -> T &
         {
             return pointer[index];
         }

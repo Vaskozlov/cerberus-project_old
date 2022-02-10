@@ -17,7 +17,7 @@ namespace cerb
         using value_type = size_t;
         using const_value_type = value_type;
         using pointer = value_type *;
-        using const_pointer = const value_type *;
+        using const_pointer = value_type const *;
 
         constexpr static size_t length_of_axis =
             BitN / bitsizeof(value_type) + static_cast<size_t>(BitN % bitsizeof(value_type) != 0);

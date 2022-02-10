@@ -19,7 +19,7 @@ namespace cerb::lex
         using string_pool_t = StringPool<CharT, TokenType>;
         using comments_token_t = CommentsTokens<CharT>;
         using simple_token_t = SimpleToken<CharT, TokenType>;
-        using initializer_list_t = std::initializer_list<const Pair<str_view_t, TokenType>>;
+        using initializer_list_t = std::initializer_list<Pair<str_view_t, TokenType> const >;
 
         using generator_t = typename dot_item_t::generator_t;
         using parameters_pack_t = typename dot_item_t::parameters_pack_t;
@@ -68,7 +68,7 @@ namespace cerb::lex
             processed_items.reserve(items_rules.size());
             items_storage.reserve(items_rules.size());
 
-            for (const auto &elem : items_rules) {
+            for (Pair<str_view_t, TokenType> const &elem : items_rules) {
                 processed_items.emplace_back(std::async(std::launch::async, [&elem, this]() {
                     items_storage.emplace_back(elem.first, analysis_parameters);
                 }));

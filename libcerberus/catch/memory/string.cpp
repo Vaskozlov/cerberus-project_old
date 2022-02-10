@@ -7,7 +7,7 @@ namespace cerb::test {
     {
         using namespace std::string_view_literals;
 
-        const std::string_view str = "hello, world!"sv;
+        std::string_view const str = "hello, world!"sv;
         EXPECT_TRUE(find(str, '\0') == str.end());
         EXPECT_TRUE(find(str, '\1') >= str.end());
     }
@@ -16,7 +16,7 @@ namespace cerb::test {
     {
         using namespace std::string_view_literals;
 
-        const std::u16string_view str = u"hello, world!"sv;
+        std::u16string_view const str = u"hello, world!"sv;
         EXPECT_TRUE(find(str.data(), u'\0', str.size()) == (str.data() + str.size()));
         EXPECT_TRUE(find(str.data(), u'\1', str.size()) >= (str.data() + str.size()));
         EXPECT_TRUE(find(str, u'\0') == str.end());
@@ -27,7 +27,7 @@ namespace cerb::test {
     {
         using namespace std::string_view_literals;
 
-        const std::wstring_view str = L"hello, world!"sv;
+        std::wstring_view const str = L"hello, world!"sv;
         EXPECT_TRUE(find(str.data(), L'\0', str.size()) == (str.data() + str.size()));
         EXPECT_TRUE(find(str.data(), L'\1', str.size()) >= (str.data() + str.size()));
         EXPECT_TRUE(find(str, L'\0') == str.end());
