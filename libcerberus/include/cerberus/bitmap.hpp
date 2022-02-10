@@ -2,8 +2,8 @@
 #define CERBERUS_BITMAP_HPP
 
 #include <array>
+#include <cerberus/bit.hpp>
 #include <cerberus/bit_manipulation.hpp>
-#include <cerberus/bits.hpp>
 #include <cerberus/memory.hpp>
 #include <memory>
 
@@ -99,7 +99,7 @@ namespace cerb
 
                 if (suitable_bits != 0) {
                     auto bit_index =
-                        index * bitsizeof(size_t) + bitScanForward<1, size_t>(suitable_bits);
+                        index * bitsizeof(size_t) + bit::scanForward<1, size_t>(suitable_bits);
                     return bit_index < BitN ? bit_index : npos;
                 }
             }

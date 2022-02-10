@@ -1,12 +1,12 @@
 #ifndef LIBCERBERUS_PAIR_HPP
 #define LIBCERBERUS_PAIR_HPP
 
-#include <cerberus/bits.hpp>
 #include <cerberus/cerberus.hpp>
+#include <cerberus/number.hpp>
 
 namespace cerb
 {
-    enum struct PairComparison
+    enum struct PairComparison : u32
     {
         DEFAULT,
         BY_FIRST_VALUE,

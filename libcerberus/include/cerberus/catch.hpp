@@ -50,12 +50,11 @@ namespace cerb::test
     }
 
     template<std::integral T>
-    auto createRandomArrayOfInts(size_t size) -> std::unique_ptr<T>
+    auto createRandomArrayOfInts(size_t size) -> std::unique_ptr<T[]>
     {
         static std::random_device random_device;
         static std::mt19937 engine(random_device());
-        std::unique_ptr<T> data =
-            std::unique_ptr<T>(static_cast<T *>(::operator new(size * sizeof(T))));
+        std::unique_ptr<T[]> data = std::make_unique<T[]>(size);
 
         if constexpr (std::is_unsigned_v<T>) {
             static std::uniform_int_distribution<size_t> distribution(

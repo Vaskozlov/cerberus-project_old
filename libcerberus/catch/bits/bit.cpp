@@ -1,5 +1,5 @@
 #include "bit.hpp"
-#include <cerberus/bits.hpp>
+#include <cerberus/number.hpp>
 
 namespace cerb::test
 {
@@ -87,28 +87,28 @@ namespace cerb::test
 
     auto bitScanTest(u32 argc) -> void
     {
-        EXPECT_TRUE(bitScanForward<1>(0b1000U * argc) == 3);
-        EXPECT_TRUE(bitScanForward<1>(0b1001U * argc) == 0);
-        EXPECT_TRUE(bitScanReverse<1>(0b1000U * argc) == 3);
-        EXPECT_TRUE(bitScanReverse<1>(0b1001U * argc) == 3);
+        EXPECT_TRUE(bit::scanForward<1>(0b1000U * argc) == 3);
+        EXPECT_TRUE(bit::scanForward<1>(0b1001U * argc) == 0);
+        EXPECT_TRUE(bit::scanReverse<1>(0b1000U * argc) == 3);
+        EXPECT_TRUE(bit::scanReverse<1>(0b1001U * argc) == 3);
 
         EXPECT_TRUE([]() {
-            constexpr auto value = bitScanForward<1>(0b1000U);
+            constexpr auto value = bit::scanForward<1>(0b1000U);
             return value == 3;
         }());
 
         EXPECT_TRUE([]() {
-            constexpr auto value = bitScanForward<1>(0b1001U);
+            constexpr auto value = bit::scanForward<1>(0b1001U);
             return value == 0;
         }());
 
         EXPECT_TRUE([]() {
-            constexpr auto value = bitScanReverse<1>(0b1000U);
+            constexpr auto value = bit::scanReverse<1>(0b1000U);
             return value == 3;
         }());
 
         EXPECT_TRUE([]() {
-            constexpr auto value = bitScanReverse<1>(0b1001U);
+            constexpr auto value = bit::scanReverse<1>(0b1001U);
             return value == 3;
         }());
     }

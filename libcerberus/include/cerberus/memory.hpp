@@ -1,7 +1,7 @@
 #ifndef CERBERUS_MEMORY_HPP
 #define CERBERUS_MEMORY_HPP
 
-#include <cerberus/bits.hpp>
+#include <cerberus/bit.hpp>
 #include <cerberus/type.hpp>
 #include <iterator>
 
@@ -204,14 +204,47 @@ namespace cerb
         return std::ranges::find(iterable_class, value2find);
     }
 
+    template<Iterable T1, Iterable T2>
+    CERBLIB_DECL auto equal(T1 const &lhs, T2 const &rhs) -> bool
+    {
+        using value_type = GetValueType<T1>;
+        static_assert(std::is_same_v<value_type, GetValueType<T2>>);
+
+        if (std::size(lhs) != std::size(rhs)) {
+            return false;
+        }
+
+#if CERBLIB_AMD64
+        if constexpr (
+            RawAccessible<T1> && RawAccessible<T2> && CanBeStoredInIntegral<value_type> &&
+            std::is_trivial_v<value_type>) {
+            return amd64::memcmp(std::data(lhs), std::data(rhs), std::size(lhs));
+        }
+#endif
+        return std::ranges::equal(lhs, rhs);
+    }
+
     template<typename T>
-    CERBLIB_DECL auto ptrdiff(const T first, const T last) -> size_t
+    CERBLIB_DECL auto equal(T const *lhs, T const *rhs, size_t length) -> bool
+    {
+#if CERBLIB_AMD64
+        if constexpr (CanBeStoredInIntegral<T> && std::is_trivial_v<T>) {
+            return amd64::memcmp(lhs, rhs, length);
+        }
+#endif
+
+        return std::equal(lhs, lhs + length, rhs, rhs + length);
+    }
+
+
+    template<typename T>
+    CERBLIB_DECL auto ptrdiff(T const first, T const last) -> size_t
     {
         return static_cast<size_t>(static_cast<ptrdiff_t>(last - first));
     }
 
     template<CharacterLiteral CharT>
-    CERBLIB_DECL auto strlen(const CharT *str) -> size_t
+    CERBLIB_DECL auto strlen(CharT const *str) -> size_t
     {
         return ptrdiff(str, find(str, static_cast<CharT>(0), std::numeric_limits<u32>::max()));
     }
