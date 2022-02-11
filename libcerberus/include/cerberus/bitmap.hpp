@@ -2,8 +2,8 @@
 #define CERBERUS_BITMAP_HPP
 
 #include <array>
+#include <cerberus/bit.hpp>
 #include <cerberus/bit_manipulation.hpp>
-#include <cerberus/bits.hpp>
 #include <cerberus/memory.hpp>
 #include <memory>
 
@@ -17,7 +17,7 @@ namespace cerb
         using value_type = size_t;
         using const_value_type = value_type;
         using pointer = value_type *;
-        using const_pointer = const value_type *;
+        using const_pointer = value_type const *;
 
         constexpr static size_t length_of_axis =
             BitN / bitsizeof(value_type) + static_cast<size_t>(BitN % bitsizeof(value_type) != 0);
@@ -99,7 +99,7 @@ namespace cerb
 
                 if (suitable_bits != 0) {
                     auto bit_index =
-                        index * bitsizeof(size_t) + bitScanForward<1, size_t>(suitable_bits);
+                        index * bitsizeof(size_t) + bit::scanForward<1, size_t>(suitable_bits);
                     return bit_index < BitN ? bit_index : npos;
                 }
             }

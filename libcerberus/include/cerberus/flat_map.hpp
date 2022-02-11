@@ -81,7 +81,7 @@ namespace cerb
             return at(key);
         }
 
-        constexpr auto operator[](KeyForFlatMap key) const -> const Value &
+        constexpr auto operator[](KeyForFlatMap key) const -> Value const &
         {
             return at(key);
         }
@@ -97,7 +97,7 @@ namespace cerb
             return searched_elem->second;
         }
 
-        constexpr auto at(KeyForFlatMap key) const -> const Value &
+        constexpr auto at(KeyForFlatMap key) const -> Value const &
         {
             auto searched_elem = findByKey(key);
 
@@ -111,9 +111,8 @@ namespace cerb
         constexpr FlatMap() = default;
         constexpr FlatMap(std::initializer_list<value_type> const &storage_values)
         {
-            for (const value_type &storage_value : storage_values) {
-                insert(storage_value);
-            }
+            std::ranges::for_each(
+                storage_values, [this](value_type const &value) { this->insert(value); });
         }
 
     private:

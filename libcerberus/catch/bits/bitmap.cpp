@@ -36,8 +36,8 @@ namespace cerb::test
     auto bitmapTestClear() -> void
     {
         ConstBitmap<2, 512> bitmap;
-        const auto &bitmap_data = bitmap.data();
-        const auto bitmap_data_begin = bitmap_data.begin();
+        auto const &bitmap_data = bitmap.data();
+        auto const  bitmap_data_begin = bitmap_data.begin();
 
         bitmap.set<1, 0>(0);
         bitmap.set<1, 1>(0);
@@ -52,7 +52,7 @@ namespace cerb::test
 
         bitmap.clear();
 
-        EXPECT_TRUE(std::ranges::all_of(bitmap_data, [](const auto &array) {
+        EXPECT_TRUE(std::ranges::all_of(bitmap_data, [](auto const &array) {
             return std::ranges::all_of(array, [](auto elem) { return elem == 0; });
         }));
     }

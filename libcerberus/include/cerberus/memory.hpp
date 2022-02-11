@@ -1,7 +1,7 @@
 #ifndef CERBERUS_MEMORY_HPP
 #define CERBERUS_MEMORY_HPP
 
-#include <cerberus/bits.hpp>
+#include <cerberus/bit.hpp>
 #include <cerberus/type.hpp>
 #include <iterator>
 
@@ -30,7 +30,7 @@ namespace cerb
         }
 
         template<typename T>
-        constexpr auto copy(T *dest, const T *src, size_t times) -> void
+        constexpr auto copy(T *dest, T const *src, size_t times) -> void
         {
             // We need to make sure that T is trivially copiable
             static_assert(std::is_trivially_copyable_v<T>);
@@ -53,7 +53,7 @@ namespace cerb
         }
 
         template<CanBeStoredInIntegral T>
-        constexpr auto find(const T *location, T value, size_t limit) -> const T *
+        constexpr auto find(T const *location, T value, size_t limit) -> const T *
         {
             ++limit;
 
@@ -82,34 +82,26 @@ namespace cerb
             return location;
         }
 
-        /**
-         * Compares to arrays with the size of @length. Must not be called directly.
-         * @tparam T
-         * @param dest
-         * @param src
-         * @param length
-         * @return true if they are equal, false otherwise
-         */
         template<typename T>
-        constexpr auto memcmp(const T *dest, const T *src, size_t length) -> bool
+        constexpr auto memcmp(T const *dest, T const *src, size_t length) -> bool
         {
             ++length;
 
             if constexpr (sizeof(T) % sizeof(u64) == 0) {
                 length *= sizeof(T) / sizeof(u64);
-                asm volatile("repe cmpsq; shr $3, $2;"
+                asm volatile("repe cmpsq; shr $3, %2;"
                              : "+D"(dest), "+S"(src), "+c"(length)
                              :
                              : "memory");
             } else if constexpr (sizeof(T) == sizeof(u32)) {
                 length *= sizeof(T) / sizeof(u32);
-                asm volatile("repe cmpsl; shr $2, $2;"
+                asm volatile("repe cmpsl; shr $2, %2;"
                              : "+D"(dest), "+S"(src), "+c"(length)
                              :
                              : "memory");
             } else if constexpr (sizeof(T) == sizeof(u16)) {
                 length *= sizeof(T) / sizeof(u16);
-                asm volatile("repe cmpsw; shr $1, $2;"
+                asm volatile("repe cmpsw; shr $1, %2;"
                              : "+D"(dest), "+S"(src), "+c"(length)
                              :
                              : "memory");
@@ -152,7 +144,7 @@ namespace cerb
     }
 
     template<typename T>
-    constexpr auto copy(T *dest, const T *src, size_t times) -> void
+    constexpr auto copy(T *dest, T const *src, size_t times) -> void
     {
 #if CERBLIB_AMD64
         if constexpr (std::is_trivially_copy_assignable_v<T>) {
@@ -165,7 +157,7 @@ namespace cerb
     }
 
     template<Iterable T, Iterable U>
-    constexpr auto copy(T &dest, const U &src) -> void
+    constexpr auto copy(T &dest, U const &src) -> void
     {
         using value_type = GetValueType<T>;
         using value_type2 = GetValueType<U>;
@@ -175,7 +167,7 @@ namespace cerb
         if constexpr (
             RawAccessible<T> && RawAccessible<U> &&
             std::is_trivially_copy_assignable_v<value_type>) {
-            const auto length = min<GetSizeType<T>>(std::size(dest), std::size(src));
+            auto const length = min<GetSizeType<T>>(std::size(dest), std::size(src));
 
             if (!std::is_constant_evaluated()) {
                 return amd64::copy(dest.getData(), src.getData(), length);
@@ -186,7 +178,7 @@ namespace cerb
     }
 
     template<typename T>
-    CERBLIB_DECL auto find(const T *location, cerb::AutoCopyType<T> value, size_t limit)
+    CERBLIB_DECL auto find(T const *location, cerb::AutoCopyType<T> value, size_t limit)
         -> const T *
     {
 #if CERBLIB_AMD64
@@ -198,7 +190,7 @@ namespace cerb
     }
 
     template<Iterable T>
-    CERBLIB_DECL auto find(const T &iterable_class, GetValueType<T> value2find)
+    CERBLIB_DECL auto find(T const &iterable_class, GetValueType<T> value2find) -> decltype(auto)
     {
 #if CERBLIB_AMD64
         if constexpr (
@@ -212,14 +204,47 @@ namespace cerb
         return std::ranges::find(iterable_class, value2find);
     }
 
+    template<Iterable T1, Iterable T2>
+    CERBLIB_DECL auto equal(T1 const &lhs, T2 const &rhs) -> bool
+    {
+        using value_type = GetValueType<T1>;
+        static_assert(std::is_same_v<value_type, GetValueType<T2>>);
+
+        if (std::size(lhs) != std::size(rhs)) {
+            return false;
+        }
+
+#if CERBLIB_AMD64
+        if constexpr (
+            RawAccessible<T1> && RawAccessible<T2> && CanBeStoredInIntegral<value_type> &&
+            std::is_trivial_v<value_type>) {
+            return amd64::memcmp(std::data(lhs), std::data(rhs), std::size(lhs));
+        }
+#endif
+        return std::ranges::equal(lhs, rhs);
+    }
+
     template<typename T>
-    CERBLIB_DECL auto ptrdiff(const T first, const T last) -> size_t
+    CERBLIB_DECL auto equal(T const *lhs, T const *rhs, size_t length) -> bool
+    {
+#if CERBLIB_AMD64
+        if constexpr (CanBeStoredInIntegral<T> && std::is_trivial_v<T>) {
+            return amd64::memcmp(lhs, rhs, length);
+        }
+#endif
+
+        return std::equal(lhs, lhs + length, rhs, rhs + length);
+    }
+
+
+    template<typename T>
+    CERBLIB_DECL auto ptrdiff(T const first, T const last) -> size_t
     {
         return static_cast<size_t>(static_cast<ptrdiff_t>(last - first));
     }
 
     template<CharacterLiteral CharT>
-    CERBLIB_DECL auto strlen(const CharT *str) -> size_t
+    CERBLIB_DECL auto strlen(CharT const *str) -> size_t
     {
         return ptrdiff(str, find(str, static_cast<CharT>(0), std::numeric_limits<u32>::max()));
     }

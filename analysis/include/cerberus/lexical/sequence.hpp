@@ -13,6 +13,7 @@ namespace cerb::lex
         using parent_t = DotItemObject<CharT, TokenType>;
 
         using generator_t = typename parent_t::generator_t;
+        using dot_item_pack_t = typename parent_t::dot_item_pack_t;
         using parameters_pack_t = typename parent_t::parameters_pack_t;
         using constant_bitmap_t = typename sequence_parser_t::constant_bitmap_t;
 
@@ -28,10 +29,11 @@ namespace cerb::lex
 
         constexpr Sequence(
             parameters_pack_t const &parameters_for_analysis, Flags flags,
-            ReferenceWrapper<generator_t> generator)
-          : parent_t(reference(generator), parameters_for_analysis)
+            dot_item_pack_t &dot_item_parameters)
+          : parent_t(dot_item_parameters, parameters_for_analysis)
         {
-            sequence_parser_t parser_of_sequence{ available_chars, generator };
+            generator_t &text_generator = dot_item_parameters.text_generator;
+            sequence_parser_t parser_of_sequence{ available_chars, ref(text_generator) };
 
             if (flags.isSet(Flags::PREFIX_OR_POSTFIX)) {
                 is_prefix_or_postfix = true;

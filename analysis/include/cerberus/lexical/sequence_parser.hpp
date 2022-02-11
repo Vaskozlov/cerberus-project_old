@@ -24,7 +24,7 @@ namespace cerb::lex
         }
 
         constexpr SequenceParser(constant_bitmap_t &bitmap, ReferenceWrapper<generator_t> generator)
-          : available_chars(bitmap), text_generator(generator.get())
+          : available_chars(bitmap), text_generator(generator)
         {
             parseCharsInSequence();
         }

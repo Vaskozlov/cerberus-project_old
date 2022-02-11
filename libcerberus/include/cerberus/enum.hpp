@@ -1,7 +1,7 @@
 #ifndef CERBERUS_ENUM_HPP
 #define CERBERUS_ENUM_HPP
 
-#include <cerberus/bits.hpp>
+#include <cerberus/bit.hpp>
 #include <cerberus/cerberus.hpp>
 
 #define CERBERUS_ENUM(name, type, ...)                                                             \

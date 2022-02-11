@@ -15,7 +15,7 @@
         explicit name(std::string_view t_message) : message(t_message)                             \
         {}                                                                                         \
                                                                                                    \
-        [[nodiscard]] auto what() const noexcept -> const char * override                          \
+        [[nodiscard]] auto what() const noexcept -> char const * override                          \
         {                                                                                          \
             return message.data();                                                                 \
         }                                                                                          \

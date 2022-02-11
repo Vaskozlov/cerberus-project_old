@@ -21,12 +21,6 @@ namespace cerb
         using value_type = typename tokens_storage_t::value_type;
         using string_storage_const_iterator = typename strings_storage_t::const_iterator;
 
-        constexpr auto insert(str_view_t &&string) -> decltype(auto)
-        {
-            addStringToBitmap(string);
-            return tokens_by_strings.insert(std::move(string));
-        }
-
         constexpr auto insert(str_view_t const &string) -> decltype(auto)
         {
             addStringToBitmap(string);
@@ -36,9 +30,10 @@ namespace cerb
         template<typename... Ts>
         constexpr auto emplace(Ts &&...args) -> decltype(auto)
         {
-            auto result = tokens_by_strings.template emplace<Ts...>(std::forward<Ts>(args)...);
-            addStringToBitmap(result.first->first);
-            return result;
+            auto inserted_item =
+                tokens_by_strings.template emplace<Ts...>(std::forward<Ts>(args)...);
+            addStringToBitmap(inserted_item.first->first);
+            return inserted_item;
         }
 
         constexpr auto insert(node_type &&node) -> decltype(auto)
@@ -92,16 +87,14 @@ namespace cerb
         constexpr StringPool() = default;
         constexpr StringPool(std::initializer_list<value_type> const &nodes) : available_chars(4)
         {
-            for (value_type const &node : nodes) {
-                emplace(node);
-            }
+            std::ranges::for_each(nodes, [this](value_type const &node) { this->emplace(node); });
         }
 
     private:
         constexpr auto doesLevelContainChar(string_storage_const_iterator level, CharT chr) const
             -> bool
         {
-            return std::bit_cast<bool>(level->template at<0>(convert2UnsignedInt(chr)));
+            return level->template at<0>(convert2UnsignedInt(chr));
         }
 
         constexpr auto addStringToBitmap(str_view_t const &string)
@@ -117,7 +110,11 @@ namespace cerb
 
         constexpr auto resizeIfNeed(str_view_t const &string)
         {
-            if (string.size() > available_chars.size()) {
+            auto length_of_string = string.size();
+            auto length_of_chars_storage = available_chars.size();
+            auto need_to_resize_storage = length_of_string > length_of_chars_storage;
+
+            if (need_to_resize_storage) {
                 available_chars.resize(string.size());
             }
         }

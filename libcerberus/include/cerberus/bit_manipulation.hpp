@@ -6,7 +6,7 @@
 
 namespace cerb::bit
 {
-    enum struct ValueOfBit
+    enum struct ValueOfBit : u16
     {
         ONE,
         ZERO,
@@ -24,7 +24,7 @@ namespace cerb::bit
     }
 
     template<std::integral T>
-    constexpr auto at(const T &number, size_t index) -> bool
+    constexpr auto at(T const &number, size_t index) -> bool
     {
         auto bit_index = index % bitsizeof(T);
         auto target_bit = static_cast<T>(1) << bit_index;

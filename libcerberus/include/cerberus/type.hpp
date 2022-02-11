@@ -25,7 +25,7 @@ namespace cerb
     };
 
     template<typename T, typename... Ts>
-    constexpr auto is_one_of(T target_value, Ts &&...suitable_values) -> bool
+    CERBLIB_DECL auto is_one_of(T target_value, Ts &&...suitable_values) -> bool
     {
         bool result = false;
 
@@ -76,6 +76,12 @@ namespace cerb
     };
 
     template<typename T>
+    concept LessComparable = requires(T lhs, T rhs)
+    {
+        lhs < rhs;
+    };
+
+    template<typename T>
     concept Enum = std::is_enum_v<T>;
 
     template<typename T>
@@ -123,7 +129,7 @@ namespace cerb
     };
 
     template<typename T>
-    using AutoCopyType = typename GetType4Copy<const T>::type;
+    using AutoCopyType = typename GetType4Copy<T const>::type;
 
     template<HasGotValueType T>
     using GetValueType = typename T::value_type;
@@ -133,6 +139,12 @@ namespace cerb
 
     template<HasGotSizeType T>
     using GetSizeType = typename T::size_type;
+
+    template<typename T>
+    concept TriviallyCopiable = std::is_same_v<T const, AutoCopyType<T const>>;
+
+    template<typename T>
+    concept NotTriviallyCopiable = not TriviallyCopiable<T>;
 }// namespace cerb
 
 #endif /* LIBCERBERUS_TYPE_HPP */

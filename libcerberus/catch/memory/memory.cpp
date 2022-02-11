@@ -5,7 +5,6 @@
 
 namespace cerb::test
 {
-
     constexpr i32 CheckValueI32 = -134;
     constexpr u8 TestU8Value = 255U;
     constexpr u16 TestU16Value = 1024U;
@@ -13,9 +12,9 @@ namespace cerb::test
     constexpr u64 TestU64Value = static_cast<u64>(1U) << 51;
     constexpr PairedNumbers TestComplexValue = { -1515, 4019441.0 };
 
-    constexpr auto arrayStoresSameValues(const auto &array, auto expected_value) -> bool
+    constexpr auto arrayStoresSameValues(auto const &array, auto expected_value) -> bool
     {
-        for (size_t i = 0; i < array.size(); ++i) {
+        for (size_t i = 0; i < std::size(array); ++i) {
             if (array[i] != expected_value) {
                 return false;
             }
@@ -25,7 +24,7 @@ namespace cerb::test
     }
 
     template<size_t ArraySize, typename T>
-    constexpr auto copyRandomData2ArrayAndTestMemcpyOnIt(T *random_data) -> void
+    constexpr auto copyRandomData2ArrayAndTestCopyOnIt(T *random_data) -> void
     {
         std::array<T, ArraySize> src{};
         std::array<T, ArraySize> dest{};
@@ -40,7 +39,7 @@ namespace cerb::test
         EXPECT_TRUE(std::ranges::equal(src, dest));
     }
 
-    auto generateRandomComplexData(size_t size) -> std::unique_ptr<PairedNumbers>
+    auto generateRandomComplexData(size_t size) -> std::unique_ptr<PairedNumbers[]>
     {
         static std::random_device random_device;
         static std::mt19937 engine(random_device());
@@ -48,8 +47,7 @@ namespace cerb::test
         static std::uniform_int_distribution<ssize_t> isize_distribution(
             std::numeric_limits<ssize_t>::min(), std::numeric_limits<ssize_t>::max());
 
-        auto random_complex_data = std::unique_ptr<PairedNumbers>(
-            static_cast<PairedNumbers *>(::operator new(size * sizeof(PairedNumbers))));
+        auto random_complex_data = std::make_unique<PairedNumbers[]>(size);
 
         for (size_t i = 0; i < size; ++i) {
             random_complex_data.get()[i] = { isize_distribution(engine),
@@ -59,7 +57,7 @@ namespace cerb::test
         return random_complex_data;
     }
 
-    consteval auto constexprMemsetTest() -> int
+    consteval auto constexprFillTest() -> int
     {
         std::array<u8, 512> data_8{};
         std::array<u16, 512> data_16{};
@@ -86,20 +84,19 @@ namespace cerb::test
         return 0;
     }
 
-    auto memsetTest(u32) -> void
+    auto fillTest(u32) -> void
     {
         constexpr u32 buffer_size = 512;
         constexpr u32 complex_buffer_size = 128;
-        constexpr int const_result = constexprMemsetTest();
-        static const std::string long_string = "Hello, world! It's a long string!";
+        constexpr int const_result = constexprFillTest();
+        static std::string const long_string = "Hello, world! It's a long string!";
 
         std::array<i32, 512> array_32{};
         std::vector<std::string> vector_str;
         std::vector<PairedNumbers> complex_vector;
         std::array<std::string, complex_buffer_size> array_str;
 
-        auto data = std::unique_ptr<PairedNumbers>(
-            static_cast<PairedNumbers *>(::operator new(buffer_size * sizeof(PairedNumbers))));
+        auto data = std::make_unique<PairedNumbers[]>(buffer_size);
         auto *void_data = static_cast<void *>(data.get());
 
         auto data_8 = RawPointerWrapper<u8>(static_cast<u8 *>(void_data), buffer_size);
@@ -140,7 +137,7 @@ namespace cerb::test
         EXPECT_TRUE(arrayStoresSameValues(complex_vector, TestComplexValue));
     }
 
-    auto memcpyTest() -> void
+    auto copyTest() -> void
     {
         constexpr u32 buffer_size = 512;
         constexpr u32 complex_buffer_size = 128;
@@ -149,21 +146,49 @@ namespace cerb::test
         auto random_data_8 = createRandomArrayOfInts<u8>(buffer_size);
         auto random_data_16 = createRandomArrayOfInts<u16>(buffer_size);
         auto random_data_32 = createRandomArrayOfInts<u32>(buffer_size);
-        auto random_data_usize = createRandomArrayOfInts<size_t>(buffer_size);
+        auto random_data_size_t = createRandomArrayOfInts<size_t>(buffer_size);
         auto random_complex_data = generateRandomComplexData(complex_buffer_size);
 
-        copyRandomData2ArrayAndTestMemcpyOnIt<buffer_size>(random_data_8.get());
-        copyRandomData2ArrayAndTestMemcpyOnIt<buffer_size>(random_data_16.get());
-        copyRandomData2ArrayAndTestMemcpyOnIt<buffer_size>(random_data_32.get());
-        copyRandomData2ArrayAndTestMemcpyOnIt<buffer_size>(random_data_usize.get());
-        copyRandomData2ArrayAndTestMemcpyOnIt<complex_buffer_size>(random_complex_data.get());
+        copyRandomData2ArrayAndTestCopyOnIt<buffer_size>(random_data_8.get());
+        copyRandomData2ArrayAndTestCopyOnIt<buffer_size>(random_data_16.get());
+        copyRandomData2ArrayAndTestCopyOnIt<buffer_size>(random_data_32.get());
+        copyRandomData2ArrayAndTestCopyOnIt<buffer_size>(random_data_size_t.get());
+        copyRandomData2ArrayAndTestCopyOnIt<complex_buffer_size>(random_complex_data.get());
+    }
+
+    auto memcmpTestOnVector() -> void
+    {
+        std::vector<int> a{ 10, 20, 30, 40, 50 };
+        std::vector<int> b{ 10, 20, 30, 40, 50 };
+
+        EXPECT_TRUE(equal(a, b));
+
+        b.push_back(10);
+        EXPECT_FALSE(equal(a, b));
+
+        a.push_back(20);
+        EXPECT_FALSE(equal(a, b));
+    }
+
+    auto memcmpTestOnPointer() -> void
+    {
+        auto random_data_32 = createRandomArrayOfInts<u32>(128);
+        auto data_ptr = std::make_unique<u32[]>(128);
+
+        EXPECT_FALSE(equal(random_data_32.get(), data_ptr.get(), 128));
+
+        copy(data_ptr.get(), random_data_32.get(), 128);
+
+        EXPECT_TRUE(equal(random_data_32.get(), data_ptr.get(), 128));
     }
 
     auto memoryTest(u32 argc) -> int
     {
-        memsetTest(argc);
-        memcpyTest();
+        fillTest(argc);
+        copyTest();
         stringTest(argc);
+        memcmpTestOnVector();
+        memcmpTestOnPointer();
         return 0;
     }
 }// namespace cerb::test

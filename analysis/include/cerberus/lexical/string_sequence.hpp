@@ -15,13 +15,16 @@ namespace cerb::lex
         using parent = DotItemObject<CharT, TokenType>;
 
         using generator_t = typename parent::generator_t;
+        using dot_item_pack_t = typename parent::dot_item_pack_t;
         using parameters_pack_t = typename parent::parameters_pack_t;
 
         using Flags = typename parent::Flags;
         using ScanStatus = typename parent::ScanStatus;
 
+        using parent::dot_item_pack;
+        using parent::getRecognizedToken;
+        using parent::getTextGenerator;
         using parent::is_prefix_or_postfix;
-        using parent::text_generator;
 
         constexpr auto scan() -> ScanStatus override
         {
@@ -31,15 +34,16 @@ namespace cerb::lex
                 }
             }
 
-            return ScanStatus::REDUCED;
+            return ScanStatus::SUCCESS;
         }
 
         constexpr StringSequence(
             parameters_pack_t const &parameters_for_analysis, Flags object_flags,
-            ReferenceWrapper<generator_t> generator_for_text)
-          : parent(reference(generator_for_text), parameters_for_analysis), flags(object_flags)
+            dot_item_pack_t &dot_item_parameters)
+          : parent(dot_item_parameters, parameters_for_analysis), flags(object_flags)
         {
-            string_parser parser_for_string{ CharsEnum<CharT>::DQM, generator_for_text.get() };
+            generator_t &text_generator = dot_item_parameters.text_generator;
+            string_parser parser_for_string{ CharsEnum<CharT>::DQM, ref(text_generator) };
             parsed_string = std::move(parser_for_string.parseString());
 
             if (flags.isSet(Flags::PREFIX_OR_POSTFIX)) {
@@ -59,11 +63,13 @@ namespace cerb::lex
 
         CERBLIB_DECL auto reversedCharScan(CharT chr) const -> bool
         {
+            generator_t &text_generator = getTextGenerator();
             return chr != text_generator.getCurrentChar();
         }
 
         CERBLIB_DECL auto ordinaryCharScan(CharT chr) const -> bool
         {
+            generator_t &text_generator = getTextGenerator();
             return chr == text_generator.getCurrentChar();
         }
 
