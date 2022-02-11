@@ -104,9 +104,9 @@ namespace cerb
             unsigned long bit_index;
 
 #    if defined(_WIN32) && !defined(_WIN64)
-            _BitscanForward(&bit_index, static_cast<size_t>(value));
+            _BitScanForward(&bit_index, static_cast<size_t>(value));
 #    else
-            _BitscanForward64(&bit_index, static_cast<size_t>(value));
+            _BitScanForward64(&bit_index, static_cast<size_t>(value));
 #    endif
             return static_cast<size_t>(bit_index);
 #else
