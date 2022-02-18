@@ -36,7 +36,7 @@ namespace cerb::lex
             return static_cast<CharT>(value);
         }
 
-        constexpr auto incAndCheckThatStringDoesNotEnd() -> void
+        constexpr auto incAndCheckThatStringDoesNotEnd() const -> void
         {
             if (text_generator.getCharWithoutLayout() == chars_enum_t::EoF) {
                 throw SequenceError("Unable to close sequence");

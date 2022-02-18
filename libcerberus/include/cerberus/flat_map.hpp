@@ -13,7 +13,7 @@ namespace cerb
         using value_type = Pair<Key, Value, PairComparison::BY_FIRST_VALUE>;
         using storage_t = std::array<value_type, Size>;
 
-        using iterator = typename storage_t::iterator;
+        using iterator = GetIteratorType<storage_t>;
         using const_iterator = typename storage_t::const_iterator;
         using reverse_iterator = typename storage_t::reverse_iterator;
         using const_reverse_iterator = typename storage_t::const_reverse_iterator;

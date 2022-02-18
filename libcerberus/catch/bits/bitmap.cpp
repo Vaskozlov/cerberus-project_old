@@ -37,7 +37,8 @@ namespace cerb::test
     {
         ConstBitmap<2, 512> bitmap;
         auto const &bitmap_data = bitmap.data();
-        auto const  bitmap_data_begin = bitmap_data.begin();
+        auto const bitmap_data_begin = bitmap_data.begin();
+        auto is_zero = [](auto elem) { return elem == 0; };
 
         bitmap.set<1, 0>(0);
         bitmap.set<1, 1>(0);
@@ -45,15 +46,15 @@ namespace cerb::test
         bitmap.set<1, 1>(511);
 
         bitmap.clear<0>();
-        EXPECT_TRUE(std::ranges::all_of(*bitmap_data_begin, [](auto elem) { return elem == 0; }));
+        EXPECT_TRUE(std::ranges::all_of(*bitmap_data_begin, is_zero));
 
         bitmap.set<1, 0>(0);
         bitmap.set<1, 0>(511);
 
         bitmap.clear();
 
-        EXPECT_TRUE(std::ranges::all_of(bitmap_data, [](auto const &array) {
-            return std::ranges::all_of(array, [](auto elem) { return elem == 0; });
+        EXPECT_TRUE(std::ranges::all_of(bitmap_data, [&is_zero](auto const &array) {
+            return std::ranges::all_of(array, is_zero);
         }));
     }
 
@@ -64,19 +65,19 @@ namespace cerb::test
         bitmap.set<1, 0>(100);
         bitmap.set<1, 2>(100);
 
-        auto position_1 =
+        auto test_find_1 =
             bitmap.find<bit::ValueOfBit::ONE, bit::ValueOfBit::ZERO, bit::ValueOfBit::ONE>();
-        EXPECT_TRUE(position_1 == 100);
+        EXPECT_TRUE(test_find_1 == 100);
 
         bitmap.set<1, 2>(64);
 
-        auto position_2 =
+        auto test_find_2 =
             bitmap.find<bit::ValueOfBit::ZERO, bit::ValueOfBit::ANY, bit::ValueOfBit::ONE>();
-        EXPECT_TRUE(position_2 == 64);
+        EXPECT_TRUE(test_find_2 == 64);
 
-        auto position_3 =
+        auto test_find_3 =
             bitmap.find<bit::ValueOfBit::ONE, bit::ValueOfBit::ONE, bit::ValueOfBit::ONE>();
-        EXPECT_TRUE(position_3 == bitmap.npos);
+        EXPECT_TRUE(test_find_3 == bitmap.npos);
     }
 
     auto bitmapTest(u32) -> int
@@ -85,7 +86,6 @@ namespace cerb::test
         bitmapTestAt();
         bitmapTestClear();
         bitmapTestSimpleFind();
-
         return 0;
     }
 }// namespace cerb::test

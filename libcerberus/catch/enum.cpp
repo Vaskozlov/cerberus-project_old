@@ -1,9 +1,11 @@
 #include "enum.hpp"
 #include <cerberus/enum.hpp>
 
+// NOLINTNEXTLINE
 CERBERUS_ENUM(TestEnum, cerb::u32, VALUE0 = 0b1, VALUE1 = 0b10, VALUE2 = 0b100);
 
-namespace cerb::test {
+namespace cerb::test
+{
     auto enumTest(u32) -> int
     {
         TestEnum test(TestEnum::VALUE0);

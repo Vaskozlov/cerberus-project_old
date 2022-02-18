@@ -13,9 +13,8 @@ namespace cerb
         constexpr static u32 number_of_chars = pow2<u32>(bitsizeof(CharT));
 
         using str_view_t = BasicStringView<CharT>;
-        using bitmap = ConstBitmap<1, number_of_chars>;
-        using strings_storage_t = std::vector<bitmap>;
         using tokens_storage_t = std::map<str_view_t, TokenType>;
+        using strings_storage_t = std::vector<ConstBitmap<1, number_of_chars>>;
 
         using node_type = typename tokens_storage_t::node_type;
         using value_type = typename tokens_storage_t::value_type;
