@@ -75,7 +75,7 @@ namespace cerb::lex
                 initialized = true;
                 tryToAppendTabOrSpace();
             } else {
-                if (isEndOfInput(text[offset])) {
+                if (isEoF(text[offset])) {
                     return chars_enum_t::EoF;
                 }
 

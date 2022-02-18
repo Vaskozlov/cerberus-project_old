@@ -34,7 +34,7 @@ namespace cerb::lex
     using wchar_enum_t = CharsEnum<wchar_t>;
 
     template<CharacterLiteral CharT>
-    CERBLIB_DECL auto isEndOfInput(CharT chr) -> bool
+    CERBLIB_DECL auto isEoF(CharT chr) -> bool
     {
         return chr == CharsEnum<CharT>::EoF;
     }

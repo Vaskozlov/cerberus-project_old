@@ -41,7 +41,7 @@ namespace cerb::lex
                 throw ParsingError("Given input is not a string!");
             }
 
-            while (not isEndOfInput(generator.getRawChar())) {
+            while (not isEoF(generator.getRawChar())) {
                 CharT chr = generator.getCurrentChar();
 
                 if (chr == string_char) {
@@ -159,7 +159,7 @@ namespace cerb::lex
 
         constexpr auto incAndCheckThatStringDoesNotEnd() -> void
         {
-            if (isEndOfInput(generator.getRawChar())) {
+            if (isEoF(generator.getRawChar())) {
                 throw ParsingError(
                     "End of string reached, however special symbol for this have not been found");
             }

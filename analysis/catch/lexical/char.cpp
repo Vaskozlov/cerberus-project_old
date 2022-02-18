@@ -9,8 +9,8 @@ namespace cerb::test
 
         for (u16 i = 1; i <= 255; ++i) {
             auto chr = static_cast<u8>(i);
-            EXPECT_FALSE(isEndOfInput(chr));
-            EXPECT_FALSE(isEndOfInput(std::bit_cast<char>(chr)));
+            EXPECT_FALSE(isEoF(chr));
+            EXPECT_FALSE(isEoF(std::bit_cast<char>(chr)));
         }
     }
 

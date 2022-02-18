@@ -151,7 +151,7 @@ namespace cerb::lex
         constexpr auto skipBeginOfMultilineComment(ReferenceWrapper<size_t> index) -> void
         {
             for (; index < getMultilineCommentBegin().size(); ++index) {
-                throwIfEoF(text_generator.getRawChar());
+                throwOnEoF(text_generator.getRawChar());
             }
         }
 
@@ -159,7 +159,7 @@ namespace cerb::lex
             str_view_t const &current_state, ReferenceWrapper<size_t> index) -> void
         {
             while (not current_state.containsAt(index, getMultilineCommentEnd())) {
-                throwIfEoF(text_generator.getRawChar());
+                throwOnEoF(text_generator.getRawChar());
                 ++index;
             }
         }
@@ -167,14 +167,14 @@ namespace cerb::lex
         constexpr auto skipEndOfMultilineComment() -> void
         {
             for (size_t index = 0; index < getMultilineCommentEnd().size(); ++index) {
-                throwIfEoF(text_generator.getRawChar());
+                throwOnEoF(text_generator.getRawChar());
             }
         }
 
-        constexpr auto throwIfEoF(CharT chr) const -> void
+        constexpr auto throwOnEoF(CharT chr) const -> void
         {
-            if (isEndOfInput(chr)) {
-                throw std::invalid_argument("Unexpected end of input on given string.");
+            if (isEoF(chr)) {
+                throw std::invalid_argument("Unexpected end of input.");
             }
         }
 
