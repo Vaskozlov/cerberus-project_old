@@ -1,7 +1,7 @@
 #include "bitmap.hpp"
 #include <cerberus/bitmap.hpp>
 
-namespace cerb::test
+namespace cerb::debug
 {
     auto bitmapTestSet() -> void
     {

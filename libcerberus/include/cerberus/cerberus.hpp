@@ -147,15 +147,6 @@ namespace cerb
 
     using ssize_t = intmax_t;
 
-    template<auto Begin, auto End, auto Inc>
-    constexpr auto constexprFor(auto &&function) -> void
-    {
-        if constexpr (Begin < End) {
-            function(std::integral_constant<decltype(Begin), Begin>());
-            constexprFor<Begin + Inc, End, Inc>(function);
-        }
-    }
-
     template<typename F, typename... Ts>
     CERBLIB_DECL auto forEach(F &&function, Ts &&...args)
     {

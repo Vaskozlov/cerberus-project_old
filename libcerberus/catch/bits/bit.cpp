@@ -1,7 +1,7 @@
 #include "bit.hpp"
 #include <cerberus/number.hpp>
 
-namespace cerb::test
+namespace cerb::debug
 {
 
     auto byteMaskTest() -> void

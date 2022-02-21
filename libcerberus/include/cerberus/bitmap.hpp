@@ -14,22 +14,13 @@ namespace cerb
     {
         static_assert(AxisN != 0);
 
-        using value_type = size_t;
-        using const_value_type = value_type;
-        using pointer = value_type *;
-        using const_pointer = value_type const *;
-
         constexpr static size_t length_of_axis =
-            BitN / bitsizeof(value_type) + static_cast<size_t>(BitN % bitsizeof(value_type) != 0);
+            BitN / bitsizeof(size_t) + static_cast<size_t>(BitN % bitsizeof(size_t) != 0);
         constexpr static size_t npos = std::numeric_limits<size_t>::max();
 
-        using axis_storage_t = std::array<value_type, length_of_axis>;
+        using axis_storage_t = std::array<size_t, length_of_axis>;
         using storage_t = std::array<axis_storage_t, AxisN>;
 
-    private:
-        storage_t storage{};
-
-    public:
         CERBLIB_DECL auto size() const -> size_t
         {
             return BitN;
@@ -49,13 +40,13 @@ namespace cerb
         constexpr auto clear() -> void
         {
             static_assert(Axis <= AxisN);
-            fill(storage[Axis], static_cast<value_type>(0));
+            fill(storage[Axis], static_cast<size_t>(0));
         }
 
         constexpr auto clear() -> void
         {
             std::ranges::for_each(storage, [](axis_storage_t &axis_storage) {
-                fill(axis_storage, static_cast<value_type>(0));
+                fill(axis_storage, static_cast<size_t>(0));
             });
         }
 
@@ -71,7 +62,6 @@ namespace cerb
         constexpr auto at(size_t index) const -> decltype(auto)
         {
             static_assert(Axis < AxisN);
-
             return bit::at<size_t>(storage[Axis].begin(), index);
         }
 
@@ -79,28 +69,21 @@ namespace cerb
         constexpr auto reverseBits() -> void
         {
             static_assert(Axis < AxisN);
-
-            for (auto &number : storage[Axis]) {
-                number = ~number;
-            }
+            std::ranges::for_each(storage[Axis], [](size_t &value) { value = ~value; });
         }
 
         template<bit::ValueOfBit... BitValues>
-        constexpr auto find() -> size_t
+        CERBLIB_DECL auto find() const -> size_t
         {
             static_assert(AxisN == sizeof...(BitValues));
 
             size_t index = 0;
 
             for (; index < storage.size(); ++index) {
-                auto suitable_bits =
-                    bit::applyMaskOnArray<size_t, GetIteratorType<storage_t>, BitValues...>(
-                        index, storage.begin());
+                auto suitable_bits = getSuitableBits<BitValues...>(index);
 
                 if (suitable_bits != 0) {
-                    auto bit_index =
-                        index * bitsizeof(size_t) + bit::scanForward<1, size_t>(suitable_bits);
-                    return bit_index < BitN ? bit_index : npos;
+                    return calculateBitPosition(index, suitable_bits);
                 }
             }
 
@@ -108,6 +91,23 @@ namespace cerb
         }
 
         constexpr ConstBitmap() = default;
+
+    private:
+        template<bit::ValueOfBit... BitValues>
+        CERBLIB_DECL auto getSuitableBits(size_t index) const -> size_t
+        {
+            return bit::applyMaskOnArray<size_t, typename storage_t::const_iterator, BitValues...>(
+                index, storage.begin());
+        }
+
+        CERBLIB_DECL auto calculateBitPosition(size_t index, size_t suitable_bits) const -> size_t
+        {
+            auto index_of_bit_in_number = bit::scanForward<1, size_t>(suitable_bits);
+            auto bit_index = index * bitsizeof(size_t) + index_of_bit_in_number;
+            return bit_index < BitN ? bit_index : npos;
+        }
+
+        storage_t storage{};
     };
 
 }// namespace cerb

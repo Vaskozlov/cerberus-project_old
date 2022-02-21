@@ -1,9 +1,10 @@
 #include "memory.hpp"
 #include <algorithm>
+#include <cerberus/debug/random_array.hpp>
 #include <cerberus/pointer_wrapper.hpp>
 #include <vector>
 
-namespace cerb::test
+namespace cerb::debug
 {
     constexpr i32 CheckValueI32 = -134;
     constexpr u8 TestU8Value = 255U;
@@ -37,24 +38,6 @@ namespace cerb::test
 
         copy(dest, src);
         EXPECT_TRUE(std::ranges::equal(src, dest));
-    }
-
-    auto generateRandomComplexData(size_t size) -> std::unique_ptr<PairedNumbers[]>
-    {
-        static std::random_device random_device;
-        static std::mt19937 engine(random_device());
-
-        static std::uniform_int_distribution<ssize_t> isize_distribution(
-            std::numeric_limits<ssize_t>::min(), std::numeric_limits<ssize_t>::max());
-
-        auto random_complex_data = std::make_unique<PairedNumbers[]>(size);
-
-        for (size_t i = 0; i < size; ++i) {
-            random_complex_data.get()[i] = { isize_distribution(engine),
-                                             static_cast<double>(isize_distribution(engine)) };
-        }
-
-        return random_complex_data;
     }
 
     consteval auto constexprFillTest() -> int
@@ -147,7 +130,7 @@ namespace cerb::test
         auto random_data_16 = createRandomArrayOfInts<u16>(buffer_size);
         auto random_data_32 = createRandomArrayOfInts<u32>(buffer_size);
         auto random_data_size_t = createRandomArrayOfInts<size_t>(buffer_size);
-        auto random_complex_data = generateRandomComplexData(complex_buffer_size);
+        auto random_complex_data = createRandomArrayOfPairs<PairedNumbers>(complex_buffer_size);
 
         copyRandomData2ArrayAndTestCopyOnIt<buffer_size>(random_data_8.get());
         copyRandomData2ArrayAndTestCopyOnIt<buffer_size>(random_data_16.get());
@@ -191,4 +174,4 @@ namespace cerb::test
         memcmpTestOnPointer();
         return 0;
     }
-}// namespace cerb::test
+}// namespace cerb::debug

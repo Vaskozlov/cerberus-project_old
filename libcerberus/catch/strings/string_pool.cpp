@@ -1,7 +1,8 @@
 #include "string_pool.hpp"
 #include "cerberus/string_pool.hpp"
 
-namespace cerb::test {
+namespace cerb::debug
+{
     auto stringPoolTest() -> int
     {
         StringPool<char, unsigned> string_pool({ { "Hello", 0 }, { "World", 1 } });

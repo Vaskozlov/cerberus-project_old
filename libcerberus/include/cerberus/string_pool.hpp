@@ -100,11 +100,12 @@ namespace cerb
         {
             resizeIfNeed(string);
             auto level = available_chars.begin();
-
-            for (CharT chr : string) {
+            auto set_level = [&level](CharT chr) {
                 level->template set<1, 0>(convert2UnsignedInt(chr));
                 ++level;
-            }
+            };
+
+            std::ranges::for_each(string, set_level);
         }
 
         constexpr auto resizeIfNeed(str_view_t const &string)

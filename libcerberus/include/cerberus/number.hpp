@@ -51,7 +51,7 @@ namespace cerb
     template<std::floating_point T, std::unsigned_integral PowerType>
     CERBLIB_DECL auto pow2(PowerType power_of_2) -> T
     {
-        static_assert(is_any_of_v<T, f32, f64>, "cerb::pow2 supports only floats and doubles.");
+        static_assert(IsAnyOfV<T, f32, f64>, "cerb::pow2 supports only floats and doubles.");
 
         ByteMask mask{ static_cast<T>(1) };
 

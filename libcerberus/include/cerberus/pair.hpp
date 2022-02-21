@@ -6,7 +6,7 @@
 
 namespace cerb
 {
-    enum struct PairComparison : u32
+    enum struct PairComparison : u16
     {
         DEFAULT,
         BY_FIRST_VALUE,

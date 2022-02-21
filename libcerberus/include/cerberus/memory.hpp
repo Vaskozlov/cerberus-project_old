@@ -232,7 +232,6 @@ namespace cerb
             return amd64::memcmp(lhs, rhs, length);
         }
 #endif
-
         return std::equal(lhs, lhs + length, rhs, rhs + length);
     }
 

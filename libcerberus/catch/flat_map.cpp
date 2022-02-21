@@ -2,7 +2,8 @@
 #include <cerberus/cerberus.hpp>
 #include <cerberus/flat_map.hpp>
 
-namespace cerb::test {
+namespace cerb::debug
+{
     auto flatMapTest(u32) -> int
     {
         FlatMap<int, int, 4> flat_map{};

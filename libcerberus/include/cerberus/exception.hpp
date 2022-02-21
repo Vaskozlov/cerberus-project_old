@@ -5,11 +5,8 @@
 #include <string_view>
 
 #define CERBERUS_EXCEPTION(name)                                                                   \
-    class name : public std::exception                                                             \
+    struct name : public std::exception                                                            \
     {                                                                                              \
-        std::string_view message{};                                                                \
-                                                                                                   \
-    public:                                                                                        \
         name() = default;                                                                          \
                                                                                                    \
         explicit name(std::string_view t_message) : message(t_message)                             \
@@ -19,6 +16,9 @@
         {                                                                                          \
             return message.data();                                                                 \
         }                                                                                          \
+                                                                                                   \
+    private:                                                                                       \
+        std::string_view message{};                                                                \
     }
 
 #endif /* CERBERUS_EXCEPTION_HPP */

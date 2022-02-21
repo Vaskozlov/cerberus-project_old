@@ -1,7 +1,9 @@
 #include "pointer_wrapper.hpp"
+#include <cerberus/debug/random_array.hpp>
 #include <cerberus/pointer_wrapper.hpp>
 
-namespace cerb::test {
+namespace cerb::debug
+{
     auto pointerWrapperTest(u32) -> int
     {
         auto pointer = createRandomArrayOfInts<int>(100);
@@ -34,4 +36,4 @@ namespace cerb::test {
 
         return 0;
     }
-}// namespace cerb::test
+}// namespace cerb::debug

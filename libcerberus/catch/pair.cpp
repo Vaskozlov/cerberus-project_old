@@ -2,7 +2,8 @@
 #include <cerberus/cerberus.hpp>
 #include <vector>
 
-namespace cerb::test {
+namespace cerb::debug
+{
     auto defaultPairTest() -> void
     {
         auto pair = cerb::makePair(10, 10);

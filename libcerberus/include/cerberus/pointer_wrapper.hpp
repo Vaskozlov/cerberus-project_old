@@ -9,12 +9,17 @@ namespace cerb
     template<typename T>
     struct CERBLIB_TRIVIAL RawPointerWrapper
     {
-        CERBLIB_DECL auto operator*() -> decltype(auto)
+        using iterator = T *;
+        using const_iterator = T const *;
+        using reverse_iterator = std::reverse_iterator<T *>;
+        using const_reverse_iterator = std::reverse_iterator<T const *>;
+
+        CERBLIB_DECL auto operator*() -> T &
         {
             return *pointer;
         }
 
-        CERBLIB_DECL auto operator*() const -> decltype(auto)
+        CERBLIB_DECL auto operator*() const -> T &
         {
             return *pointer;
         }
@@ -62,26 +67,44 @@ namespace cerb
             return size() <=> other.size();
         }
 
-        using reverse_iterator = std::reverse_iterator<T *>;
-
-        CERBLIB_DECL auto begin() const -> T *
+        CERBLIB_DECL auto begin() -> iterator
         {
             return pointer;
         }
 
-        CERBLIB_DECL auto end() const -> T *
+        CERBLIB_DECL auto end() -> iterator
         {
             return pointer + length;
         }
 
-        CERBLIB_DECL auto cbegin() const -> T *
+        CERBLIB_DECL auto begin() const -> iterator
         {
             return pointer;
         }
 
-        CERBLIB_DECL auto cend() const -> T *
+        CERBLIB_DECL auto end() const -> iterator
         {
             return pointer + length;
+        }
+
+        CERBLIB_DECL auto cbegin() const -> const_iterator
+        {
+            return pointer;
+        }
+
+        CERBLIB_DECL auto cend() const -> const_iterator
+        {
+            return pointer + length;
+        }
+
+        CERBLIB_DECL auto rbegin() -> reverse_iterator
+        {
+            return reverse_iterator(pointer + length);
+        }
+
+        CERBLIB_DECL auto rend() -> reverse_iterator
+        {
+            return reverse_iterator(pointer);
         }
 
         CERBLIB_DECL auto rbegin() const -> reverse_iterator
@@ -94,12 +117,12 @@ namespace cerb
             return reverse_iterator(pointer);
         }
 
-        CERBLIB_DECL auto crbegin() const -> reverse_iterator
+        CERBLIB_DECL auto crbegin() const -> const_reverse_iterator
         {
             return reverse_iterator(pointer + length);
         }
 
-        CERBLIB_DECL auto crend() const -> reverse_iterator
+        CERBLIB_DECL auto crend() const -> const_reverse_iterator
         {
             return reverse_iterator(pointer);
         }
@@ -112,12 +135,6 @@ namespace cerb
         CERBLIB_DECL auto operator[](size_t index) const -> T &
         {
             return pointer[index];
-        }
-
-        constexpr auto set(T ptr, size_t len) -> void
-        {
-            pointer = ptr;
-            length = len;
         }
 
         constexpr RawPointerWrapper() = default;

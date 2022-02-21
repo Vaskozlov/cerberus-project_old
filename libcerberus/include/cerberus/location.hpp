@@ -8,12 +8,8 @@
 
 namespace cerb
 {
-    class Location
+    struct Location
     {
-        std::string_view filename{};
-        size_t line{};
-
-    public:
         CERBLIB_DECL auto getLine() const -> size_t
         {
             return line;
@@ -28,6 +24,10 @@ namespace cerb
         constexpr Location(std::string_view filename_of_location, std::size_t line_of_location)
           : filename(filename_of_location), line(line_of_location)
         {}
+
+    private:
+        std::string_view filename{};
+        size_t line{};
     };
 }// namespace cerb
 
