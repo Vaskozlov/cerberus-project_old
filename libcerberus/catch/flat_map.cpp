@@ -11,6 +11,7 @@ namespace cerb::debug
 
         EXPECT_TRUE(flat_map[10] == 20);
         EXPECT_TRUE(flat_map[20] == 0);
+        EXPECT_TRUE(std::as_const(flat_map)[20] == 0);
 
         flat_map[20] = 30;
         EXPECT_TRUE(flat_map[20] == 30);

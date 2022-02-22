@@ -5,10 +5,13 @@ enable_testing()
 
 option(CERBERUS_STRICT_COMPILATION "Enable -Werror strict compilation" OFF)
 option(USE_LIBCPP "Use libc++ when compiling with clang" OFF)
+option(USE_SANITIZERS "Use sanitizers" ON)
 
 message(STATUS "CC " ${CMAKE_C_COMPILER})
 message(STATUS "CXX " ${CMAKE_CXX_COMPILER})
 message(STATUS "Strict compilation? " ${CERBERUS_STRICT_COMPILATION})
+message(STATUS "Use libcpp? " ${USE_LIBCPP})
+message(STATUS "Use sanitizers? " ${USE_SANITIZERS})
 
 include(libcerberus/CMakeLists.txt)
 include(analysis/CMakeLists.txt)

@@ -29,7 +29,7 @@ namespace cerb::debug
     constexpr auto expectTrue(bool condition, Location const &loc = CERBLIB_LOCATION) -> void
     {
         if (not condition) {
-            if (std::is_constant_evaluated()) {
+            if CERBLIB_COMPILE_TIME {
                 throw CompileTimeError("Cerberus test failure!");
             } else {
                 failure(condition, loc);
@@ -40,7 +40,7 @@ namespace cerb::debug
     constexpr auto expectFalse(bool condition, Location const &loc = CERBLIB_LOCATION) -> void
     {
         if (condition) {
-            if (std::is_constant_evaluated()) {
+            if CERBLIB_COMPILE_TIME {
                 throw CompileTimeError("Cerberus test failure!");
             } else {
                 failure(condition, loc);

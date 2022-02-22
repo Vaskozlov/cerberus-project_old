@@ -86,14 +86,15 @@ namespace cerb
         constexpr StringPool() = default;
         constexpr StringPool(std::initializer_list<value_type> const &nodes) : available_chars(4)
         {
-            std::ranges::for_each(nodes, [this](value_type const &node) { this->emplace(node); });
+            auto emplace_node = [this](value_type const &node) { this->emplace(node); };
+            std::ranges::for_each(nodes, emplace_node);
         }
 
     private:
         constexpr auto doesLevelContainChar(string_storage_const_iterator level, CharT chr) const
             -> bool
         {
-            return level->template at<0>(convert2UnsignedInt(chr));
+            return level->template at<0>(asUInt(chr));
         }
 
         constexpr auto addStringToBitmap(str_view_t const &string)
@@ -101,7 +102,7 @@ namespace cerb
             resizeIfNeed(string);
             auto level = available_chars.begin();
             auto set_level = [&level](CharT chr) {
-                level->template set<1, 0>(convert2UnsignedInt(chr));
+                level->template set<1, 0>(asUInt(chr));
                 ++level;
             };
 

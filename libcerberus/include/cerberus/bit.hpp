@@ -98,7 +98,7 @@ namespace cerb::bit
         }
 
 #ifdef _MSC_VER
-        if (std::is_constant_evaluated()) {
+        if CERBLIB_COMPILE_TIME {
             return msvc::scanForward<BitValue>(value);
         }
 
@@ -128,7 +128,7 @@ namespace cerb::bit
         }
 
 #ifdef _MSC_VER
-        if (std::is_constant_evaluated()) {
+        if CERBLIB_COMPILE_TIME {
             return msvc::scanReverse<BitValue>(value);
         }
 
@@ -141,7 +141,7 @@ namespace cerb::bit
 #    endif
         return bit_index;
 #else
-        return bitsizeof(unsigned long) - 1UL -
+        return bitsizeof(size_t) - 1UL -
                static_cast<size_t>(__builtin_clzl(static_cast<size_t>(value)));
 #endif
     }

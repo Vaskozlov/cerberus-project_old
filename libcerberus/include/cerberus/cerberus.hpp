@@ -5,6 +5,17 @@
 #    error libcerberus requires at least C++20
 #endif /* minimum requirements */
 
+#include <algorithm>
+#include <array>
+#include <bit>
+#include <cinttypes>
+#include <cstddef>
+#include <limits>
+#include <string_view>
+#include <type_traits>
+#include <utility>
+#include <version>
+
 #ifndef bitsizeof
 #    define bitsizeof(x) (sizeof(x) * 8UL)
 #endif /* bitsizeof */
@@ -36,6 +47,14 @@
 #        define CERBLIB_INLINE __attribute__((always_inline)) inline
 #    endif
 #endif /* CERBLIB_INLINE */
+
+#ifndef CERBLIB_COMPILE_TIME
+#    ifndef __cpp_if_consteval
+#        define CERBLIB_COMPILE_TIME (std::is_constant_evaluated())
+#    else
+#        define CERBLIB_COMPILE_TIME consteval
+#    endif
+#endif /* CERBLIB_COMPILE_TIME */
 
 #ifndef CERBLIB_DECL
 #    define CERBLIB_DECL [[nodiscard]] constexpr
@@ -119,16 +138,6 @@
 #        define CERBLIB_CLANG_ENABLE_WARNING
 #    endif
 #endif /* CERBLIB_CLANG_ENABLE_WARNING */
-
-#include <algorithm>
-#include <array>
-#include <bit>
-#include <cinttypes>
-#include <cstddef>
-#include <limits>
-#include <string_view>
-#include <type_traits>
-#include <utility>
 
 namespace cerb
 {
