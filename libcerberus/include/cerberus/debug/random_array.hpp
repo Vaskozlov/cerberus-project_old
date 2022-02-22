@@ -45,7 +45,7 @@ namespace cerb::debug
         static std::uniform_int_distribution<value_type1> first_distribution(
             std::numeric_limits<pair_v1_for_generation>::min(),
             std::numeric_limits<pair_v1_for_generation>::max());
-        
+
         static std::uniform_int_distribution<value_type2> second_distribution(
             std::numeric_limits<pair_v2_for_generation>::min(),
             std::numeric_limits<pair_v2_for_generation>::max());

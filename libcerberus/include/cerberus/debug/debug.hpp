@@ -47,6 +47,6 @@ namespace cerb::debug
             }
         }
     }
-}// namespace cerb::test
+}// namespace cerb::debug
 
 #endif /* LIBCERBERUS_CATCH_CATCH_HPP */
