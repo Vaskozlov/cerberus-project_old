@@ -29,8 +29,8 @@ namespace cerb::bit
     template<u64 PowerOf2, std::integral T>
     CERBLIB_DECL auto align(T value) -> T
     {
-        bool const need2Align = value % private_::pow2<T>(PowerOf2) == 0;
-        return need2Align ? value : ceil<PowerOf2, T>(value);
+        bool const need_to_align = value % private_::pow2<T>(PowerOf2) == 0;
+        return need_to_align ? value : ceil<PowerOf2, T>(value);
     }
 
 #ifdef _MSC_VER
@@ -48,7 +48,6 @@ namespace cerb::bit
             size_t bit_index = 0;
             constexpr T mask = 0b1;
 
-            CERBLIB_UNROLL_N(2)
             for (; value > 0; ++bit_index) {
                 if ((value & mask) == mask) {
                     return bit_index;
@@ -86,7 +85,6 @@ namespace cerb::bit
             size_t bit_index = bitsizeof(T) - 1;
             constexpr T mask = static_cast<T>(1) << (bitsizeof(T) - 1);
 
-            CERBLIB_UNROLL_N(2)
             for (; value > 0; --bit_index) {
                 if ((value & mask) == mask) {
                     return bit_index;
