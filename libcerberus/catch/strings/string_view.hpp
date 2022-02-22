@@ -8,4 +8,4 @@ namespace cerb::debug
     auto stringViewTest(u32 argc = 1) -> int;
 }
 
-#endif /* CERBERUS_CATCH_STRING_VIEW_HPP */
+#endif /* CERBE RUS_CATCH_STRING_VIEW_HPP */

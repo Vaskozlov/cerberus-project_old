@@ -97,4 +97,4 @@ namespace cerb::debug
         stringAndVectorPairTest();
         return 0;
     }
-}// namespace cerb::test
+}// namespace cerb::debug

@@ -69,4 +69,4 @@ namespace cerb::debug
         arrayOfPairsFindTest();
         return 0;
     }
-}// namespace cerb::test
+}// namespace cerb::debug
