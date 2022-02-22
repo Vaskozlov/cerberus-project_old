@@ -4,6 +4,7 @@
 #include <cerberus/bitmap.hpp>
 #include <cerberus/string_view.hpp>
 #include <map>
+#include <vector>
 
 namespace cerb
 {

@@ -37,7 +37,7 @@ namespace cerb::bit
     namespace msvc
     {
         template<unsigned BitValue, std::unsigned_integral T>
-        CERBLIB_DECL auto scanForward(T value) -> size_t
+        CERBLIB_DECL auto scanForwardCompileTime(T value) -> size_t
         {
             static_assert(BitValue == 0 || BitValue == 1);
 
@@ -60,9 +60,23 @@ namespace cerb::bit
         }
 
         template<unsigned BitValue, std::unsigned_integral T>
-        CERBLIB_DECL auto scanReverse(T value) -> size_t
+        CERBLIB_DECL auto scanForwardRuntime(T value) -> size_t
         {
-            static_assert(std::is_unsigned_v<T>);
+            static_assert(BitValue == 0 || BitValue == 1);
+
+            unsigned long bit_index;
+
+#    if defined(_WIN32) && !defined(_WIN64)
+            _BitScanForward(&bit_index, static_cast<size_t>(value));
+#    else
+            _BitScanForward64(&bit_index, static_cast<size_t>(value));
+#    endif
+            return static_cast<size_t>(bit_index);
+        }
+
+        template<unsigned BitValue, std::unsigned_integral T>
+        CERBLIB_DECL auto scanReverseCompileTime(T value) -> size_t
+        {
             static_assert(BitValue == 0 || BitValue == 1);
 
             if constexpr (BitValue == 0) {
@@ -82,6 +96,21 @@ namespace cerb::bit
 
             return bitsizeof(size_t);
         }
+
+        template<unsigned BitValue, std::unsigned_integral T>
+        CERBLIB_DECL auto scanReverseRuntime(T value) -> size_t
+        {
+            static_assert(BitValue == 0 || BitValue == 1);
+
+            unsigned long bit_index;
+
+#    if defined(_WIN32) && !defined(_WIN64)
+            _BitScanReverse(&bit_index, static_cast<size_t>(value));
+#    else
+            _BitScanReverse64(&bit_index, static_cast<size_t>(value));
+#    endif
+            return static_cast<size_t>(bit_index);
+        }
     }  // namespace msvc
 #endif /* _MSC_VER */
 
@@ -99,17 +128,10 @@ namespace cerb::bit
 
 #ifdef _MSC_VER
         if CERBLIB_COMPILE_TIME {
-            return msvc::scanForward<BitValue>(value);
+            return msvc::scanForwardCompileTime<BitValue>(value);
+        } else {
+            return msvc::scanForwardRuntime<BitValue>(value);
         }
-
-        unsigned long bit_index;
-
-#    if defined(_WIN32) && !defined(_WIN64)
-        _BitScanForward(&bit_index, static_cast<size_t>(value));
-#    else
-        _BitScanForward64(&bit_index, static_cast<size_t>(value));
-#    endif
-        return static_cast<size_t>(bit_index);
 #else
         return static_cast<size_t>(__builtin_ctzl(static_cast<size_t>(value)));
 #endif
@@ -129,17 +151,10 @@ namespace cerb::bit
 
 #ifdef _MSC_VER
         if CERBLIB_COMPILE_TIME {
-            return msvc::scanReverse<BitValue>(value);
+            return msvc::scanReverseCompileTime<BitValue>(value);
+        } else {
+            return msvc::scanReverseRuntime<BitValue>(value);
         }
-
-        unsigned long bit_index;
-
-#    if defined(_WIN32) && !defined(_WIN64)
-        _BitScanReverse(&bit_index, static_cast<size_t>(value));
-#    else
-        _BitScanReverse64(&bit_index, static_cast<size_t>(value));
-#    endif
-        return bit_index;
 #else
         return bitsizeof(size_t) - 1UL -
                static_cast<size_t>(__builtin_clzl(static_cast<size_t>(value)));

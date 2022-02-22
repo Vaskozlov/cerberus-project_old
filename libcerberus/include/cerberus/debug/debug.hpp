@@ -9,8 +9,8 @@
 #include <fmt/format.h>
 #include <iostream>
 
-#define EXPECT_TRUE(value) expectTrue(value, CERBLIB_LOCATION)
-#define EXPECT_FALSE(value) expectFalse(value, CERBLIB_LOCATION)
+#define EXPECT_TRUE(value) debug::expectTrue(value, CERBLIB_LOCATION)
+#define EXPECT_FALSE(value) debug::expectFalse(value, CERBLIB_LOCATION)
 
 namespace cerb::debug
 {
