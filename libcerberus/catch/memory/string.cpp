@@ -2,7 +2,8 @@
 #include <cerberus/memory.hpp>
 #include <cerberus/pair.hpp>
 
-namespace cerb::test {
+namespace cerb::debug
+{
     auto stringViewFindTest() -> void
     {
         using namespace std::string_view_literals;
@@ -68,4 +69,4 @@ namespace cerb::test {
         arrayOfPairsFindTest();
         return 0;
     }
-}// namespace cerb::test
+}// namespace cerb::debug

@@ -12,7 +12,7 @@ namespace cerb
     struct BasicStringView;
 
     template<typename T>
-    concept StringType = CharacterLiteral<GetValueType<T>> && is_any_of_v<
+    concept StringType = CharacterLiteral<GetValueType<T>> && IsAnyOfV<
         T, BasicStringView<GetValueType<T>>, std::basic_string<GetValueType<T>>,
         std::basic_string_view<GetValueType<T>>>;
 

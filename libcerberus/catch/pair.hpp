@@ -1,10 +1,11 @@
 #ifndef LIBCERBERUS_CATCH_PAIR_HPP
 #define LIBCERBERUS_CATCH_PAIR_HPP
 
-#include <cerberus/catch.hpp>
+#include <cerberus/debug/debug.hpp>
 #include <cerberus/pair.hpp>
 
-namespace cerb::test {
+namespace cerb::debug
+{
     auto pairTest() -> int;
 }
 

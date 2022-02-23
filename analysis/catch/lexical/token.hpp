@@ -1,7 +1,7 @@
 #ifndef CERBERUS_CATCH_TOKEN_HPP
 #define CERBERUS_CATCH_TOKEN_HPP
 
-#include <cerberus/catch.hpp>
+#include <cerberus/debug/debug.hpp>
 
 namespace cerb::test
 {

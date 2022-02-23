@@ -2,7 +2,8 @@
 #include <cerberus/cerberus.hpp>
 #include <cerberus/flat_map.hpp>
 
-namespace cerb::test {
+namespace cerb::debug
+{
     auto flatMapTest(u32) -> int
     {
         FlatMap<int, int, 4> flat_map{};
@@ -10,6 +11,7 @@ namespace cerb::test {
 
         EXPECT_TRUE(flat_map[10] == 20);
         EXPECT_TRUE(flat_map[20] == 0);
+        EXPECT_TRUE(std::as_const(flat_map)[20] == 0);
 
         flat_map[20] = 30;
         EXPECT_TRUE(flat_map[20] == 30);
@@ -29,4 +31,4 @@ namespace cerb::test {
 
         return 0;
     }
-}// namespace cerb::test
+}// namespace cerb::debug

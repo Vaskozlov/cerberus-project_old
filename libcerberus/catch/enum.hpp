@@ -1,9 +1,10 @@
 #ifndef CERBERUS_CATCH_ENUM_HPP
 #define CERBERUS_CATCH_ENUM_HPP
 
-#include <cerberus/catch.hpp>
+#include <cerberus/debug/debug.hpp>
 
-namespace cerb::test {
+namespace cerb::debug
+{
     auto enumTest(u32 = 1) -> int;
 }
 

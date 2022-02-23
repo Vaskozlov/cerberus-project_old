@@ -98,7 +98,7 @@ namespace cerb::lex
         template<std::integral T>
         constexpr auto setChar(T chr) -> void
         {
-            available_chars.template set<1, 0>(convert2UnsignedInt(chr));
+            available_chars.template set<1, 0>(asUInt(chr));
         }
 
         CERBLIB_DECL auto tryToStartRangeOrSkipExtraStartSymbol() -> bool

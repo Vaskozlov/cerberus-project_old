@@ -1,9 +1,10 @@
 #ifndef CERBERUS_CATCH_FLAT_MAP_HPP
 #define CERBERUS_CATCH_FLAT_MAP_HPP
 
-#include <cerberus/catch.hpp>
+#include <cerberus/debug/debug.hpp>
 
-namespace cerb::test {
+namespace cerb::debug
+{
     auto flatMapTest(u32 = 1) -> int;
 }
 

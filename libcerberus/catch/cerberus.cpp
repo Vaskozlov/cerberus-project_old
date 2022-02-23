@@ -10,7 +10,7 @@
 
 auto main() -> int
 {
-    using namespace cerb::test;
+    using namespace cerb::debug;
 
     pairTest();
     bitTest();

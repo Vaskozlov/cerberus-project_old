@@ -7,7 +7,7 @@
 namespace cerb
 {
     template<typename TargetType, typename... SuitableTypes>
-    struct is_any_of
+    struct IsAnyOf
     {
         template<typename CurrentType2Check, typename... OtherTypes2Check>
         CERBLIB_DECL static auto check(bool result = false) -> bool
@@ -25,7 +25,7 @@ namespace cerb
     };
 
     template<typename T, typename... Ts>
-    CERBLIB_DECL auto is_one_of(T target_value, Ts &&...suitable_values) -> bool
+    CERBLIB_DECL auto isOneOf(T target_value, Ts &&...suitable_values) -> bool
     {
         bool result = false;
 
@@ -41,7 +41,7 @@ namespace cerb
     }
 
     template<typename TargetType, typename... OtherTypes>
-    constexpr bool is_any_of_v = is_any_of<TargetType, OtherTypes...>::value;
+    constexpr bool IsAnyOfV = IsAnyOf<TargetType, OtherTypes...>::value;
 
     template<typename T>
     concept Pairable = requires(T value)
@@ -85,7 +85,7 @@ namespace cerb
     concept Enum = std::is_enum_v<T>;
 
     template<typename T>
-    concept CanBeStoredInIntegral = is_one_of(
+    concept CanBeStoredInIntegral = isOneOf(
         sizeof(T),
         sizeof(uint8_t),
         sizeof(uint16_t),
@@ -107,29 +107,11 @@ namespace cerb
     concept ClassValueFastCopiable = std::is_trivially_copy_assignable_v<typename T::value_type>;
 
     template<typename CharT>
-    concept CharacterLiteral = std::is_standard_layout_v<CharT> &&
-        cerb::is_any_of_v<CharT, char, unsigned char, char8_t, char16_t, char32_t, wchar_t>;
+    concept CharacterLiteral =
+        cerb::IsAnyOfV<CharT, char, unsigned char, char8_t, char16_t, char32_t, wchar_t>;
 
     template<typename T>
-    struct GetType4Copy
-    {
-        template<Trivial U>
-        CERBLIB_DECL static auto check() -> U
-        {
-            return *static_cast<U *>(nullptr);
-        }
-
-        template<NotTrivial U>
-        CERBLIB_DECL static auto check() -> U &
-        {
-            return *static_cast<U *>(nullptr);
-        }
-
-        using type = decltype(check<typename std::remove_reference_t<T>>());
-    };
-
-    template<typename T>
-    using AutoCopyType = typename GetType4Copy<T const>::type;
+    using AutoCopyType = std::conditional_t<Trivial<T>, T const, T const &>;
 
     template<HasGotValueType T>
     using GetValueType = typename T::value_type;

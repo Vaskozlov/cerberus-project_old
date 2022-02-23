@@ -111,8 +111,8 @@ namespace cerb
         constexpr FlatMap() = default;
         constexpr FlatMap(std::initializer_list<value_type> const &storage_values)
         {
-            std::ranges::for_each(
-                storage_values, [this](value_type const &value) { this->insert(value); });
+            auto insert_value = [this](value_type const &value) { this->insert(value); };
+            std::ranges::for_each(storage_values, insert_value);
         }
 
     private:

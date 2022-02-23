@@ -2,7 +2,7 @@
 #include <cerberus/string_view.hpp>
 #include <string>
 
-namespace cerb::test
+namespace cerb::debug
 {
 
     auto basicStringViewTestEqualStrings(u32 argc) -> void
@@ -79,4 +79,4 @@ namespace cerb::test
         basicStringViewContainsAtTest(argc);
         return 0;
     }
-}// namespace cerb::test
+}// namespace cerb::debug

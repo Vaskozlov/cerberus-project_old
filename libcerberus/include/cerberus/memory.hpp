@@ -196,7 +196,7 @@ namespace cerb
         if constexpr (
             RawAccessible<T> && CanBeStoredInIntegral<GetValueType<T>> &&
             std::is_trivially_copy_assignable_v<T>) {
-            if (std::is_constant_evaluated()) {
+            if CERBLIB_COMPILE_TIME {
                 return find(std::data(iterable_class), value2find, std::size(iterable_class));
             }
         }
@@ -232,7 +232,6 @@ namespace cerb
             return amd64::memcmp(lhs, rhs, length);
         }
 #endif
-
         return std::equal(lhs, lhs + length, rhs, rhs + length);
     }
 
