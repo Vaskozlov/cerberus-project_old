@@ -2,8 +2,8 @@
 #define LIBCERBERUS_CATCH_CATCH_HPP
 
 #include <cerberus/cerberus.hpp>
+#include <cerberus/debug/location.hpp>
 #include <cerberus/exception.hpp>
-#include <cerberus/location.hpp>
 #include <cerberus/pair.hpp>
 #include <fmt/color.h>
 #include <fmt/format.h>
