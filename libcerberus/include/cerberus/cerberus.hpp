@@ -56,6 +56,14 @@
 #    endif
 #endif /* CERBLIB_COMPILE_TIME */
 
+#ifndef CERBLIB_RUNTIME
+#    ifndef __cpp_if_consteval
+#        define CERBLIB_RUNTIME (not std::is_constant_evaluated())
+#    else
+#        define CERBLIB_RUNTIME not consteval
+#    endif
+#endif /* CERBLIB_RUNTIME */
+
 #ifndef CERBLIB_DECL
 #    define CERBLIB_DECL [[nodiscard]] constexpr
 #endif /* CERBLIB_DECL */

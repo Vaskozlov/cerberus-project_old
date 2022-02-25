@@ -136,7 +136,7 @@ namespace cerb
 
         CERBLIB_DECL auto operator==(CharT const *other) const -> bool
         {
-            return this->operator==(BasicStringView<CharT>(other));
+            return operator==(BasicStringView<CharT>(other));
         }
 
         template<StringType T>
@@ -148,19 +148,19 @@ namespace cerb
 
         CERBLIB_DECL auto operator<=>(CharT const *other) const -> decltype(auto)
         {
-            return this->operator<=>(BasicStringView<CharT>(other));
+            return operator<=>(BasicStringView<CharT>(other));
         }
 
         template<StringType T>
         CERBLIB_DECL auto operator<=>(T const &other) const
         {
-            for (size_t i = 0; i < min<size_type>(this->length, std::size(other)); ++i) {
-                if (this->at(i) != other.at(i)) {
-                    return this->at(i) <=> other.at(i);
+            for (size_t i = 0; i < min<size_type>(length, std::size(other)); ++i) {
+                if (at(i) != other.at(i)) {
+                    return at(i) <=> other.at(i);
                 }
             }
 
-            return this->length <=> std::size(other);
+            return length <=> std::size(other);
         }
 
         constexpr BasicStringView() = default;

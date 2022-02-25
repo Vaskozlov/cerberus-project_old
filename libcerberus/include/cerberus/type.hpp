@@ -12,7 +12,7 @@ namespace cerb
         template<typename CurrentType2Check, typename... OtherTypes2Check>
         CERBLIB_DECL static auto check(bool result = false) -> bool
         {
-            result = logicalOr(result, std::is_same_v<TargetType, CurrentType2Check>);
+            result = result || std::is_same_v<TargetType, CurrentType2Check>;
 
             if constexpr (sizeof...(OtherTypes2Check) != 0) {
                 result = check<OtherTypes2Check...>(result);
@@ -32,7 +32,7 @@ namespace cerb
         forEach(
             [&result, &target_value]<typename U>(const U &value) {
                 if constexpr (std::convertible_to<U, T>) {
-                    result = logicalOr(result, static_cast<T>(value) == target_value);
+                    result = result || (static_cast<T>(value) == target_value);
                 }
             },
             std::forward<Ts>(suitable_values)...);
