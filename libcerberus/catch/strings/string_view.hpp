@@ -5,7 +5,7 @@
 
 namespace cerb::debug
 {
-    auto stringViewTest(u32 argc = 1) -> int;
+    auto testStringView(u32 argc = 1) -> int;
 }
 
 #endif /* CERBE RUS_CATCH_STRING_VIEW_HPP */

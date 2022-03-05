@@ -21,7 +21,8 @@ namespace cerb
         }
 
         constexpr Location() = default;
-        constexpr Location(std::string_view filename_of_location, std::size_t line_of_location)
+        constexpr Location(
+            std::string_view const &filename_of_location, std::size_t line_of_location)
           : filename(filename_of_location), line(line_of_location)
         {}
 

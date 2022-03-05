@@ -4,7 +4,7 @@
 
 namespace cerb::debug
 {
-    auto flatMapTest(u32) -> int
+    auto testFlatMapOfInts() -> bool
     {
         FlatMap<int, int, 4> flat_map{};
         flat_map.insert({ 10, 20 });
@@ -29,6 +29,12 @@ namespace cerb::debug
             EXPECT_TRUE(1);
         }
 
+        return true;
+    }
+
+    auto testFlatMap(u32) -> int
+    {
+        testFlatMapOfInts();
         return 0;
     }
 }// namespace cerb::debug

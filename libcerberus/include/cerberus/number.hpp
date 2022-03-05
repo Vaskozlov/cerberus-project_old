@@ -6,10 +6,38 @@
 
 namespace cerb
 {
+    constexpr i64 F32ExponentBit = 23;
+    constexpr i64 F32ZeroExponent = 0x7fU;
+    constexpr u64 F32ExponentMask = 0xFF80'0000;
+
+    constexpr i64 F64ExponentBit = 52;
+    constexpr i64 F64ZeroExponent = 0x3ffU;
+    constexpr u64 F64ExponentMask = 0xFFF0'0000'0000'0000;
+
+    template<typename T>
+    CERBLIB_DECL auto asInt(T number) -> decltype(auto)
+    {
+        static_assert(std::integral<T> || std::is_enum_v<T> || std::is_floating_point_v<T>);
+
+        if constexpr (std::is_unsigned_v<T>) {
+            return number;
+        } else if constexpr (sizeof(T) == sizeof(i8)) {
+            return std::bit_cast<i8>(number);
+        } else if constexpr (sizeof(T) == sizeof(i16)) {
+            return std::bit_cast<i16>(number);
+        } else if constexpr (sizeof(T) == sizeof(i32)) {
+            return std::bit_cast<i32>(number);
+        } else if constexpr (sizeof(T) == sizeof(i64)) {
+            return std::bit_cast<i64>(number);
+        } else if constexpr (sizeof(T) == sizeof(ssize_t)) {
+            return std::bit_cast<ssize_t>(number);
+        }
+    }
+
     template<typename T>
     CERBLIB_DECL auto asUInt(T number) -> decltype(auto)
     {
-        static_assert(std::integral<T> || std::is_enum_v<T>);
+        static_assert(std::integral<T> || std::is_enum_v<T> || std::is_floating_point_v<T>);
 
         if constexpr (std::is_unsigned_v<T>) {
             return number;
@@ -62,34 +90,21 @@ namespace cerb
         }
     }
 
-    CERBLIB_DECL auto getExponent(f32 number) -> ssize_t
+    template<std::floating_point T>
+    CERBLIB_DECL auto getExponent(T number) -> ssize_t
     {
-        static_assert(sizeof(f32) == 4);
+        static_assert(IsAnyOfV<T, f32, f64>);
 
-        constexpr i32 f32_exponent_bit = 23;
-        constexpr i32 f32_zero_exponent = 0x7fU;
-        constexpr u32 f32_exponent_mask = 0xFF80'0000;
+        constexpr bool is_32bit_size = sizeof(T) == sizeof(u32);
 
-        u32 mask = std::bit_cast<u32>(number);
-        u32 exponent_mask = mask & f32_exponent_mask;
-        u32 exponent_as_uint = exponent_mask >> f32_exponent_bit;
-        ssize_t exponent = static_cast<ssize_t>(exponent_as_uint) - f32_zero_exponent;
+        constexpr i64 exponent_bit = is_32bit_size ? F32ExponentBit : F64ExponentBit;
+        constexpr i64 zero_exponent = is_32bit_size ? F32ZeroExponent : F64ZeroExponent;
+        constexpr u64 exponent_mask = is_32bit_size ? F32ExponentMask : F64ExponentMask;
 
-        return exponent;
-    }
-
-    CERBLIB_DECL auto getExponent(f64 number) -> ssize_t
-    {
-        static_assert(sizeof(f64) == 8);
-
-        constexpr i64 f64_exponent_bit = 52;
-        constexpr i64 f64_zero_exponent = 0x3ffU;
-        constexpr u64 f64_exponent_mask = 0xFFF0'0000'0000'0000;
-
-        u64 mask = std::bit_cast<u64>(number);
-        u64 exponent_mask = mask & f64_exponent_mask;
-        u64 exponent_as_uint = exponent_mask >> f64_exponent_bit;
-        ssize_t exponent = static_cast<ssize_t>(exponent_as_uint) - f64_zero_exponent;
+        auto mask = std::bit_cast<decltype(asUInt(number))>(number);
+        auto exponent_of_mask = mask & exponent_mask;
+        auto exponent_as_uint = exponent_of_mask >> exponent_bit;
+        ssize_t exponent = static_cast<ssize_t>(exponent_as_uint) - zero_exponent;
 
         return exponent;
     }
@@ -105,17 +120,14 @@ namespace cerb
     {
         static_assert(IsAnyOfV<T, f32, f64>, "cerb::pow2 supports only floats and doubles.");
 
-        ByteMask mask{ static_cast<T>(1) };
+        constexpr u64 f32_exponent = 1ULL << F32ExponentBit;
+        constexpr u64 f64_exponent = 1ULL << F64ExponentBit;
+        constexpr u64 float_exponent = sizeof(T) == sizeof(u32) ? f32_exponent : f64_exponent;
 
-        if constexpr (sizeof(T) == sizeof(f32)) {
-            constexpr u32 f32_exponent = 1UL << 23;
-            mask.getAsInt() += static_cast<u32>(f32_exponent * power_of_2);
-        } else {
-            constexpr u64 f64_exponent = 1ULL << 52;
-            mask.getAsInt() += f64_exponent * power_of_2;
-        }
+        auto mask = asUInt(static_cast<T>(1));
 
-        return mask.value;
+        mask += power_of_2 * float_exponent;
+        return std::bit_cast<T>(mask);
     }
 
     template<std::integral T>
@@ -127,40 +139,21 @@ namespace cerb
         return cmov(value < 0, -value, value);
     }
 
-    CERBLIB_DECL auto abs(f32 value) -> f32
+    template<std::floating_point T>
+    CERBLIB_DECL auto abs(T value) -> T
     {
-        static_assert(sizeof(f32) == sizeof(u32));
+        static_assert(IsAnyOfV<T, f32, f64>, "cerb::abs supports only f32 and f64.");
 
-        ByteMask mask{ value };
+        auto mask = asInt(value);
+        mask &= std::numeric_limits<decltype(mask)>::max();
 
-        if CERBLIB_COMPILE_TIME {
-            mask.value = -mask.value;
-        } else {
-            mask.getAsInt() &= static_cast<u32>(std::numeric_limits<i32>::max());
-        }
-
-        return mask.value;
-    }
-
-    CERBLIB_DECL auto abs(f64 value) -> f64
-    {
-        static_assert(sizeof(f64) == sizeof(u64), "cerb::abs supports only floats and doubles.");
-
-        ByteMask mask{ value };
-
-        if CERBLIB_COMPILE_TIME {
-            mask.value = -mask.value;
-        } else {
-            mask.getAsInt() &= static_cast<u64>(std::numeric_limits<i64>::max());
-        }
-
-        return mask.value;
+        return std::bit_cast<T>(mask);
     }
 
     template<std::equality_comparable T>
     CERBLIB_DECL auto safeEqual(T lhs, T rhs) -> bool
     {
-        if constexpr (std::is_floating_point_v<T>) {
+        if constexpr (std::floating_point<T>) {
             return abs(lhs - rhs) <= std::numeric_limits<T>::epsilon();
         } else {
             return lhs == rhs;

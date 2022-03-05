@@ -5,7 +5,7 @@
 
 namespace cerb::debug
 {
-    auto flatMapTest(u32 = 1) -> int;
+    auto testFlatMap(u32 = 1) -> int;
 }
 
 #endif /* CERBERUS_CATCH_FLAT_MAP_HPP */

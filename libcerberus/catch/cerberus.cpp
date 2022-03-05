@@ -2,25 +2,25 @@
 #include "bits/bitmap.hpp"
 #include "enum.hpp"
 #include "flat_map.hpp"
+#include "for_each.hpp"
 #include "memory/memory.hpp"
 #include "memory/pointer_wrapper.hpp"
 #include "pair.hpp"
-#include "strings/string_pool.hpp"
-#include "strings/string_view.hpp"
+#include "strings/string.hpp"
 
 auto main() -> int
 {
     using namespace cerb::debug;
 
-    pairTest();
-    bitTest();
+    testPair();
+    testBit();
     memoryTest();
-    stringViewTest();
+    testStringModule();
     pointerWrapperTest();
     bitmapTest();
-    stringPoolTest();
-    enumTest();
-    flatMapTest();
+    testEnum();
+    testFlatMap();
+    testForEach();
 
     return 0;
 }

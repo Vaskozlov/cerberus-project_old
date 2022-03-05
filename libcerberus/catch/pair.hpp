@@ -6,7 +6,7 @@
 
 namespace cerb::debug
 {
-    auto pairTest() -> int;
+    auto testPair() -> int;
 }
 
 #endif /* LIBCERBERUS_CATCH_PAIR_HPP */

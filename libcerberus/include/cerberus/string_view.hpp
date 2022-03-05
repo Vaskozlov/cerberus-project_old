@@ -194,29 +194,29 @@ namespace cerb
 
     namespace string_view_literals
     {
-        inline auto operator""_sv(char const *string, size_t length) -> BasicStringView<char>
+        constexpr auto operator""_sv(char const *string, size_t length) -> BasicStringView<char>
         {
             return { string, length };
         }
 
-        inline auto operator""_sv(char8_t const *string, size_t length) -> BasicStringView<char8_t>
+        constexpr auto operator""_sv(char8_t const *string, size_t length) -> BasicStringView<char8_t>
         {
             return { string, length };
         }
 
-        inline auto operator""_sv(char16_t const *string, size_t length)
+        constexpr auto operator""_sv(char16_t const *string, size_t length)
             -> BasicStringView<char16_t>
         {
             return { string, length };
         }
 
-        inline auto operator""_sv(char32_t const *string, size_t length)
+        constexpr auto operator""_sv(char32_t const *string, size_t length)
             -> BasicStringView<char32_t>
         {
             return { string, length };
         }
 
-        inline auto operator""_sv(wchar_t const *string, size_t length) -> BasicStringView<wchar_t>
+        constexpr auto operator""_sv(wchar_t const *string, size_t length) -> BasicStringView<wchar_t>
         {
             return { string, length };
         }

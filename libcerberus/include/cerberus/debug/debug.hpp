@@ -12,6 +12,9 @@
 #define EXPECT_TRUE(value) debug::expectTrue(value, CERBLIB_LOCATION)
 #define EXPECT_FALSE(value) debug::expectFalse(value, CERBLIB_LOCATION)
 
+#define CR_EXPECT_TRUE(value) static_assert(value); EXPECT_TRUE(value)
+#define CR_EXPECT_FALSE(value) static_assert(not (value); EXPECT_FALSE(value)
+
 namespace cerb::debug
 {
     CERBERUS_EXCEPTION(RuntimeError);
@@ -26,9 +29,10 @@ namespace cerb::debug
         throw RuntimeError();
     }
 
-    constexpr auto expectTrue(bool condition, Location const &loc = CERBLIB_LOCATION) -> void
+    template<std::integral T>
+    constexpr auto expectTrue(T condition, Location const &loc = CERBLIB_LOCATION) -> void
     {
-        if (not condition) {
+        if (not static_cast<bool>(condition)) {
             if CERBLIB_COMPILE_TIME {
                 throw CompileTimeError("Cerberus test failure!");
             } else {
@@ -37,9 +41,10 @@ namespace cerb::debug
         }
     }
 
-    constexpr auto expectFalse(bool condition, Location const &loc = CERBLIB_LOCATION) -> void
+    template<std::integral T>
+    constexpr auto expectFalse(T condition, Location const &loc = CERBLIB_LOCATION) -> void
     {
-        if (condition) {
+        if (static_cast<bool>(condition)) {
             if CERBLIB_COMPILE_TIME {
                 throw CompileTimeError("Cerberus test failure!");
             } else {

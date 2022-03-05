@@ -4,7 +4,7 @@
 
 namespace cerb::debug
 {
-    auto defaultPairTest() -> void
+    constexpr auto testDefaultPair() -> bool
     {
         auto pair = cerb::makePair(10, 10);
 
@@ -25,9 +25,11 @@ namespace cerb::debug
         EXPECT_TRUE(pair >= pair_2);
         EXPECT_FALSE(pair <= pair_2);
         EXPECT_TRUE(pair != pair_2);
+
+        return true;
     }
 
-    auto byFirstValuePairTest() -> void
+    constexpr auto testFirstValuePair() -> bool
     {
         auto pair = makePair<PairComparison::BY_FIRST_VALUE>(10, 10);
 
@@ -48,9 +50,11 @@ namespace cerb::debug
         EXPECT_FALSE(pair >= c_pair_2);
         EXPECT_TRUE(pair <= c_pair_2);
         EXPECT_TRUE(pair != c_pair_2);
+
+        return true;
     }
 
-    auto bySecondValuePairTest() -> void
+    constexpr auto testSecondValuePair() -> bool
     {
         auto pair = makePair<PairComparison::BY_SECOND_VALUE>(10, 10);
 
@@ -71,30 +75,32 @@ namespace cerb::debug
         EXPECT_FALSE(pair >= pair_2);
         EXPECT_TRUE(pair <= pair_2);
         EXPECT_TRUE(pair != pair_2);
+
+        return true;
     }
 
-    auto stringAndVectorPairTest() -> void
+    auto testPairOnStringAndVector() -> void
     {
         char const *str = "Hello, World! It's a long string!";
         std::initializer_list<int> const data = { 10, 20, 30, 40 };
         Pair<std::string, std::vector<int>> pair = { str, data };
 
-        EXPECT_TRUE(
-            logicalAnd(pair.first == std::string(str), pair.second == std::vector<int>(data)));
+        EXPECT_TRUE(logicalAnd(pair.first == str, pair.second == std::vector<int>(data)));
 
         auto pair_2 = std::move(pair);
 
-        EXPECT_TRUE(
-            logicalAnd(pair_2.first == std::string(str), pair_2.second == std::vector<int>(data)));
-        EXPECT_TRUE(logicalAnd(pair.first.empty(), pair.second.empty()));
+        EXPECT_TRUE(logicalAnd(pair_2.first == str, pair_2.second == std::vector<int>(data)));
+        EXPECT_TRUE(logicalAnd(pair.first.empty(), pair.second.empty()));// NOLINT
     }
 
-    auto pairTest() -> int
+    auto testPair() -> int
     {
-        defaultPairTest();
-        byFirstValuePairTest();
-        bySecondValuePairTest();
-        stringAndVectorPairTest();
+        CR_EXPECT_TRUE(testDefaultPair());
+        CR_EXPECT_TRUE(testFirstValuePair());
+        CR_EXPECT_TRUE(testSecondValuePair());
+
+        testPairOnStringAndVector();
+
         return 0;
     }
 }// namespace cerb::debug

@@ -13,9 +13,6 @@ namespace cerb
         template<typename T>
         constexpr auto fill(T *dest, T value, size_t times) -> void
         {
-            /* we need to make sure, that value is can be stored in register,
-             * and it is trivially copiable
-             */
             static_assert(CanBeStoredInIntegral<T> && std::is_trivially_copy_constructible_v<T>);
 
             if constexpr (sizeof(T) == sizeof(u8)) {
@@ -32,11 +29,8 @@ namespace cerb
         template<typename T>
         constexpr auto copy(T *dest, T const *src, size_t times) -> void
         {
-            // We need to make sure that T is trivially copiable
             static_assert(std::is_trivially_copyable_v<T>);
 
-            /* we can copy type which is bigger than register, because we can copy it in
-             * different parts*/
             if constexpr (sizeof(T) % sizeof(u64) == 0) {
                 times *= sizeof(T) / sizeof(u64);
                 asm volatile("rep movsq" : "+D"(dest), "+S"(src), "+c"(times) : : "memory");
@@ -189,7 +183,18 @@ namespace cerb
             }
         }
 #endif
-        return std::find(location, location + limit, value);
+        if CERBLIB_COMPILE_TIME {
+            size_t counter = 0;
+
+            while (*location != value && counter != limit) {
+                ++location;
+                ++counter;
+            }
+
+            return location;
+        } else {
+            return std::find(location, location + limit, value);
+        }
     }
 
     template<Iterable T>

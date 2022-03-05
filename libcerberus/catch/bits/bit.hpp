@@ -5,7 +5,7 @@
 
 namespace cerb::debug
 {
-    auto bitTest(u32 argc = 1U) -> int;
+    auto testBit(u32 argc = 1U) -> int;
 }
 
 #endif /* CERBERUS_CATCH_BIT_HPP */
