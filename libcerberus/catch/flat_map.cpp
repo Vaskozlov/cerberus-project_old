@@ -1,5 +1,5 @@
-#include <cerberus/debug/debug.hpp>
 #include <cerberus/cerberus.hpp>
+#include <cerberus/debug/debug.hpp>
 #include <cerberus/flat_map.hpp>
 
 namespace cerb::debug

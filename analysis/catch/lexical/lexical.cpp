@@ -6,6 +6,6 @@ using namespace cerb::debug;
 auto main() -> int
 {
     testChar();
-    //testTextGenerator();
+    // testTextGenerator();
     return 0;
 }

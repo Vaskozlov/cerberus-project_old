@@ -120,13 +120,13 @@ namespace cerb
     {
         static_assert(IsAnyOfV<T, f32, f64>, "cerb::pow2 supports only floats and doubles.");
 
-        constexpr u64 f32_exponent = 1ULL << F32ExponentBit;
-        constexpr u64 f64_exponent = 1ULL << F64ExponentBit;
-        constexpr u64 float_exponent = sizeof(T) == sizeof(u32) ? f32_exponent : f64_exponent;
+        constexpr size_t f32_exponent = 1ULL << F32ExponentBit;
+        constexpr size_t f64_exponent = 1ULL << F64ExponentBit;
+        constexpr size_t float_exponent = sizeof(T) == sizeof(u32) ? f32_exponent : f64_exponent;
 
         auto mask = asUInt(static_cast<T>(1));
 
-        mask += power_of_2 * float_exponent;
+        mask += static_cast<decltype(mask)>(static_cast<size_t>(power_of_2) * float_exponent);
         return std::bit_cast<T>(mask);
     }
 

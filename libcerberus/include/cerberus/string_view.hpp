@@ -12,9 +12,9 @@ namespace cerb
     struct BasicStringView;
 
     template<typename T>
-    concept StringType = CharacterLiteral<GetValueType<T>> && IsAnyOfV<
-        T, BasicStringView<GetValueType<T>>, std::basic_string<GetValueType<T>>,
-        std::basic_string_view<GetValueType<T>>>;
+    concept StringType = CharacterLiteral<GetValueType<T>> && IsAnyOfV < T,
+            BasicStringView<GetValueType<T>>,
+    std::basic_string<GetValueType<T>>, std::basic_string_view < GetValueType < T >>> ;
 
     template<CharacterLiteral CharT>
     struct CERBLIB_TRIVIAL BasicStringView
@@ -199,7 +199,8 @@ namespace cerb
             return { string, length };
         }
 
-        constexpr auto operator""_sv(char8_t const *string, size_t length) -> BasicStringView<char8_t>
+        constexpr auto operator""_sv(char8_t const *string, size_t length)
+            -> BasicStringView<char8_t>
         {
             return { string, length };
         }
@@ -216,7 +217,8 @@ namespace cerb
             return { string, length };
         }
 
-        constexpr auto operator""_sv(wchar_t const *string, size_t length) -> BasicStringView<wchar_t>
+        constexpr auto operator""_sv(wchar_t const *string, size_t length)
+            -> BasicStringView<wchar_t>
         {
             return { string, length };
         }
