@@ -1,4 +1,4 @@
-#include "flat_map.hpp"
+#include <cerberus/debug/debug.hpp>
 #include <cerberus/cerberus.hpp>
 #include <cerberus/flat_map.hpp>
 
@@ -32,7 +32,7 @@ namespace cerb::debug
         return true;
     }
 
-    auto testFlatMap(u32) -> int
+    auto testFlatMap() -> int
     {
         testFlatMapOfInts();
         return 0;

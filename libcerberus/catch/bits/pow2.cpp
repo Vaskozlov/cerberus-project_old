@@ -1,4 +1,3 @@
-#include "pow2.hpp"
 #include <cerberus/debug/debug.hpp>
 #include <cerberus/number.hpp>
 

@@ -1,5 +1,5 @@
-#include "string_pool.hpp"
-#include "cerberus/string_pool.hpp"
+#include <cerberus/debug/debug.hpp>
+#include <cerberus/string_pool.hpp>
 
 namespace cerb::debug
 {

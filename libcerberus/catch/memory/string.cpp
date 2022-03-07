@@ -1,10 +1,10 @@
-#include "memory.hpp"
+#include <cerberus/debug/debug.hpp>
 #include <cerberus/memory.hpp>
 #include <cerberus/pair.hpp>
 
 namespace cerb::debug
 {
-    CERBLIB_DECL auto testFindOnStringView()->bool
+    CERBLIB_DECL auto testFindOnStringView() -> bool
     {
         std::string_view str = "hello, world!";
 
@@ -14,7 +14,7 @@ namespace cerb::debug
         return true;
     }
 
-    CERBLIB_DECL auto testFindOnUtf16StringView()->bool
+    CERBLIB_DECL auto testFindOnUtf16StringView() -> bool
     {
         std::u16string_view str = u"hello, world!";
 
@@ -26,7 +26,7 @@ namespace cerb::debug
         return true;
     }
 
-    CERBLIB_DECL auto testFindOnWstringView()->bool
+    CERBLIB_DECL auto testFindOnWstringView() -> bool
     {
         std::wstring_view str = L"hello, world!";
 
@@ -66,7 +66,7 @@ namespace cerb::debug
         return true;
     }
 
-    auto testStringOperations(u32) -> int
+    auto testStringOperations() -> int
     {
         CR_EXPECT_TRUE(testFindOnStringView());
         CR_EXPECT_TRUE(testFindOnUtf16StringView());

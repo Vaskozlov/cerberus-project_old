@@ -1,13 +1,14 @@
-#include "bit.hpp"
-#include "abs.hpp"
-#include "bit_scan.hpp"
-#include "log2.hpp"
-#include "min_max.hpp"
-#include "pow2.hpp"
-#include <cerberus/number.hpp>
+#include <cerberus/debug/debug.hpp>
 
 namespace cerb::debug
 {
+    auto testAbs() -> int;
+    auto testPow2() -> int;
+    auto testLog2() -> int;
+    auto testMinMax() -> int;
+    auto testBitmap() -> int;
+    auto testBitScan() -> int;
+
     auto testByteMask() -> void
     {
         ByteMask mask{ 0ll };
@@ -21,7 +22,7 @@ namespace cerb::debug
         EXPECT_TRUE(mask.getAsInt() == 0xFFFFFF);
     }
 
-    auto testBit(u32) -> int
+    auto testBit() -> int
     {
         testAbs();
         testPow2();

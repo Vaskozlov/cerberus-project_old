@@ -1,4 +1,3 @@
-#include "equal.hpp"
 #include <cerberus/debug/debug.hpp>
 #include <cerberus/memory.hpp>
 #include <string_view>

@@ -1,19 +1,17 @@
-#include "memory.hpp"
-#include "copy.hpp"
-#include "equal.hpp"
-#include "fill.hpp"
-#include "pointer_wrapper.hpp"
-
 namespace cerb::debug
 {
-    auto testStringOperations(u32) -> int;
+    auto testFill() -> int;
+    auto testEqual() -> int;
+    auto testCopy() -> int;
+    auto testPointerWrapper() -> int;
+    auto testStringOperations() -> int;
 
-    auto memoryTest(u32 argc) -> int
+    auto memoryTest() -> int
     {
         testFill();
         testCopy();
         testEqual();
-        testStringOperations(argc);
+        testStringOperations();
         testPointerWrapper();
         return 0;
     }

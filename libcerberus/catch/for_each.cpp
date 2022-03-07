@@ -1,4 +1,4 @@
-#include "for_each.hpp"
+#include <cerberus/debug/debug.hpp>
 
 namespace cerb::debug
 {
@@ -23,7 +23,7 @@ namespace cerb::debug
         return true;
     }
 
-    auto testForEach(u32) -> int
+    auto testForEach() -> int
     {
         CR_EXPECT_TRUE(testForEachOnInts());
         return 0;

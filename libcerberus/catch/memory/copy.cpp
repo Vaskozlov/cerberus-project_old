@@ -1,4 +1,3 @@
-#include "copy.hpp"
 #include <cerberus/debug/debug.hpp>
 #include <cerberus/debug/random_values.hpp>
 #include <cerberus/memory.hpp>

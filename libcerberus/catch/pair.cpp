@@ -1,5 +1,6 @@
-#include "pair.hpp"
 #include <cerberus/cerberus.hpp>
+#include <cerberus/debug/debug.hpp>
+#include <cerberus/pair.hpp>
 #include <vector>
 
 namespace cerb::debug

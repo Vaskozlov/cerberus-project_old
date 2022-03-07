@@ -59,10 +59,10 @@ namespace cerb
     concept Iterable = requires(T value) { value.begin() != value.end(); };
 
     template<typename T>
-    concept HasGotValueType = requires(T value) { typename T::value_type; };
+    concept HasValueType = requires(T value) { typename T::value_type; };
 
     template<typename T>
-    concept HasGotSizeType = requires(T value) { typename T::size_type; };
+    concept HasSizeType = requires(T value) { typename T::size_type; };
 
     template<typename T>
     concept LessComparable = requires(T lhs, T rhs) { lhs < rhs; };
@@ -100,13 +100,16 @@ namespace cerb
     template<typename T>
     using AutoCopyType = std::conditional_t<Trivial<T>, T const, T const &>;
 
-    template<HasGotValueType T>
+    template<HasValueType T>
     using GetValueType = typename T::value_type;
+
+    template<typename T>
+    using GetElementType = typename T::element_type;
 
     template<Iterable T>
     using GetIteratorType = typename T::iterator;
 
-    template<HasGotSizeType T>
+    template<HasSizeType T>
     using GetSizeType = typename T::size_type;
 
     template<typename T>

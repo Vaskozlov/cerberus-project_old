@@ -1,9 +1,8 @@
-#include "string.hpp"
-#include "string_pool.hpp"
-#include "string_view.hpp"
-
 namespace cerb::debug
 {
+    auto testStringView() -> int;
+    auto testStringPool() -> int;
+
     auto testStringModule() -> int
     {
         testStringView();

@@ -1,5 +1,5 @@
-#include "bitmap.hpp"
 #include <cerberus/bitmap.hpp>
+#include <cerberus/debug/debug.hpp>
 
 namespace cerb::debug
 {
@@ -87,7 +87,7 @@ namespace cerb::debug
         return true;
     }
 
-    auto testBitmap(u32) -> int
+    auto testBitmap() -> int
     {
         CR_EXPECT_TRUE(testBitMapSet());
         CR_EXPECT_TRUE(testBitMapAt());

@@ -1,10 +1,10 @@
-#include "pointer_wrapper.hpp"
+#include <cerberus/debug/debug.hpp>
 #include <cerberus/debug/random_array.hpp>
 #include <cerberus/pointer_wrapper.hpp>
 
 namespace cerb::debug
 {
-    auto testPointerWrapper(u32) -> int
+    auto testPointerWrapper() -> int
     {
         auto pointer = createRandomArrayOfInts<int>(100);
         auto pointer_wrapper = RawPointerWrapper<int>(pointer.get(), 100);

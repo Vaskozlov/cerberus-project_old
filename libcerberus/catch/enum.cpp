@@ -1,4 +1,4 @@
-#include "enum.hpp"
+#include <cerberus/debug/debug.hpp>
 #include <cerberus/enum.hpp>
 
 // NOLINTNEXTLINE
@@ -22,7 +22,7 @@ namespace cerb::debug
         return true;
     }
 
-    auto testEnum(u32) -> int
+    auto testEnum() -> int
     {
         CR_EXPECT_TRUE(testSimpleEnum());
 

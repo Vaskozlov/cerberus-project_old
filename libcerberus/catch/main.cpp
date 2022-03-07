@@ -1,13 +1,13 @@
-#include "bits/bit.hpp"
-#include "memory/memory.hpp"
-#include "strings/string.hpp"
-
 namespace cerb::debug
 {
     auto testEnum() -> int;
     auto testFlatMap() -> int;
     auto testForEach() -> int;
     auto testPair() -> int;
+
+    auto testBit() -> int;
+    auto memoryTest() -> int;
+    auto testStringModule() -> int;
 }// namespace cerb::debug
 
 auto main() -> int

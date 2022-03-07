@@ -1,4 +1,4 @@
-#include "string_view.hpp"
+#include <cerberus/debug/debug.hpp>
 #include <cerberus/string_view.hpp>
 #include <string>
 
@@ -68,7 +68,7 @@ namespace cerb::debug
         return true;
     }
 
-    auto testStringView(u32) -> int
+    auto testStringView() -> int
     {
         CR_EXPECT_TRUE(testEqualStringViewComparisonWithStdStringView());
         CR_EXPECT_TRUE(testNotEqualStringViewComparisonWithStdStringView());

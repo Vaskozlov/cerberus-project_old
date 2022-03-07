@@ -1,4 +1,3 @@
-#include "bit_scan.hpp"
 #include <cerberus/debug/debug.hpp>
 #include <cerberus/number.hpp>
 
@@ -25,4 +24,4 @@ namespace cerb::debug
 
         return 0;
     }
-}
+}// namespace cerb::debug
