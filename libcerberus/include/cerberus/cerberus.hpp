@@ -172,15 +172,19 @@ namespace cerb
 
     using ssize_t = intmax_t;
 
-    template<typename F, typename... Ts>
-    CERBLIB_DECL auto forEach(F &&function, Ts &&...args)
+    template<typename F, typename T>
+    constexpr auto forEach(F&& function, T&& arg) -> void
     {
-        [[maybe_unused]] auto const _ = { ([&function]<typename T>(T &&value) {
-            function(std::forward<T>(value));
-            return 0;
-        })(std::forward<Ts>(args))... };
+        function(std::forward<T>(arg));
     }
 
+    template<typename F, typename T, typename... Ts>
+    constexpr auto forEach(F&& function, T&& arg, Ts&&... args) -> void
+    {
+        function(std::forward<T>(arg));
+        forEach(function, std::forward<Ts>(args)...);
+    }
+  
     template<typename... Ts>
     CERBLIB_DECL auto logicalAnd(bool first, Ts... other) -> bool
     {
