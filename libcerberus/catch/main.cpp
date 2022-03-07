@@ -1,12 +1,14 @@
 #include "bits/bit.hpp"
-#include "bits/bitmap.hpp"
-#include "enum.hpp"
-#include "flat_map.hpp"
-#include "for_each.hpp"
 #include "memory/memory.hpp"
-#include "memory/pointer_wrapper.hpp"
-#include "pair.hpp"
 #include "strings/string.hpp"
+
+namespace cerb::debug
+{
+    auto testEnum() -> int;
+    auto testFlatMap() -> int;
+    auto testForEach() -> int;
+    auto testPair() -> int;
+}// namespace cerb::debug
 
 auto main() -> int
 {
@@ -16,8 +18,6 @@ auto main() -> int
     testBit();
     memoryTest();
     testStringModule();
-    testPointerWrapper();
-    testBitmap();
     testEnum();
     testFlatMap();
     testForEach();
