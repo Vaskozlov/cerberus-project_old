@@ -7,12 +7,13 @@
 #include <cerberus/pair.hpp>
 #include <fmt/color.h>
 #include <fmt/format.h>
-#include <iostream>
 
 #define EXPECT_TRUE(value) debug::expectTrue(value, CERBLIB_LOCATION)
 #define EXPECT_FALSE(value) debug::expectFalse(value, CERBLIB_LOCATION)
 
-#define CR_EXPECT_TRUE(value) static_assert(value); EXPECT_TRUE(value)
+#define CR_EXPECT_TRUE(value)                                                                      \
+    static_assert(value);                                                                          \
+    EXPECT_TRUE(value)
 #define CR_EXPECT_FALSE(value) static_assert(not (value); EXPECT_FALSE(value)
 
 namespace cerb::debug
@@ -21,6 +22,14 @@ namespace cerb::debug
     CERBERUS_EXCEPTION(CompileTimeError);
 
     using PairedNumbers = Pair<ssize_t, double>;
+
+    template<Iterable T, typename... Ts>
+    constexpr auto initializerAllElement(T &source, Ts &&...args) -> void
+    {
+        auto construct = [&](auto &elem) { std::construct_at(&elem, std::forward<Ts>(args)...); };
+
+        std::ranges::for_each(source, construct);
+    }
 
     inline auto failure(bool condition, Location const &loc = CERBLIB_LOCATION) -> void
     {

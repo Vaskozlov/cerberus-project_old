@@ -3,7 +3,9 @@
 
 namespace cerb::debug
 {
-    auto bitmapTestSet() -> void
+    using namespace bit;
+
+    CERBLIB_DECL auto testBitMapSet() -> bool
     {
         ConstBitmap<2, 512> bitmap;
         bitmap.set<1, 0>(10);
@@ -18,9 +20,11 @@ namespace cerb::debug
 
         bitmap.set<0, 1>(20);
         EXPECT_TRUE(bitmap.data()[1][0] == 0);
+
+        return true;
     }
 
-    auto bitmapTestAt() -> void
+    CERBLIB_DECL auto testBitMapAt() -> bool
     {
         ConstBitmap<2, 512> bitmap;
 
@@ -31,9 +35,11 @@ namespace cerb::debug
         bitmap.set<1, 1>(20);
         EXPECT_TRUE(bitmap.at<1>(20) == 1);
         EXPECT_TRUE(bitmap.at<1>(19) == 0);
+
+        return true;
     }
 
-    auto bitmapTestClear() -> void
+    CERBLIB_DECL auto testBitMapClear() -> bool
     {
         ConstBitmap<2, 512> bitmap;
         auto const &bitmap_data = bitmap.data();
@@ -56,36 +62,37 @@ namespace cerb::debug
         EXPECT_TRUE(std::ranges::all_of(bitmap_data, [&is_zero](auto const &array) {
             return std::ranges::all_of(array, is_zero);
         }));
+
+        return true;
     }
 
-    auto bitmapTestSimpleFind() -> void
+    CERBLIB_DECL auto testBitMapFind() -> bool
     {
         ConstBitmap<3, 512> bitmap;
 
         bitmap.set<1, 0>(100);
         bitmap.set<1, 2>(100);
 
-        auto test_find_1 =
-            bitmap.find<bit::ValueOfBit::ONE, bit::ValueOfBit::ZERO, bit::ValueOfBit::ONE>();
-        EXPECT_TRUE(test_find_1 == 100);
+        EXPECT_TRUE(safeEqual<size_t>(
+            bitmap.find<ValueOfBit::ONE, ValueOfBit::ZERO, ValueOfBit::ONE>(), 100));
 
         bitmap.set<1, 2>(64);
 
-        auto test_find_2 =
-            bitmap.find<bit::ValueOfBit::ZERO, bit::ValueOfBit::ANY, bit::ValueOfBit::ONE>();
-        EXPECT_TRUE(test_find_2 == 64);
+        EXPECT_TRUE(safeEqual<size_t>(
+            bitmap.find<ValueOfBit::ZERO, ValueOfBit::ANY, ValueOfBit::ONE>(), 64));
 
-        auto test_find_3 =
-            bitmap.find<bit::ValueOfBit::ONE, bit::ValueOfBit::ONE, bit::ValueOfBit::ONE>();
-        EXPECT_TRUE(test_find_3 == bitmap.npos);
+        EXPECT_TRUE(safeEqual(
+            bitmap.find<ValueOfBit::ONE, ValueOfBit::ONE, ValueOfBit::ONE>(), bitmap.npos));
+
+        return true;
     }
 
-    auto bitmapTest(u32) -> int
+    auto testBitmap(u32) -> int
     {
-        bitmapTestSet();
-        bitmapTestAt();
-        bitmapTestClear();
-        bitmapTestSimpleFind();
+        CR_EXPECT_TRUE(testBitMapSet());
+        CR_EXPECT_TRUE(testBitMapAt());
+        CR_EXPECT_TRUE(testBitMapClear());
+        CR_EXPECT_TRUE(testBitMapFind());
         return 0;
     }
-}// namespace cerb::test
+}// namespace cerb::debug

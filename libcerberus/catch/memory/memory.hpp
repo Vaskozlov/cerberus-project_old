@@ -7,7 +7,6 @@
 namespace cerb::debug
 {
     auto memoryTest(u32 argc = 1) -> int;
-    auto stringTest(u32) -> int;
 }// namespace cerb::debug
 
 #endif /* CERBERUS_CATCH_MEMORY_HPP */

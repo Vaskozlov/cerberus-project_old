@@ -5,7 +5,7 @@
 
 namespace cerb::debug
 {
-    auto bitmapTest(u32 argc = 1U) -> int;
+    auto testBitmap(u32 argc = 1U) -> int;
 }
 
 #endif /* CERBERUS_CATCH_BITMAP_HPP */

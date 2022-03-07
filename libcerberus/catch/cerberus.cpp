@@ -16,8 +16,8 @@ auto main() -> int
     testBit();
     memoryTest();
     testStringModule();
-    pointerWrapperTest();
-    bitmapTest();
+    testPointerWrapper();
+    testBitmap();
     testEnum();
     testFlatMap();
     testForEach();

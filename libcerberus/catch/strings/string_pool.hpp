@@ -5,7 +5,7 @@
 
 namespace cerb::debug
 {
-    auto stringPoolTest() -> int;
+    auto testStringPool() -> int;
 }
 
 #endif /* CERBERUS_CATCH_STRING_POOL_HPP */

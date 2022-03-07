@@ -4,7 +4,7 @@
 
 namespace cerb::debug
 {
-    constexpr auto testEqualStringViewComparisonWithStdStringView() -> bool
+    CERBLIB_DECL auto testEqualStringViewComparisonWithStdStringView() -> bool
     {
         using namespace string_view_literals;
 
@@ -38,7 +38,7 @@ namespace cerb::debug
         return true;
     }
 
-    constexpr auto testNotEqualStringViewComparisonWithStdStringView() -> bool
+    CERBLIB_DECL auto testNotEqualStringViewComparisonWithStdStringView() -> bool
     {
         std::string_view standard_str_view = "It's a \"Hello, World!\" program";
         cerb::string_view str_view = "It's not a \"Hello, World!\" program";
@@ -57,7 +57,7 @@ namespace cerb::debug
         return true;
     }
 
-    constexpr auto testStringViewContainsAt() -> bool
+    CERBLIB_DECL auto testStringViewContainsAt() -> bool
     {
         cerb::string_view str = "Hello, World!?";
         EXPECT_TRUE(str.containsAt(0, "Hello"));

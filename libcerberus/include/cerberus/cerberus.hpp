@@ -40,6 +40,14 @@
 #    endif
 #endif /* CERBLIB_AMD64 */
 
+#ifndef CERBLIB_64BIT
+#    if INTPTR_MAX == INT32_MAX
+#        define CERBLIB_64BIT 0
+#    else
+#        define CERBLIB_64BIT 1
+#    endif
+#endif /* CERBLIB_64BIT */
+
 #ifndef CERBLIB_INLINE
 #    if defined(_MSC_VER)
 #        define CERBLIB_INLINE __forceinline

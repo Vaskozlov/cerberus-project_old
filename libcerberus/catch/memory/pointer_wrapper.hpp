@@ -5,7 +5,7 @@
 
 namespace cerb::debug
 {
-    auto pointerWrapperTest(u32 = 1) -> int;
+    auto testPointerWrapper(u32 = 1) -> int;
 }
 
 #endif /* CERBERUS_CATCH_POINTER_WRAPPER_HPP */

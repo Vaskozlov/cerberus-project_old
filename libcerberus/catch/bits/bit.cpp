@@ -1,5 +1,6 @@
 #include "bit.hpp"
 #include "abs.hpp"
+#include "bit_scan.hpp"
 #include "log2.hpp"
 #include "min_max.hpp"
 #include "pow2.hpp"
@@ -20,16 +21,6 @@ namespace cerb::debug
         EXPECT_TRUE(mask.getAsInt() == 0xFFFFFF);
     }
 
-    constexpr auto testBitScan() -> bool
-    {
-        EXPECT_TRUE(bit::scanForward<1>(0b1000U) == 3);
-        EXPECT_TRUE(bit::scanForward<1>(0b1001U) == 0);
-        EXPECT_TRUE(bit::scanReverse<1>(0b1000U) == 3);
-        EXPECT_TRUE(bit::scanReverse<1>(0b1001U) == 3);
-
-        return true;
-    }
-
     auto testBit(u32) -> int
     {
         testAbs();
@@ -37,7 +28,7 @@ namespace cerb::debug
         testLog2();
         testMinMax();
         testByteMask();
-        CR_EXPECT_TRUE(testBitScan());
+        testBitScan();
         return 0;
     }
 }// namespace cerb::debug

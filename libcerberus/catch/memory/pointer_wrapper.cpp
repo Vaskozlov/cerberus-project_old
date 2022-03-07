@@ -4,7 +4,7 @@
 
 namespace cerb::debug
 {
-    auto pointerWrapperTest(u32) -> int
+    auto testPointerWrapper(u32) -> int
     {
         auto pointer = createRandomArrayOfInts<int>(100);
         auto pointer_wrapper = RawPointerWrapper<int>(pointer.get(), 100);

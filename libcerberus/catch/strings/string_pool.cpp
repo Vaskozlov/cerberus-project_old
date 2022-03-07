@@ -3,7 +3,7 @@
 
 namespace cerb::debug
 {
-    auto stringPoolTest() -> int
+    auto testStringPool() -> int
     {
         StringPool<char, unsigned> string_pool({ { "Hello", 0 }, { "World", 1 } });
 

@@ -134,7 +134,13 @@ namespace cerb
             }
         }
 #endif
-        std::ranges::fill(dest, value);
+        if constexpr (IsAnyOfV<GetValueType<T>, u8, i8>) {
+            // stdlibc++ uses __builtin_memset for chars, so
+            // std::ranges::fill does not work at compile time
+            std::fill(dest.begin(), dest.end(), value);
+        } else {
+            std::ranges::fill(dest, value);
+        }
     }
 
     template<typename T>
@@ -186,7 +192,7 @@ namespace cerb
         if CERBLIB_COMPILE_TIME {
             size_t counter = 0;
 
-            while (*location != value && counter != limit) {
+            while (counter != limit && *location != value) {
                 ++location;
                 ++counter;
             }

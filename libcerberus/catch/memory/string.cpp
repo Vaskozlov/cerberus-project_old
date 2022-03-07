@@ -4,69 +4,75 @@
 
 namespace cerb::debug
 {
-    auto stringViewFindTest() -> void
+    CERBLIB_DECL auto testFindOnStringView()->bool
     {
-        using namespace std::string_view_literals;
+        std::string_view str = "hello, world!";
 
-        std::string_view const str = "hello, world!"sv;
         EXPECT_TRUE(find(str, '\0') == str.end());
         EXPECT_TRUE(find(str, '\1') >= str.end());
+
+        return true;
     }
 
-    auto u16StringViewFindTest() -> void
+    CERBLIB_DECL auto testFindOnUtf16StringView()->bool
     {
-        using namespace std::string_view_literals;
+        std::u16string_view str = u"hello, world!";
 
-        std::u16string_view const str = u"hello, world!"sv;
         EXPECT_TRUE(find(str.data(), u'\0', str.size()) == (str.data() + str.size()));
         EXPECT_TRUE(find(str.data(), u'\1', str.size()) >= (str.data() + str.size()));
         EXPECT_TRUE(find(str, u'\0') == str.end());
         EXPECT_TRUE(find(str, u'\1') >= str.end());
+
+        return true;
     }
 
-    auto wstringViewFindTest() -> void
+    CERBLIB_DECL auto testFindOnWstringView()->bool
     {
-        using namespace std::string_view_literals;
+        std::wstring_view str = L"hello, world!";
 
-        std::wstring_view const str = L"hello, world!"sv;
         EXPECT_TRUE(find(str.data(), L'\0', str.size()) == (str.data() + str.size()));
         EXPECT_TRUE(find(str.data(), L'\1', str.size()) >= (str.data() + str.size()));
         EXPECT_TRUE(find(str, L'\0') == str.end());
         EXPECT_TRUE(find(str, L'\1') >= str.end());
+
+        return true;
     }
 
-    auto arrayOfIntFindTest() -> void
+    CERBLIB_DECL auto testFindOnArrayOfInts() -> bool
     {
-        std::array array_of_integrals = { -10, -20, 400, 14, 0, 123 };
+        std::array integrals = { -10, -20, 400, 14, 0, 123 };
 
-        EXPECT_TRUE(find(array_of_integrals, 123) == array_of_integrals.end() - 1);
+        EXPECT_TRUE(find(integrals, 123) == integrals.end() - 1);
         EXPECT_TRUE(
-            find(array_of_integrals.data(), 123, array_of_integrals.size()) ==
-            (array_of_integrals.data() + array_of_integrals.size() - 1));
+            find(integrals.data(), 123, integrals.size()) ==
+            (integrals.data() + integrals.size() - 1));
 
-        EXPECT_TRUE(find(array_of_integrals, 500) >= array_of_integrals.end());
+        EXPECT_TRUE(find(integrals, 500) >= integrals.end());
         EXPECT_TRUE(
-            find(array_of_integrals.data(), 500, array_of_integrals.size()) >=
-            (array_of_integrals.data() + array_of_integrals.size()));
+            find(integrals.data(), 500, integrals.size()) >= (integrals.data() + integrals.size()));
+
+        return true;
     }
 
-    auto arrayOfPairsFindTest() -> void
+    CERBLIB_DECL auto testFindOnArrayOfPairs() -> bool
     {
-        std::array<Pair<i32, i32>, 6> array_of_pairs = {
+        std::array<Pair<i32, i32>, 6> pairs = {
             { { -10, 10 }, { -20, 30 }, { 400, 400 }, { 14, 0 }, { 1, 0 }, { 123, 123 } }
         };
 
-        EXPECT_TRUE(find(array_of_pairs, { 123, 123 }) == array_of_pairs.end() - 1);
-        EXPECT_TRUE(find(array_of_pairs, { 123, 123 }) == array_of_pairs.end() - 1);
+        EXPECT_TRUE(find(pairs, { 123, 123 }) == pairs.end() - 1);
+        EXPECT_TRUE(find(pairs, { 123, 123 }) == pairs.end() - 1);
+
+        return true;
     }
 
-    auto stringTest(u32) -> int
+    auto testStringOperations(u32) -> int
     {
-        stringViewFindTest();
-        u16StringViewFindTest();
-        wstringViewFindTest();
-        arrayOfIntFindTest();
-        arrayOfPairsFindTest();
+        CR_EXPECT_TRUE(testFindOnStringView());
+        CR_EXPECT_TRUE(testFindOnUtf16StringView());
+        CR_EXPECT_TRUE(testFindOnWstringView());
+        CR_EXPECT_TRUE(testFindOnArrayOfInts());
+        CR_EXPECT_TRUE(testFindOnArrayOfPairs());
         return 0;
     }
 }// namespace cerb::debug

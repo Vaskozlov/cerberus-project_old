@@ -163,7 +163,7 @@ namespace cerb
     template<typename T>
     CERBLIB_DECL auto safeNotEqual(T lhs, T rhs) -> bool
     {
-        if constexpr (std::is_floating_point_v<T>) {
+        if constexpr (std::floating_point<T>) {
             return abs(lhs - rhs) > std::numeric_limits<T>::epsilon();
         } else {
             return lhs != rhs;
@@ -171,23 +171,19 @@ namespace cerb
     }
 
     template<std::unsigned_integral UInt>
-    CERBLIB_DECL auto log2(UInt number) -> size_t
+    CERBLIB_DECL auto log2(UInt number) -> ssize_t
     {
-        return bit::scanForward<1>(number);
-    }
-
-    CERBLIB_DECL auto log2(f32 number) -> ssize_t
-    {
-        if (number <= 0.0f) {
+        if (number == 0) {
             return -1;
         }
 
-        return getExponent(number);
+        return static_cast<ssize_t>(bit::scanForward<1>(number));
     }
 
-    CERBLIB_DECL auto log2(f64 number) -> ssize_t
+    template<std::floating_point Float>
+    CERBLIB_DECL auto log2(Float number) -> ssize_t
     {
-        if (number <= 0.0) {
+        if (number <= static_cast<Float>(0.0)) {
             return -1;
         }
 
