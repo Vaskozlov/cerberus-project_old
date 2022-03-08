@@ -57,37 +57,15 @@ namespace cerb
     template<typename T, typename... Ts>
     CERBLIB_DECL auto max(T arg, Ts... args) -> T
     {
-        if constexpr (sizeof...(args) == 0) {
-            return arg;
-        } else {
-            T rhs = max<T>(args...);
-
-#ifdef __clang__
-            if constexpr (std::integral<T>) {
-                std::array temporary = { arg, rhs };
-                return temporary[arg < rhs];
-            }
-#endif
-            return arg > rhs ? arg : rhs;
-        }
+        ((arg = args > arg ? args : arg), ...);
+        return arg;
     }
 
     template<typename T, typename... Ts>
     CERBLIB_DECL auto min(T arg, Ts &&...args) -> T
     {
-        if constexpr (sizeof...(args) == 0) {
-            return arg;
-        } else {
-            T rhs = min<T>(args...);
-
-#ifdef __clang__
-            if constexpr (std::integral<T>) {
-                std::array temporary = { arg, rhs };
-                return temporary[arg > rhs];
-            }
-#endif
-            return arg < rhs ? arg : rhs;
-        }
+        ((arg = args < arg ? args : arg), ...);
+        return arg;
     }
 
     template<std::floating_point T>
@@ -142,7 +120,7 @@ namespace cerb
     template<std::floating_point T>
     CERBLIB_DECL auto abs(T value) -> T
     {
-        static_assert(IsAnyOfV<T, f32, f64>, "cerb::abs supports only f32 and f64.");
+        static_assert(CanBeStoredInIntegral<T>);
 
         auto mask = asInt(value);
         mask &= std::numeric_limits<decltype(mask)>::max();
@@ -183,6 +161,8 @@ namespace cerb
     template<std::floating_point Float>
     CERBLIB_DECL auto log2(Float number) -> ssize_t
     {
+        static_assert(IsAnyOfV<Float, f32, f64>);
+
         if (number <= static_cast<Float>(0.0)) {
             return -1;
         }

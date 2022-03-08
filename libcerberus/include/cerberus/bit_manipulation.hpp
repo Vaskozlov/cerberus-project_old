@@ -2,6 +2,7 @@
 #define CERBERUS_BIT_MANIPULATION_HPP
 
 #include <cerberus/cerberus.hpp>
+#include <cerberus/number.hpp>
 #include <cerberus/type.hpp>
 
 namespace cerb::bit
@@ -27,7 +28,7 @@ namespace cerb::bit
     constexpr auto at(T const &number, size_t index) -> bool
     {
         auto bit_index = index % bitsizeof(T);
-        auto target_bit = static_cast<T>(1) << bit_index;
+        auto target_bit = pow2<size_t>(bit_index);
 
         return (number & target_bit) == target_bit;
     }
@@ -41,9 +42,9 @@ namespace cerb::bit
         auto bit_index = index % bitsizeof(ValueType);
 
         if constexpr (BitValue == 0) {
-            *(iterator + array_index) &= ~(static_cast<ValueType>(1) << bit_index);
+            *(iterator + array_index) &= ~(pow2<ValueType>(bit_index));
         } else {
-            *(iterator + array_index) |= static_cast<ValueType>(1) << bit_index;
+            *(iterator + array_index) |= pow2<ValueType>(bit_index);
         }
     }
 
@@ -53,9 +54,9 @@ namespace cerb::bit
         auto bit_index = index % bitsizeof(T);
 
         if constexpr (BitValue == 0) {
-            number &= ~(static_cast<T>(1) << bit_index);
+            number &= ~(pow2<T>(bit_index));
         } else {
-            number |= static_cast<T>(1) << bit_index;
+            number |= pow2<T>(bit_index);
         }
     }
 
@@ -63,24 +64,22 @@ namespace cerb::bit
     CERBLIB_DECL auto applyMaskOnArray(size_t index, T array_iterator) -> ValueType
     {
         ValueType result = std::numeric_limits<ValueType>::max();
+        auto process_layer_of_mask = [&array_iterator, &index, &result](ValueOfBit bit_value) {
+            switch (bit_value) {
+            case ValueOfBit::ONE:
+                result &= (*array_iterator)[index];
+                break;
 
-        forEach(
-            [&array_iterator, &index, &result](ValueOfBit bit_value) {
-                switch (bit_value) {
-                case ValueOfBit::ONE:
-                    result &= (*array_iterator)[index];
-                    break;
+            case ValueOfBit::ZERO:
+                result &= ~(*array_iterator)[index];
 
-                case ValueOfBit::ZERO:
-                    result &= ~(*array_iterator)[index];
+            default:
+                break;
+            }
+            ++array_iterator;
+        };
 
-                default:
-                    break;
-                }
-                ++array_iterator;
-            },
-            BitValues...);
-
+        forEach(process_layer_of_mask, BitValues...);
         return result;
     }
 }// namespace cerb::bit

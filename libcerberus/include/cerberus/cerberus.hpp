@@ -172,31 +172,35 @@ namespace cerb
 
     using ssize_t = intmax_t;
 
-    template<typename F, typename T>
-    constexpr auto forEach(F&& function, T&& arg) -> void
+    template<typename F, typename... Ts>
+    constexpr auto forEach(F &&function, Ts &&...args) -> size_t
     {
-        function(std::forward<T>(arg));
-    }
-
-    template<typename F, typename T, typename... Ts>
-    constexpr auto forEach(F&& function, T&& arg, Ts&&... args) -> void
-    {
-        function(std::forward<T>(arg));
-        forEach(function, std::forward<Ts>(args)...);
-    }
-  
-    template<typename... Ts>
-    CERBLIB_DECL auto logicalAnd(bool first, Ts... other) -> bool
-    {
-        forEach([&first](bool value) { first &= value; }, other...);
-        return first;
+        (function(std::forward<Ts>(args)), ...);
+        return sizeof...(args);
     }
 
     template<typename... Ts>
-    CERBLIB_DECL auto logicalOr(bool first, Ts... other) -> bool
+    CERBLIB_DECL auto sum(Ts... args) -> decltype(auto)
     {
-        forEach([&first](bool value) { first |= value; }, other...);
-        return first;
+        return (... + args);
+    }
+
+    template<typename... Ts>
+    CERBLIB_DECL auto prod(Ts... args) -> decltype(auto)
+    {
+        return (... * args);
+    }
+
+    template<typename... Ts>
+    CERBLIB_DECL auto logicalAnd(Ts... args) -> bool
+    {
+        return (... & args);
+    }
+
+    template<typename... Ts>
+    CERBLIB_DECL auto logicalOr(Ts... args) -> bool
+    {
+        return (... | args);
     }
 
     template<typename T>

@@ -28,15 +28,13 @@ namespace cerb
     CERBLIB_DECL auto isOneOf(T target_value, Ts &&...suitable_values) -> bool
     {
         bool result = false;
+        auto compare_function = [&result, &target_value]<typename U>(U const &value) {
+            if constexpr (std::convertible_to<U, T>) {
+                result = result || (static_cast<T>(value) == target_value);
+            }
+        };
 
-        forEach(
-            [&result, &target_value]<typename U>(const U &value) {
-                if constexpr (std::convertible_to<U, T>) {
-                    result = result || (static_cast<T>(value) == target_value);
-                }
-            },
-            std::forward<Ts>(suitable_values)...);
-
+        forEach(compare_function, std::forward<Ts>(suitable_values)...);
         return result;
     }
 

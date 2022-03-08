@@ -60,7 +60,7 @@ namespace cerb
         template<Iterable U>
         CERBLIB_DECL auto operator<=>(U const &other) -> decltype(auto)
         {
-            for (size_t i = 0; i < min<size_t>(size(), other.size()); ++i) {
+            for (size_t i = 0; i < min(size(), other.size()); ++i) {
                 if (*(pointer + i) != other[i]) {
                     return *(pointer + i) <=> other[i];
                 }
@@ -155,7 +155,7 @@ namespace cerb
     }
 
     template<PointerLike T>
-    CERBLIB_DECL auto wrapPointer(T &ptr, size_t len) -> RawPointerWrapper<typename T::element_type>
+    CERBLIB_DECL auto wrapPointer(T &ptr, size_t len) -> RawPointerWrapper<GetElementType<T>>
     {
         return { ptr.get(), len };
     }

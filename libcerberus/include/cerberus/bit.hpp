@@ -5,34 +5,6 @@
 
 namespace cerb::bit
 {
-    namespace private_
-    {
-        template<std::unsigned_integral T, std::unsigned_integral PowerType>
-        CERBLIB_DECL auto pow2(PowerType power_of_2) -> T
-        {
-            return static_cast<T>(1) << power_of_2;
-        }
-    }// namespace private_
-
-    template<size_t PowerOf2, std::integral T>
-    CERBLIB_DECL auto trunk(T number) -> T
-    {
-        return number & ~(private_::pow2<T>(PowerOf2) - 1);
-    }
-
-    template<size_t PowerOf2, std::integral T>
-    CERBLIB_DECL auto ceil(T number) -> T
-    {
-        return number + (private_::pow2<T>(PowerOf2) - number % private_::pow2<T>(PowerOf2));
-    }
-
-    template<u64 PowerOf2, std::integral T>
-    CERBLIB_DECL auto align(T value) -> T
-    {
-        bool const need_to_align = value % private_::pow2<T>(PowerOf2) == 0;
-        return need_to_align ? value : ceil<PowerOf2, T>(value);
-    }
-
 #ifdef _MSC_VER
     namespace msvc
     {
@@ -112,6 +84,63 @@ namespace cerb::bit
     }  // namespace msvc
 #endif /* _MSC_VER */
 
+    namespace private_
+    {
+        template<std::unsigned_integral T, std::unsigned_integral PowerType>
+        CERBLIB_DECL auto pow2(PowerType power_of_2) -> T
+        {
+            return static_cast<T>(1) << power_of_2;
+        }
+
+        template<std::unsigned_integral T>
+        CERBLIB_DECL auto systemScanForward(T value) -> size_t
+        {
+#ifdef _MSC_VER
+            if CERBLIB_COMPILE_TIME {
+                return msvc::scanForwardCompileTime<BitValue>(value);
+            } else {
+                return msvc::scanForwardRuntime<BitValue>(value);
+            }
+#else
+            return static_cast<size_t>(__builtin_ctzl(static_cast<size_t>(value)));
+#endif
+        }
+
+        template<std::unsigned_integral T>
+        CERBLIB_DECL auto systemScanReverse(T value) -> size_t
+        {
+#ifdef _MSC_VER
+            if CERBLIB_COMPILE_TIME {
+                return msvc::scanReverseCompileTime<BitValue>(value);
+            } else {
+                return msvc::scanReverseRuntime<BitValue>(value);
+            }
+#else
+            return bitsizeof(size_t) - 1UL -
+                   static_cast<size_t>(__builtin_clzl(static_cast<size_t>(value)));
+#endif
+        }
+    }// namespace private_
+
+    template<size_t PowerOf2, std::integral T>
+    CERBLIB_DECL auto trunk(T number) -> T
+    {
+        return number & ~(private_::pow2<T>(PowerOf2) - 1);
+    }
+
+    template<size_t PowerOf2, std::integral T>
+    CERBLIB_DECL auto ceil(T number) -> T
+    {
+        return number + (private_::pow2<T>(PowerOf2) - number % private_::pow2<T>(PowerOf2));
+    }
+
+    template<u64 PowerOf2, std::integral T>
+    CERBLIB_DECL auto align(T value) -> T
+    {
+        bool const need_to_align = value % private_::pow2<T>(PowerOf2) == 0;
+        return need_to_align ? value : ceil<PowerOf2, T>(value);
+    }
+
     template<unsigned BitValue, std::unsigned_integral T>
     CERBLIB_DECL auto scanForward(T value) -> size_t
     {
@@ -124,15 +153,7 @@ namespace cerb::bit
             return bitsizeof(size_t);
         }
 
-#ifdef _MSC_VER
-        if CERBLIB_COMPILE_TIME {
-            return msvc::scanForwardCompileTime<BitValue>(value);
-        } else {
-            return msvc::scanForwardRuntime<BitValue>(value);
-        }
-#else
-        return static_cast<size_t>(__builtin_ctzl(static_cast<size_t>(value)));
-#endif
+        return private_::systemScanForward(value);
     }
 
     template<unsigned BitValue, std::unsigned_integral T>
@@ -147,16 +168,7 @@ namespace cerb::bit
             return bitsizeof(size_t);
         }
 
-#ifdef _MSC_VER
-        if CERBLIB_COMPILE_TIME {
-            return msvc::scanReverseCompileTime<BitValue>(value);
-        } else {
-            return msvc::scanReverseRuntime<BitValue>(value);
-        }
-#else
-        return bitsizeof(size_t) - 1UL -
-               static_cast<size_t>(__builtin_clzl(static_cast<size_t>(value)));
-#endif
+        return private_::systemScanReverse(value);
     }
 }// namespace cerb::bit
 

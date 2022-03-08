@@ -23,14 +23,6 @@ namespace cerb::debug
 
     using PairedNumbers = Pair<ssize_t, double>;
 
-    template<Iterable T, typename... Ts>
-    constexpr auto initializerAllElement(T &source, Ts &&...args) -> void
-    {
-        auto construct = [&](auto &elem) { std::construct_at(&elem, std::forward<Ts>(args)...); };
-
-        std::ranges::for_each(source, construct);
-    }
-
     inline auto failure(bool condition, Location const &loc = CERBLIB_LOCATION) -> void
     {
         fmt::print(fmt::fg(fmt::color::red), "Cerberus test failure with code: {}! ", condition);

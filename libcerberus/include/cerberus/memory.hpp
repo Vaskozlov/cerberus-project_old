@@ -182,13 +182,16 @@ namespace cerb
     CERBLIB_DECL auto find(T const *location, cerb::AutoCopyType<T> value, size_t limit)
         -> T const *
     {
+        constexpr bool suitable_for_fast_search = CanBeStoredInIntegral<T> && std::is_trivial_v<T>;
+
 #if CERBLIB_AMD64
-        if constexpr (CanBeStoredInIntegral<T> && std::is_trivial_v<T>) {
+        if constexpr (suitable_for_fast_search) {
             if CERBLIB_RUNTIME {
                 return amd64::find(location, value, limit);
             }
         }
 #endif
+
         if CERBLIB_COMPILE_TIME {
             size_t counter = 0;
 
@@ -207,11 +210,11 @@ namespace cerb
     CERBLIB_DECL auto find(T const &iterable_class, GetValueType<T> value_to_find) -> decltype(auto)
     {
 #if CERBLIB_AMD64
-        constexpr bool can_be_find_fast = RawAccessible<T> &&
-                                          CanBeStoredInIntegral<GetValueType<T>> &&
-                                          std::is_trivially_copy_assignable_v<GetValueType<T>>;
+        constexpr bool suitable_for_fast_search = RawAccessible<T> &&
+                                                  CanBeStoredInIntegral<GetValueType<T>> &&
+                                                  std::is_trivial_v<GetValueType<T>>;
 
-        if constexpr (can_be_find_fast) {
+        if constexpr (suitable_for_fast_search) {
             if CERBLIB_RUNTIME {
                 return find(std::data(iterable_class), value_to_find, std::size(iterable_class));
             }

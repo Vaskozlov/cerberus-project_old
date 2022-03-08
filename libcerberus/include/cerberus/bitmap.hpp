@@ -45,16 +45,17 @@ namespace cerb
 
         constexpr auto clear() -> void
         {
-            std::ranges::for_each(storage, [](axis_storage_t &axis_storage) {
+            auto clear_axis = [](axis_storage_t &axis_storage) {
                 fill(axis_storage, static_cast<size_t>(0));
-            });
+            };
+
+            std::ranges::for_each(storage, clear_axis);
         }
 
         template<u16 BitValue, size_t Axis>
         constexpr auto set(size_t index) -> decltype(auto)
         {
             static_assert(Axis < AxisN);
-
             return bit::set<BitValue, size_t>(storage[Axis].begin(), index);
         }
 
@@ -69,7 +70,9 @@ namespace cerb
         constexpr auto reverseBits() -> void
         {
             static_assert(Axis < AxisN);
-            std::ranges::for_each(storage[Axis], [](size_t &value) { value = ~value; });
+
+            auto reverse_value = [](size_t &value) { value = ~value; };
+            std::ranges::for_each(storage[Axis], reverse_value);
         }
 
         template<bit::ValueOfBit... BitValues>
