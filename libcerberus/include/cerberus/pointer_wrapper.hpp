@@ -9,6 +9,8 @@ namespace cerb
     template<typename T>
     struct CERBLIB_TRIVIAL RawPointerWrapper
     {
+        using element_type = T;
+        using value_type = T;
         using iterator = T *;
         using const_iterator = T const *;
         using reverse_iterator = std::reverse_iterator<T *>;
@@ -58,7 +60,7 @@ namespace cerb
         template<Iterable U>
         CERBLIB_DECL auto operator<=>(U const &other) -> decltype(auto)
         {
-            for (size_t i = 0; i < min<size_t>(size(), other.size()); ++i) {
+            for (size_t i = 0; i < min(size(), other.size()); ++i) {
                 if (*(pointer + i) != other[i]) {
                     return *(pointer + i) <=> other[i];
                 }
@@ -145,6 +147,18 @@ namespace cerb
         T *pointer{};
         size_t length{};
     };
+
+    template<typename T>
+    CERBLIB_DECL auto wrapPointer(T *ptr, size_t len) -> RawPointerWrapper<T>
+    {
+        return { ptr, len };
+    }
+
+    template<PointerLike T>
+    CERBLIB_DECL auto wrapPointer(T &ptr, size_t len) -> RawPointerWrapper<GetElementType<T>>
+    {
+        return { ptr.get(), len };
+    }
 }// namespace cerb
 
 #endif /* CERBERUS_POINTER_WRAPPER_HPP */

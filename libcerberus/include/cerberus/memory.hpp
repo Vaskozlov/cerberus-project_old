@@ -13,9 +13,6 @@ namespace cerb
         template<typename T>
         constexpr auto fill(T *dest, T value, size_t times) -> void
         {
-            /* we need to make sure, that value is can be stored in register,
-             * and it is trivially copiable
-             */
             static_assert(CanBeStoredInIntegral<T> && std::is_trivially_copy_constructible_v<T>);
 
             if constexpr (sizeof(T) == sizeof(u8)) {
@@ -32,11 +29,8 @@ namespace cerb
         template<typename T>
         constexpr auto copy(T *dest, T const *src, size_t times) -> void
         {
-            // We need to make sure that T is trivially copiable
             static_assert(std::is_trivially_copyable_v<T>);
 
-            /* we can copy type which is bigger than register, because we can copy it in
-             * different parts*/
             if constexpr (sizeof(T) % sizeof(u64) == 0) {
                 times *= sizeof(T) / sizeof(u64);
                 asm volatile("rep movsq" : "+D"(dest), "+S"(src), "+c"(times) : : "memory");
@@ -120,7 +114,7 @@ namespace cerb
     {
 #if CERBLIB_AMD64
         if constexpr (std::is_trivially_copy_assignable_v<T> && CanBeStoredInIntegral<T>) {
-            if (!std::is_constant_evaluated()) {
+            if CERBLIB_RUNTIME {
                 return amd64::fill(dest, value, times);
             }
         }
@@ -135,12 +129,18 @@ namespace cerb
         if constexpr (
             RawAccessible<T> && ClassValueFastCopiable<T> &&
             CanBeStoredInIntegral<GetValueType<T>>) {
-            if (!std::is_constant_evaluated()) {
-                return amd64::fill(dest.getData(), value, dest.size());
+            if CERBLIB_RUNTIME {
+                return amd64::fill(std::data(dest), value, std::size(dest));
             }
         }
 #endif
-        std::ranges::fill(dest, value);
+        if constexpr (IsAnyOfV<GetValueType<T>, u8, i8>) {
+            // stdlibc++ uses __builtin_memset for chars, so
+            // std::ranges::fill does not work at compile time
+            std::fill(dest.begin(), dest.end(), value);
+        } else {
+            std::ranges::fill(dest, value);
+        }
     }
 
     template<typename T>
@@ -148,7 +148,7 @@ namespace cerb
     {
 #if CERBLIB_AMD64
         if constexpr (std::is_trivially_copy_assignable_v<T>) {
-            if (!std::is_constant_evaluated()) {
+            if CERBLIB_RUNTIME {
                 return amd64::copy(dest, src, times);
             }
         }
@@ -156,21 +156,22 @@ namespace cerb
         std::copy(src, src + times, dest);
     }
 
-    template<Iterable T, Iterable U>
-    constexpr auto copy(T &dest, U const &src) -> void
+    template<Iterable T1, Iterable T2>
+    constexpr auto copy(T1 &dest, T2 const &src) -> void
     {
-        using value_type = GetValueType<T>;
-        using value_type2 = GetValueType<U>;
+        using value_type = GetValueType<T1>;
+        using value_type2 = GetValueType<T2>;
         static_assert(std::is_same_v<value_type, value_type2>);
 
 #if CERBLIB_AMD64
-        if constexpr (
-            RawAccessible<T> && RawAccessible<U> &&
-            std::is_trivially_copy_assignable_v<value_type>) {
-            auto const length = min<GetSizeType<T>>(std::size(dest), std::size(src));
+        constexpr bool suitable_for_fast_copy = RawAccessible<T1> && RawAccessible<T2> &&
+                                                std::is_trivially_copy_assignable_v<value_type>;
 
-            if (!std::is_constant_evaluated()) {
-                return amd64::copy(dest.getData(), src.getData(), length);
+        if constexpr (suitable_for_fast_copy) {
+            auto const length = min<GetSizeType<T1>>(std::size(dest), std::size(src));
+
+            if CERBLIB_RUNTIME {
+                return amd64::copy(std::data(dest), std::size(src), length);
             }
         }
 #endif
@@ -179,29 +180,47 @@ namespace cerb
 
     template<typename T>
     CERBLIB_DECL auto find(T const *location, cerb::AutoCopyType<T> value, size_t limit)
-        -> const T *
+        -> T const *
     {
-#if CERBLIB_AMD64
-        if constexpr (CanBeStoredInIntegral<T> && std::is_trivially_copy_assignable_v<T>) {
-            return amd64::find(location, value, limit);
-        }
-#endif
-        return std::find(location, location + limit, value);
-    }
+        constexpr bool suitable_for_fast_search = CanBeStoredInIntegral<T> && std::is_trivial_v<T>;
 
-    template<Iterable T>
-    CERBLIB_DECL auto find(T const &iterable_class, GetValueType<T> value2find) -> decltype(auto)
-    {
 #if CERBLIB_AMD64
-        if constexpr (
-            RawAccessible<T> && CanBeStoredInIntegral<GetValueType<T>> &&
-            std::is_trivially_copy_assignable_v<T>) {
-            if CERBLIB_COMPILE_TIME {
-                return find(std::data(iterable_class), value2find, std::size(iterable_class));
+        if constexpr (suitable_for_fast_search) {
+            if CERBLIB_RUNTIME {
+                return amd64::find(location, value, limit);
             }
         }
 #endif
-        return std::ranges::find(iterable_class, value2find);
+
+        if CERBLIB_COMPILE_TIME {
+            size_t counter = 0;
+
+            while (counter != limit && *location != value) {
+                ++location;
+                ++counter;
+            }
+
+            return location;
+        } else {
+            return std::find(location, location + limit, value);
+        }
+    }
+
+    template<Iterable T>
+    CERBLIB_DECL auto find(T const &iterable_class, GetValueType<T> value_to_find) -> decltype(auto)
+    {
+#if CERBLIB_AMD64
+        constexpr bool suitable_for_fast_search = RawAccessible<T> &&
+                                                  CanBeStoredInIntegral<GetValueType<T>> &&
+                                                  std::is_trivial_v<GetValueType<T>>;
+
+        if constexpr (suitable_for_fast_search) {
+            if CERBLIB_RUNTIME {
+                return find(std::data(iterable_class), value_to_find, std::size(iterable_class));
+            }
+        }
+#endif
+        return std::ranges::find(iterable_class, value_to_find);
     }
 
     template<Iterable T1, Iterable T2>
@@ -215,10 +234,14 @@ namespace cerb
         }
 
 #if CERBLIB_AMD64
-        if constexpr (
-            RawAccessible<T1> && RawAccessible<T2> && CanBeStoredInIntegral<value_type> &&
-            std::is_trivial_v<value_type>) {
-            return amd64::memcmp(std::data(lhs), std::data(rhs), std::size(lhs));
+        constexpr bool can_be_fast_compared = RawAccessible<T1> && RawAccessible<T2> &&
+                                              CanBeStoredInIntegral<value_type> &&
+                                              std::is_trivial_v<value_type>;
+
+        if constexpr (can_be_fast_compared) {
+            if CERBLIB_RUNTIME {
+                return amd64::memcmp(std::data(lhs), std::data(rhs), std::size(lhs));
+            }
         }
 #endif
         return std::ranges::equal(lhs, rhs);
@@ -228,8 +251,12 @@ namespace cerb
     CERBLIB_DECL auto equal(T const *lhs, T const *rhs, size_t length) -> bool
     {
 #if CERBLIB_AMD64
-        if constexpr (CanBeStoredInIntegral<T> && std::is_trivial_v<T>) {
-            return amd64::memcmp(lhs, rhs, length);
+        constexpr bool can_be_fast_compared = CanBeStoredInIntegral<T> && std::is_trivial_v<T>;
+
+        if constexpr (can_be_fast_compared) {
+            if CERBLIB_RUNTIME {
+                return amd64::memcmp(lhs, rhs, length);
+            }
         }
 #endif
         return std::equal(lhs, lhs + length, rhs, rhs + length);

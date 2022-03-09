@@ -1,10 +1,10 @@
-#include "flat_map.hpp"
 #include <cerberus/cerberus.hpp>
+#include <cerberus/debug/debug.hpp>
 #include <cerberus/flat_map.hpp>
 
 namespace cerb::debug
 {
-    auto flatMapTest(u32) -> int
+    auto testFlatMapOfInts() -> bool
     {
         FlatMap<int, int, 4> flat_map{};
         flat_map.insert({ 10, 20 });
@@ -29,6 +29,12 @@ namespace cerb::debug
             EXPECT_TRUE(1);
         }
 
+        return true;
+    }
+
+    auto testFlatMap() -> int
+    {
+        testFlatMapOfInts();
         return 0;
     }
 }// namespace cerb::debug

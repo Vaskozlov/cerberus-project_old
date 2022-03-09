@@ -3,9 +3,9 @@
 
 #include <cerberus/debug/debug.hpp>
 
-namespace cerb::test
+namespace cerb::debug
 {
-    auto lexicalCharTest(u32 = 1) -> int;
+    auto testChar(u32 = 1) -> int;
 }
 
 #endif /* CERBERUS_CATCH_CHAR_HPP */

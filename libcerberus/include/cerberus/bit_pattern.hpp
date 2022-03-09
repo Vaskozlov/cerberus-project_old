@@ -28,7 +28,6 @@ namespace cerb
         {
             T current_bit = (static_cast<T>(1) << (input.size() - 2));
 
-            CERBLIB_UNROLL_N(2)
             for (char elem : input) {
                 if (elem == '\0') {
                     return;

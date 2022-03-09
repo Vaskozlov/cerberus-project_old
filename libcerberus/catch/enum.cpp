@@ -1,4 +1,4 @@
-#include "enum.hpp"
+#include <cerberus/debug/debug.hpp>
 #include <cerberus/enum.hpp>
 
 // NOLINTNEXTLINE
@@ -6,7 +6,7 @@ CERBERUS_ENUM(TestEnum, cerb::u32, VALUE0 = 0b1, VALUE1 = 0b10, VALUE2 = 0b100);
 
 namespace cerb::debug
 {
-    auto enumTest(u32) -> int
+    constexpr auto testSimpleEnum() -> bool
     {
         TestEnum test(TestEnum::VALUE0);
 
@@ -19,6 +19,13 @@ namespace cerb::debug
         test &= TestEnum::VALUE2;
         EXPECT_TRUE(test.get() == 0b0);
 
+        return true;
+    }
+
+    auto testEnum() -> int
+    {
+        CR_EXPECT_TRUE(testSimpleEnum());
+
         return 0;
     }
-}// namespace cerb::test
+}// namespace cerb::debug

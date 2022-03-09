@@ -40,6 +40,14 @@
 #    endif
 #endif /* CERBLIB_AMD64 */
 
+#ifndef CERBLIB_64BIT
+#    if INTPTR_MAX == INT32_MAX
+#        define CERBLIB_64BIT 0
+#    else
+#        define CERBLIB_64BIT 1
+#    endif
+#endif /* CERBLIB_64BIT */
+
 #ifndef CERBLIB_INLINE
 #    if defined(_MSC_VER)
 #        define CERBLIB_INLINE __forceinline
@@ -55,6 +63,14 @@
 #        define CERBLIB_COMPILE_TIME consteval
 #    endif
 #endif /* CERBLIB_COMPILE_TIME */
+
+#ifndef CERBLIB_RUNTIME
+#    ifndef __cpp_if_consteval
+#        define CERBLIB_RUNTIME (not std::is_constant_evaluated())
+#    else
+#        define CERBLIB_RUNTIME not consteval
+#    endif
+#endif /* CERBLIB_RUNTIME */
 
 #ifndef CERBLIB_DECL
 #    define CERBLIB_DECL [[nodiscard]] constexpr
@@ -157,26 +173,34 @@ namespace cerb
     using ssize_t = intmax_t;
 
     template<typename F, typename... Ts>
-    CERBLIB_DECL auto forEach(F &&function, Ts &&...args)
+    constexpr auto forEach(F &&function, Ts &&...args) -> size_t
     {
-        [[maybe_unused]] auto const _ = { ([&function]<typename T>(T &&value) {
-            function(std::forward<T>(value));
-            return 0;
-        })(std::forward<Ts>(args))... };
+        (function(std::forward<Ts>(args)), ...);
+        return sizeof...(args);
     }
 
     template<typename... Ts>
-    CERBLIB_DECL auto logicalAnd(bool first, Ts... other) -> bool
+    CERBLIB_DECL auto sum(Ts... args) -> decltype(auto)
     {
-        forEach([&first](bool value) { first &= value; }, other...);
-        return first;
+        return (... + args);
     }
 
     template<typename... Ts>
-    CERBLIB_DECL auto logicalOr(bool first, Ts... other) -> bool
+    CERBLIB_DECL auto prod(Ts... args) -> decltype(auto)
     {
-        forEach([&first](bool value) { first |= value; }, other...);
-        return first;
+        return (... * args);
+    }
+
+    template<typename... Ts>
+    CERBLIB_DECL auto logicalAnd(Ts... args) -> bool
+    {
+        return (... & args);
+    }
+
+    template<typename... Ts>
+    CERBLIB_DECL auto logicalOr(Ts... args) -> bool
+    {
+        return (... | args);
     }
 
     template<typename T>

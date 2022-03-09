@@ -19,6 +19,10 @@ namespace cerb
         template<Pairable PairT>
         CERBLIB_DECL auto operator==(PairT const &other) const -> bool
         {
+            static_assert(
+                std::equality_comparable_with<decltype(other.first), T1> and
+                std::equality_comparable_with<decltype(other.second), T2>);
+
             if constexpr (ComparisonRule == PairComparison::DEFAULT) {
                 return safeEqual<T1>(first, other.first) && safeEqual<T2>(second, other.second);
             } else if constexpr (ComparisonRule == PairComparison::BY_FIRST_VALUE) {
@@ -28,11 +32,14 @@ namespace cerb
             }
         }
 
-        CERBLIB_DECL auto operator==(auto const &other) const -> bool
+        template<typename U>
+        CERBLIB_DECL auto operator==(U const &other) const -> bool
         {
             static_assert(
-                ComparisonRule == PairComparison::BY_FIRST_VALUE ||
-                ComparisonRule == PairComparison::BY_SECOND_VALUE);
+                (ComparisonRule == PairComparison::BY_FIRST_VALUE &&
+                 std::equality_comparable_with<U, T1>) ||
+                (ComparisonRule == PairComparison::BY_SECOND_VALUE &&
+                 std::equality_comparable_with<U, T2>));
 
             if constexpr (ComparisonRule == PairComparison::BY_FIRST_VALUE) {
                 return safeEqual<T1>(first, other);
