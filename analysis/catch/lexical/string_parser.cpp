@@ -2,7 +2,6 @@
 
 namespace cerb::debug
 {
-
     auto testStringParserOnString() -> void
     {
         // empty
