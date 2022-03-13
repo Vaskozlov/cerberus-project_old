@@ -1,11 +1,11 @@
-#include "lexical_analyzer.hpp"
+#include <cerberus/debug/debug.hpp>
 #include <cerberus/lexical/lexical_analyzer.hpp>
 
-namespace cerb::test
+namespace cerb::debug
 {
     using namespace lex;
 
-    auto lexicalAnalyzerTest(u32) -> int
+    auto lexicalAnalyzerTest() -> int
     {
         LexicalAnalyzer<char, u32> lexical_analyzer{
             { '\'', 0 }, { '\"', 1 }, { "//", "/*", "*/" }, { { "\"u\"[0-9-]+", 2 } }, {}
@@ -16,4 +16,4 @@ namespace cerb::test
 
         return 0;
     }
-}// namespace cerb::test
+}// namespace cerb::debug

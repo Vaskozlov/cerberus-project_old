@@ -37,7 +37,7 @@ namespace cerb::lex
     template<CharacterLiteral CharT>
     CERBLIB_DECL auto isLayout(CharT chr) -> bool
     {
-        return logicalAnd(chr != CharEnum<CharT>::EoF, chr < CharEnum<CharT>::Space);
+        return logicalAnd(chr > CharEnum<CharT>::EoF, chr <= CharEnum<CharT>::Space);
     }
 
     template<CharacterLiteral CharT>

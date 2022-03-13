@@ -1,11 +1,11 @@
-#include "char.hpp"
+#include <cerberus/debug/debug.hpp>
 #include <cerberus/lex/char.hpp>
 
 namespace cerb::debug
 {
     using namespace cerb::lex;
 
-    auto testChar2Hex() -> void
+    CERBLIB_DECL auto testChar2Hex() -> bool
     {
         for (u16 i = 0; i < 10; ++i) {
             EXPECT_TRUE(HexadecimalCharsToInt<char>[static_cast<char>('0' + i)] == i);
@@ -18,9 +18,11 @@ namespace cerb::debug
         for (u16 i = 0; i < 6; ++i) {
             EXPECT_TRUE(HexadecimalCharsToInt<char>[static_cast<char>('A' + i)] == (i + 10));
         }
+
+        return true;
     }
 
-    auto u16TestChar2Hex() -> void
+    CERBLIB_DECL auto testu16Char2Hex() -> bool
     {
         for (u16 i = 0; i < 10; ++i) {
             EXPECT_TRUE(HexadecimalCharsToInt<char16_t>[u'0' + i] == i);
@@ -33,6 +35,8 @@ namespace cerb::debug
         for (u16 i = 0; i < 6; ++i) {
             EXPECT_TRUE(HexadecimalCharsToInt<char16_t>[u'A' + i] == (i + 10));
         }
+
+        return true;
     }
 
     auto testCharEnum() -> void
@@ -61,10 +65,10 @@ namespace cerb::debug
         static_assert(CharEnum<char16_t>::Underscore == u'_');
     }
 
-    auto testChar(u32) -> int
+    auto testChar() -> int
     {
-        testChar2Hex();
-        u16TestChar2Hex();
+        CR_EXPECT_TRUE(testChar2Hex());
+        CR_EXPECT_TRUE(testu16Char2Hex());
         testCharEnum();
         testCharEnumU16();
         return 0;

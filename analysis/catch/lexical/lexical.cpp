@@ -1,11 +1,22 @@
-#include "char.hpp"
-#include "text_generator.hpp"
+namespace cerb::debug
+{
+    auto testChar() -> int;
+    auto testToken() -> int;
+    auto testStringParser() -> int;
+    auto testGeneratorForText() -> int;
+    auto lexicalAnalyzerTest() -> int;
+}// namespace cerb::debug
 
-using namespace cerb::debug;
 
 auto main() -> int
 {
+    using namespace cerb::debug;
+
     testChar();
-    // testTextGenerator();
+    testToken();
+    testStringParser();
+    testGeneratorForText();
+    lexicalAnalyzerTest();
+
     return 0;
 }

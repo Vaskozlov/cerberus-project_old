@@ -1,35 +1,22 @@
-#include "string_parser.hpp"
-#include <cerberus/lexical/string_parser.hpp>
-#include <cerberus/lexical/text_generator.hpp>
+#include <cerberus/debug/debug.hpp>
 
-namespace cerb::test
+namespace cerb::debug
 {
-    using namespace lex;
 
-    auto testStringParserOnChar() -> void
+    auto testStringParserOnString() -> void
     {
-        string_view string = "\"test \\xff\\n\"";
-        TextGenerator generator{ string };
-        generator.getRawChar();
-        StringParser string_parser{ '\"', generator };
-
-        EXPECT_TRUE(string_parser.parseString() == "test \xff\n");
+        // empty
     }
 
-    auto testStringParserOnChar16() -> void
+    auto testStringParserOnUtf16String() -> void
     {
-        u16string_view string = u"\"test \\uFFFF\\xff\\n\"";
-        TextGenerator generator{ string };
-        generator.getRawChar();
-        StringParser string_parser{ u'\"', generator };
-
-        EXPECT_TRUE(string_parser.parseString() == u"test \uFFFF\xff\n");
+        // empty
     }
 
-    auto stringParserTest(u32) -> int
+    auto testStringParser() -> int
     {
-        testStringParserOnChar();
-        testStringParserOnChar16();
+        testStringParserOnString();
+        testStringParserOnUtf16String();
         return 0;
     }
-}// namespace cerb::test
+}// namespace cerb::debug
