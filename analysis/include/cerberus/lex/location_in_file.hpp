@@ -13,7 +13,7 @@ namespace cerb::lex
             return line_number;
         }
 
-        CERBLIB_DECL auto charNumber() const -> size_t
+        CERBLIB_DECL auto charPosition() const -> size_t
         {
             return char_number;
         }
@@ -23,7 +23,7 @@ namespace cerb::lex
             return char_offset;
         }
 
-        CERBLIB_DECL auto filename() -> BasicStringView<CharT> const &
+        CERBLIB_DECL auto filename() const -> BasicStringView<CharT> const &
         {
             return name_of_file;
         }
@@ -41,7 +41,7 @@ namespace cerb::lex
         }
 
         constexpr LocationInFile() = default;
-        constexpr LocationInFile(
+        constexpr explicit LocationInFile(
             BasicStringView<CharT> const &filename, size_t current_line = 1,
             size_t current_char = 1, size_t offset_from_the_begging = 0)
           : name_of_file(filename), line_number(current_line), char_number(current_char),
