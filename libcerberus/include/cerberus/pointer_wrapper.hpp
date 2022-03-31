@@ -2,6 +2,7 @@
 #define CERBERUS_POINTER_WRAPPER_HPP
 
 #include <cerberus/memory.hpp>
+#include <cerberus/range.hpp>
 #include <cerberus/type.hpp>
 
 namespace cerb
@@ -60,7 +61,7 @@ namespace cerb
         template<Iterable U>
         CERBLIB_DECL auto operator<=>(U const &other) -> decltype(auto)
         {
-            for (size_t i = 0; i < min(size(), other.size()); ++i) {
+            for (size_t i : Range(min<size_t>(size(), other.size()))) {
                 if (*(pointer + i) != other[i]) {
                     return *(pointer + i) <=> other[i];
                 }

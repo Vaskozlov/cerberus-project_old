@@ -3,6 +3,7 @@
 
 #include <cerberus/lexical/dot_item/dot_item.hpp>
 #include <cerberus/lexical/tokens/token.hpp>
+#include <cerberus/range.hpp>
 #include <future>
 #include <thread>
 
@@ -19,7 +20,7 @@ namespace cerb::lex
         using string_pool_t = StringPool<CharT, TokenType>;
         using comments_token_t = CommentsTokens<CharT>;
         using simple_token_t = SimpleToken<CharT, TokenType>;
-        using initializer_list_t = std::initializer_list<Pair<str_view_t, TokenType> const >;
+        using initializer_list_t = std::initializer_list<Pair<str_view_t, TokenType> const>;
 
         using generator_t = typename dot_item_t::generator_t;
         using parameters_pack_t = typename dot_item_t::parameters_pack_t;
@@ -166,7 +167,7 @@ namespace cerb::lex
 
         constexpr auto skipEndOfMultilineComment() -> void
         {
-            for (size_t index = 0; index < getMultilineCommentEnd().size(); ++index) {
+            for (CERBLIB_UNUSED(size_t) : Range(getMultilineCommentEnd().size())) {
                 throwOnEoF(text_generator.getRawChar());
             }
         }

@@ -68,11 +68,11 @@ namespace cerb::debug
 
     auto testStringOperations() -> int
     {
-        CR_EXPECT_TRUE(testFindOnStringView());
-        CR_EXPECT_TRUE(testFindOnUtf16StringView());
-        CR_EXPECT_TRUE(testFindOnWstringView());
-        CR_EXPECT_TRUE(testFindOnArrayOfInts());
-        CR_EXPECT_TRUE(testFindOnArrayOfPairs());
+        CERBERUS_TEST(testFindOnStringView());
+        CERBERUS_TEST(testFindOnUtf16StringView());
+        CERBERUS_TEST(testFindOnWstringView());
+        CERBERUS_TEST(testFindOnArrayOfInts());
+        CERBERUS_TEST(testFindOnArrayOfPairs());
         return 0;
     }
 }// namespace cerb::debug

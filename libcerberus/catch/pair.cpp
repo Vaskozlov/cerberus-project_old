@@ -96,9 +96,9 @@ namespace cerb::debug
 
     auto testPair() -> int
     {
-        CR_EXPECT_TRUE(testDefaultPair());
-        CR_EXPECT_TRUE(testFirstValuePair());
-        CR_EXPECT_TRUE(testSecondValuePair());
+        CERBERUS_TEST(testDefaultPair());
+        CERBERUS_TEST(testFirstValuePair());
+        CERBERUS_TEST(testSecondValuePair());
 
         testPairOnStringAndVector();
 

@@ -33,9 +33,9 @@ namespace cerb::debug
 
     auto testLog2() -> int
     {
-        CR_EXPECT_TRUE(testLog2OnInts());
-        CR_EXPECT_TRUE(testLog2OnF32());
-        CR_EXPECT_TRUE(testLog2OnF64());
+        CERBERUS_TEST(testLog2OnInts());
+        CERBERUS_TEST(testLog2OnF32());
+        CERBERUS_TEST(testLog2OnF64());
         return 0;
     }
 }// namespace cerb::debug

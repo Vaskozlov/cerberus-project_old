@@ -1,6 +1,7 @@
 #ifndef CERBERUS_RANDOM_ARRAY_HPP
 #define CERBERUS_RANDOM_ARRAY_HPP
 
+#include <cerberus/range.hpp>
 #include <memory>
 #include <random>
 
@@ -18,7 +19,7 @@ namespace cerb::debug
 
         std::unique_ptr<T[]> data = std::make_unique<T[]>(size);
 
-        for (size_t i = 0; i < size; ++i) {
+        for (size_t i : Range(size)) {
             data.get()[i] = static_cast<T>(distribution(engine));
         }
 
@@ -52,7 +53,7 @@ namespace cerb::debug
 
         std::unique_ptr<T[]> data = std::make_unique<T[]>(size);
 
-        for (size_t i = 0; i < size; ++i) {
+        for (size_t i : Range(size)) {
             data.get()[i].first = static_cast<pair_v1>(first_distribution(engine));
             data.get()[i].second = static_cast<pair_v2>(second_distribution(engine));
         }

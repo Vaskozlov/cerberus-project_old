@@ -1,4 +1,5 @@
 #include <cerberus/debug/debug.hpp>
+#include <cerberus/range.hpp>
 #include <cerberus/string_view.hpp>
 #include <string>
 
@@ -24,14 +25,6 @@ namespace cerb::debug
         EXPECT_TRUE(str_view.front() == standard_str_view.front());
         EXPECT_TRUE(str_view.at(2) == standard_str_view.at(2));
         EXPECT_TRUE(str_view.find('!') == standard_str_view.find('!'));
-        EXPECT_TRUE([&]() {
-            for (size_t i = 0; i < standard_str_view.size(); ++i) {
-                if (str_view[i] != standard_str_view[i]) {
-                    return false;
-                }
-            }
-            return true;
-        }());
 
         EXPECT_TRUE(std::ranges::equal(standard_str_view, str_view));
 
@@ -70,9 +63,9 @@ namespace cerb::debug
 
     auto testStringView() -> int
     {
-        CR_EXPECT_TRUE(testEqualStringViewComparisonWithStdStringView());
-        CR_EXPECT_TRUE(testNotEqualStringViewComparisonWithStdStringView());
-        CR_EXPECT_TRUE(testStringViewContainsAt());
+        CERBERUS_TEST(testEqualStringViewComparisonWithStdStringView());
+        CERBERUS_TEST(testNotEqualStringViewComparisonWithStdStringView());
+        CERBERUS_TEST(testStringViewContainsAt());
         return 0;
     }
 }// namespace cerb::debug

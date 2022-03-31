@@ -32,9 +32,9 @@ namespace cerb::debug
 
     auto testPow2() -> int
     {
-        CR_EXPECT_TRUE(testPow2OnInt());
-        CR_EXPECT_TRUE(testPow2OnF32());
-        CR_EXPECT_TRUE(testPow2OnF64());
+        CERBERUS_TEST(testPow2OnInt());
+        CERBERUS_TEST(testPow2OnF32());
+        CERBERUS_TEST(testPow2OnF64());
         return 0;
     }
 }// namespace cerb::debug

@@ -1,6 +1,7 @@
 #include <cerberus/debug/debug.hpp>
 #include <cerberus/debug/random_array.hpp>
 #include <cerberus/pointer_wrapper.hpp>
+#include <cerberus/range.hpp>
 
 namespace cerb::debug
 {
@@ -12,7 +13,7 @@ namespace cerb::debug
         EXPECT_TRUE(pointer_wrapper.size() == 100);
 
         EXPECT_TRUE([&]() {
-            for (size_t i = 0; i < 100; ++i) {
+            for (size_t i : Range(100U)) {
                 if (pointer.get()[i] != pointer_wrapper[i]) {
                     return false;
                 }

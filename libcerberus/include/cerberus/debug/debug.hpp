@@ -11,23 +11,23 @@
 #define EXPECT_TRUE(value) debug::expectTrue(value, CERBLIB_LOCATION)
 #define EXPECT_FALSE(value) debug::expectFalse(value, CERBLIB_LOCATION)
 
-#define CR_EXPECT_TRUE(value)                                                                      \
+#define CANT_BE_REACHED EXPECT_TRUE(false)
+#define MUST_BE_REACHED EXPECT_TRUE(true)
+
+#define CERBERUS_TEST(value)                                                                       \
     static_assert(value);                                                                          \
     EXPECT_TRUE(value)
-#define CR_EXPECT_FALSE(value) static_assert(not (value); EXPECT_FALSE(value)
 
 namespace cerb::debug
 {
     CERBERUS_EXCEPTION(RuntimeError);
     CERBERUS_EXCEPTION(CompileTimeError);
 
-    using PairedNumbers = Pair<ssize_t, double>;
-
     inline auto failure(bool condition, Location const &loc = CERBLIB_LOCATION) -> void
     {
-        fmt::print(fmt::fg(fmt::color::red), "Cerberus test failure with code: {}! ", condition);
-        fmt::print("File: {}, getLine: {}\n", loc.getFilename(), loc.getLine());
-        throw RuntimeError();
+        throw RuntimeError(fmt::format(
+            "Cerberus test failure with code: {}! File: {}, getLine: {}\n", condition,
+            loc.getFilename(), loc.getLine()));
     }
 
     template<std::integral T>

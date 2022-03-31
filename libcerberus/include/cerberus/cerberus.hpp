@@ -155,6 +155,10 @@
 #    endif
 #endif /* CERBLIB_CLANG_ENABLE_WARNING */
 
+#ifndef CERBLIB_UNUSED
+#    define CERBLIB_UNUSED(x) [[maybe_unused]] x _
+#endif /* CERBLIB_UNUSED */
+
 namespace cerb
 {
     using u8 = std::uint8_t;
@@ -170,7 +174,28 @@ namespace cerb
     using f32 = float;
     using f64 = double;
 
+    using uint = unsigned int;
     using ssize_t = intmax_t;
+
+    constexpr auto operator"" _u8(unsigned long long value) -> u8
+    {
+        return static_cast<u8>(value);
+    }
+
+    constexpr auto operator"" _u16(unsigned long long value) -> u16
+    {
+        return static_cast<u16>(value);
+    }
+
+    constexpr auto operator"" _u32(unsigned long long value) -> u32
+    {
+        return static_cast<u32>(value);
+    }
+
+    constexpr auto operator"" _u64(unsigned long long value) -> u64
+    {
+        return static_cast<u64>(value);
+    }
 
     template<typename F, typename... Ts>
     constexpr auto forEach(F &&function, Ts &&...args) -> size_t

@@ -4,6 +4,7 @@ namespace cerb::debug
     auto testFlatMap() -> int;
     auto testForEach() -> int;
     auto testPair() -> int;
+    auto testRange() -> int;
 
     auto testBit() -> int;
     auto memoryTest() -> int;
@@ -14,13 +15,15 @@ auto main() -> int
 {
     using namespace cerb::debug;
 
-    testPair();
-    testBit();
-    memoryTest();
-    testStringModule();
     testEnum();
     testFlatMap();
     testForEach();
+    testPair();
+    testRange();
+
+    testBit();
+    memoryTest();
+    testStringModule();
 
     return 0;
 }
