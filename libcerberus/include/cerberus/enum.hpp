@@ -94,7 +94,7 @@
                                                                                                    \
         constexpr auto operator<=>(name const &other) const = default;                             \
                                                                                                    \
-        name() = default;                                                                \
+        name() = default;                                                                          \
         constexpr name(type value2set) : value(cast(value2set))                                    \
         {}                                                                                         \
                                                                                                    \
