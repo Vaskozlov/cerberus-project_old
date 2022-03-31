@@ -1,23 +1,21 @@
 #include <cerberus/debug/debug.hpp>
 #include <cerberus/lex/generator_for_text.hpp>
+#include <cerberus/range.hpp>
 
 namespace cerb::debug
 {
     using namespace lex;
 
+    constexpr static std::string_view TestInput =
+        "    \t\tHello, World! \nIt's a test "
+        "\t\t  string.";
+
     auto testRawGeneratorForText() -> void
     {
-        constexpr static std::string_view expected_text =
-            "    \t\tHello, World! \nIt's a test "
-            "\t\t  string.";
+        GeneratorForText<char> text_generator(TestInput, "None");
 
-        GeneratorForText<char> text_generator(
-            "    "
-            "\t\tHello, World! \nIt's a test \t\t  string.",
-            "None");
-
-        for (size_t i = 0; i < expected_text.size(); ++i) {
-            EXPECT_TRUE(text_generator.getRawChar() == expected_text[i]);
+        for (size_t i : Range(TestInput.size())) {
+            EXPECT_TRUE(text_generator.getRawChar() == TestInput[i]);
         }
 
         EXPECT_TRUE(isEoF(text_generator.getRawChar()));
@@ -25,12 +23,11 @@ namespace cerb::debug
 
         try {
             [[maybe_unused]] char _ = text_generator.getCurrentChar(1);
-            EXPECT_TRUE(false);
+            CANT_BE_REACHED;
         } catch (TextGeneratorError const &) {
-            EXPECT_TRUE(true);
+            MUST_BE_REACHED;
         }
     }
-
 
     auto testCleanGeneratorForText() -> void
     {
@@ -66,14 +63,11 @@ namespace cerb::debug
             "",        // t.
         };
 
-        GeneratorForText<char> text_generator(
-            "    "
-            "\t\tHello, World! \nIt's a test \t\t  string.",
-            "None");
+        GeneratorForText<char> text_generator(TestInput, "None");
 
         EXPECT_TRUE(isEoF(text_generator.getCurrentChar()));
 
-        for (size_t i = 0; i < 28; ++i) {
+        for (u32 i : Range(28U)) {
             char chr = text_generator.getCleanChar();
             EXPECT_TRUE(chr == expected_text[i]);
             EXPECT_TRUE(text_generator.getTabsAndSpaces() == expected_tabs_and_spaces[i]);
@@ -84,9 +78,9 @@ namespace cerb::debug
 
         try {
             [[maybe_unused]] char _ = text_generator.getCurrentChar(1);
-            EXPECT_TRUE(false);
+            CANT_BE_REACHED;
         } catch (TextGeneratorError const &) {
-            EXPECT_TRUE(true);
+            MUST_BE_REACHED;
         }
     }
 

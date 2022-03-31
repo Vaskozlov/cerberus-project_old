@@ -5,8 +5,8 @@ namespace cerb::debug
     auto testStringParser() -> int;
     auto testGeneratorForText() -> int;
     auto lexicalAnalyzerTest() -> int;
+    auto testStringToCodes() -> int;
 }// namespace cerb::debug
-
 
 auto main() -> int
 {
@@ -17,6 +17,7 @@ auto main() -> int
     testStringParser();
     testGeneratorForText();
     lexicalAnalyzerTest();
+    testStringToCodes();
 
     return 0;
 }

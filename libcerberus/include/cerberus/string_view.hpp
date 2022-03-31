@@ -3,6 +3,7 @@
 
 #include <cerberus/cerberus.hpp>
 #include <cerberus/memory.hpp>
+#include <cerberus/range.hpp>
 #include <cerberus/type.hpp>
 #include <string_view>
 
@@ -154,7 +155,7 @@ namespace cerb
         template<StringType T>
         CERBLIB_DECL auto operator<=>(T const &other) const
         {
-            for (size_t i = 0; i < min<size_type>(length, std::size(other)); ++i) {
+            for (size_t i : Range(min<size_type>(length, std::size(other)))) {
                 if (at(i) != other.at(i)) {
                     return at(i) <=> other.at(i);
                 }
@@ -179,6 +180,10 @@ namespace cerb
 
         template<unsigned long Size>// NOLINTNEXTLINE
         constexpr BasicStringView(CharT const (&str)[Size]) : length(Size), string(str)
+        {}
+
+        template<StringType T>// NOLINTNEXTLINE
+        constexpr BasicStringView(T const &str) : length(std::size(str)), string(std::data(str))
         {}
 
     private:

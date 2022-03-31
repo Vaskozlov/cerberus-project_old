@@ -33,8 +33,8 @@ namespace cerb::debug
 
     auto testAbs() -> int
     {
-        CR_EXPECT_TRUE(testAbsOnInts());
-        CR_EXPECT_TRUE(testAbsOnFloats());
+        CERBERUS_TEST(testAbsOnInts());
+        CERBERUS_TEST(testAbsOnFloats());
         return 0;
     }
 }// namespace cerb::debug

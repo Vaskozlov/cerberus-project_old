@@ -31,8 +31,8 @@ namespace cerb::debug
 
     auto testEqual() -> int
     {
-        CR_EXPECT_TRUE(testEqualOnSimpleArray());
-        CR_EXPECT_TRUE(testEqualOnString());
+        CERBERUS_TEST(testEqualOnSimpleArray());
+        CERBERUS_TEST(testEqualOnString());
         return 0;
     }
 }// namespace cerb::debug

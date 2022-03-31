@@ -6,6 +6,7 @@
 #include <cerberus/lexical/file_location.hpp>
 #include <cerberus/lexical/lexical_exceptions.hpp>
 #include <cerberus/lexical/text_generator.hpp>
+#include <cerberus/range.hpp>
 #include <cerberus/string_view.hpp>
 #include <string>
 
@@ -133,7 +134,7 @@ namespace cerb::lex
         {
             CharT resulted_char = chars_enum_t::EoF;
 
-            for (size_t i = 0; i < length; ++i) {
+            for (CERBLIB_UNUSED(size_t) : Range(length)) {
                 incAndCheckThatStringDoesNotEnd();
                 resulted_char *= cast(notation);
                 resulted_char += tryToConvertCharToInt(notation);

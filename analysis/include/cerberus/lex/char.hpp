@@ -16,7 +16,7 @@ namespace cerb::lex
         CharEnum, CharT, EoF = CCHAR('\0'), Tab = CCHAR('\t'),// NOLINT
         NewLine = CCHAR('\n'), CarriageReturn = CCHAR('\r'), Space = CCHAR(' '),
         Underscore = CCHAR('_'), DQM = CCHAR('\"'), Apostrophe = CCHAR('\''),
-        Backslash = CCHAR('\\'));
+        Backlash = CCHAR('\\'));
 
     template<CharacterLiteral CharT>
     constexpr FlatMap<CharT, u16, 22> HexadecimalCharsToInt{

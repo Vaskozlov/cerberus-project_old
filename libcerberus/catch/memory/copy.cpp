@@ -47,8 +47,8 @@ namespace cerb::debug
 
     auto testCopy() -> int
     {
-        CR_EXPECT_TRUE(testCopyOnArray());
-        CR_EXPECT_TRUE(testCopyOnPointer());
+        CERBERUS_TEST(testCopyOnArray());
+        CERBERUS_TEST(testCopyOnPointer());
         return 0;
     }
 }// namespace cerb::debug

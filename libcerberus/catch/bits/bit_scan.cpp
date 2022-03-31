@@ -19,8 +19,8 @@ namespace cerb::debug
 
     auto testBitScan() -> int
     {
-        CR_EXPECT_TRUE(testBitScanForward());
-        CR_EXPECT_TRUE(testBitScanReverse());
+        CERBERUS_TEST(testBitScanForward());
+        CERBERUS_TEST(testBitScanReverse());
 
         return 0;
     }

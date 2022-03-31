@@ -25,7 +25,7 @@ namespace cerb::debug
 
     auto testForEach() -> int
     {
-        CR_EXPECT_TRUE(testForEachOnInts());
+        CERBERUS_TEST(testForEachOnInts());
         return 0;
     }
 }// namespace cerb::debug

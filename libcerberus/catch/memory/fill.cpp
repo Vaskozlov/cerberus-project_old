@@ -83,10 +83,10 @@ namespace cerb::debug
 
     auto testFill() -> int
     {
-        CR_EXPECT_TRUE(testFillOnArrayOfInts());
-        CR_EXPECT_TRUE(testFillOnArrayOfFloats());
-        CR_EXPECT_TRUE(testFillOnPointerOfInts());
-        CR_EXPECT_TRUE(testFillOnPointerOfFloats());
+        CERBERUS_TEST(testFillOnArrayOfInts());
+        CERBERUS_TEST(testFillOnArrayOfFloats());
+        CERBERUS_TEST(testFillOnPointerOfInts());
+        CERBERUS_TEST(testFillOnPointerOfFloats());
 
         EXPECT_TRUE(testFillOnArrayOfStrings());
         EXPECT_TRUE(testFillOnPointerOfStrings());

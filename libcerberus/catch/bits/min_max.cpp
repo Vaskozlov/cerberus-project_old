@@ -19,8 +19,8 @@ namespace cerb::debug
 
     auto testMinMax() -> int
     {
-        CR_EXPECT_TRUE(testMinMaxOnInts());
-        CR_EXPECT_TRUE(testMinMaxOnFloats());
+        CERBERUS_TEST(testMinMaxOnInts());
+        CERBERUS_TEST(testMinMaxOnFloats());
         return 0;
     }
 }// namespace cerb::debug

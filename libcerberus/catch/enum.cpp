@@ -24,7 +24,7 @@ namespace cerb::debug
 
     auto testEnum() -> int
     {
-        CR_EXPECT_TRUE(testSimpleEnum());
+        CERBERUS_TEST(testSimpleEnum());
 
         return 0;
     }

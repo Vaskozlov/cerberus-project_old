@@ -89,10 +89,10 @@ namespace cerb::debug
 
     auto testBitmap() -> int
     {
-        CR_EXPECT_TRUE(testBitMapSet());
-        CR_EXPECT_TRUE(testBitMapAt());
-        CR_EXPECT_TRUE(testBitMapClear());
-        CR_EXPECT_TRUE(testBitMapFind());
+        CERBERUS_TEST(testBitMapSet());
+        CERBERUS_TEST(testBitMapAt());
+        CERBERUS_TEST(testBitMapClear());
+        CERBERUS_TEST(testBitMapFind());
         return 0;
     }
 }// namespace cerb::debug
