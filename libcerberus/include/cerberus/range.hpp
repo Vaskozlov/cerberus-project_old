@@ -53,7 +53,7 @@ namespace cerb
             return reverse_iterator(end());
         }
 
-        constexpr Range() = default;
+        Range() = default;
 
         constexpr explicit Range(T to) : end_of_range(to)
         {}
@@ -140,7 +140,7 @@ namespace cerb
             }
         }
 
-        constexpr iterator() = default;
+        iterator() = default;
         constexpr iterator(T current_state, T inc) : state(current_state), increment(inc)
         {}
 

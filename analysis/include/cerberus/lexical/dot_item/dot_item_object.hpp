@@ -68,7 +68,7 @@ namespace cerb::lex
             return ScanStatus::SUCCESS;
         }
 
-        constexpr DotItemObject() = default;
+        DotItemObject() = default;
         constexpr virtual ~DotItemObject() = default;
 
         constexpr explicit DotItemObject(

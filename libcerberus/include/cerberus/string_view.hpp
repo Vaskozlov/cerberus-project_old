@@ -164,7 +164,7 @@ namespace cerb
             return length <=> std::size(other);
         }
 
-        constexpr BasicStringView() = default;
+        BasicStringView() = default;
 
         // NOLINTNEXTLINE
         constexpr BasicStringView(CharT const *str) : length(strlen(str)), string(str)

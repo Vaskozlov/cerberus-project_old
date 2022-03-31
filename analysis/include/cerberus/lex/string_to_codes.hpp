@@ -80,7 +80,7 @@ namespace cerb::lex
             throw StringToCodesTranslationError("Unable to close string!");
         }
 
-        constexpr StringToCodes() = default;
+        StringToCodes() = default;
         constexpr StringToCodes(CharT string_opener, BasicStringView<CharT> const &str)
           : parsing_text(str), string_begin_char(string_opener)
         {}

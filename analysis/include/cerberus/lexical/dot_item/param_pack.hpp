@@ -44,7 +44,7 @@ namespace cerb::lex
             return generator_for_text.getCurrentStateString();
         }
 
-        constexpr ParametersPack() = default;
+        ParametersPack() = default;
         constexpr ParametersPack(
             string_pool_t const &list_of_terminals, comments_token_t const &tokens_for_comments,
             generator_t const &txt_generator, simple_token_t const &token_for_char,

@@ -93,7 +93,7 @@ namespace cerb::lex
             return text[getOffset()];
         }
 
-        constexpr GeneratorForText() = default;
+        GeneratorForText() = default;
         constexpr GeneratorForText(
             BasicStringView<CharT> const &file_content,
             BasicStringView<FileNameT> const &name_of_file)

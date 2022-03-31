@@ -108,7 +108,7 @@ namespace cerb
             return searched_elem->second;
         }
 
-        constexpr FlatMap() = default;
+        FlatMap() = default;
         constexpr FlatMap(std::initializer_list<value_type> const &storage_values)
         {
             auto insert_value = [this](value_type const &value) { this->insert(value); };
