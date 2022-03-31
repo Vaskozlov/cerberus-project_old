@@ -18,6 +18,11 @@ namespace cerb::lex
             return parsing_text[index];
         }
 
+        CERBLIB_DECL auto getFutureChar() const -> CharT
+        {
+            return parsing_text[index + 1];
+        }
+
         constexpr auto nextChar() -> void
         {
             ++index;
@@ -46,7 +51,7 @@ namespace cerb::lex
         }
 
         template<std::integral T>
-        static constexpr auto cast(T value) -> void
+        static constexpr auto cast(T value) -> CharT
         {
             return static_cast<CharT>(value);
         }
@@ -77,7 +82,7 @@ namespace cerb::lex
 
         constexpr StringToCodes() = default;
         constexpr StringToCodes(CharT string_opener, BasicStringView<CharT> const &str)
-          : string_begin_char(string_opener), parsing_text(str)
+          : parsing_text(str), string_begin_char(string_opener)
         {}
 
     private:
@@ -135,29 +140,17 @@ namespace cerb::lex
             }
         }
 
-        CERBLIB_DECL auto parseOctalChar(u32 length) -> CharT
-        {
-            return convertStringToChar(8, length);
-        }
-
-        CERBLIB_DECL auto parseHexChar(u32 length) -> CharT
-        {
-            return convertStringToChar(16, length);
-        }
-
         CERBLIB_DECL auto convertStringToChar(u32 notation, u32 length) -> CharT
         {
             CharT resulted_char = CharEnum<CharT>::EoF;
 
-            for (u32 i = 0; i < length; ++i) {
-                auto chr = getNextCharAndCheckForEoF();
-
-                if (isNotSuitableForNotation(chr, notation)) {
+            for (CERBLIB_UNUSED(u32) : Range(length)) {
+                if (isNotSuitableForNotation(getFutureChar(), notation)) {
                     break;
                 }
 
                 resulted_char *= cast(notation);
-                resulted_char += convertSymbolToInt(chr);
+                resulted_char += convertSymbolToInt(getNextCharAndCheckForEoF());
             }
 
             return resulted_char;
@@ -170,12 +163,12 @@ namespace cerb::lex
             }
 
             auto code = convertSymbolToInt(chr);
-            return code >= notation;
+            return static_cast<i32>(code) >= static_cast<i32>(notation);
         }
 
         CERBLIB_DECL static auto convertSymbolToInt(CharT chr) -> CharT
         {
-            return hexadecimal_chars[chr];
+            return cast(hexadecimal_chars[chr]);
         }
 
         static constexpr auto hexadecimal_chars = HexadecimalCharsToInt<CharT>;
