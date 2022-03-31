@@ -103,7 +103,7 @@ namespace cerb::lex
             }
         }
 
-        constexpr TextGenerator() = default;
+        TextGenerator() = default;
         constexpr explicit TextGenerator(
             str_view_t const &text_data,
             cerb::string_view const &filename = {})

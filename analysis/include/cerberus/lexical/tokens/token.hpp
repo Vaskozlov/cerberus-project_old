@@ -86,7 +86,7 @@ namespace cerb::lex
             prefixes_and_postfixes.emplace_back(prefix_repr, variant_t::POSTFIX);
         }
 
-        constexpr Token() = default;
+        Token() = default;
         constexpr Token(
             TokenType type_of_token, LocationInFile const &location_in_file,
             str_view_t const &repr_of_token, TextGenerator<CharT> const &txt_manager)

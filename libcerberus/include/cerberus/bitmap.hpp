@@ -93,7 +93,7 @@ namespace cerb
             return npos;
         }
 
-        constexpr ConstBitmap() = default;
+        ConstBitmap() = default;
 
     private:
         template<bit::ValueOfBit... BitValues>

@@ -84,7 +84,7 @@ namespace cerb
             return *this;
         }
 
-        constexpr Pair() = default;
+        Pair() = default;
 
         constexpr explicit Pair(T1 const &first_value) : first(first_value), second()
         {}

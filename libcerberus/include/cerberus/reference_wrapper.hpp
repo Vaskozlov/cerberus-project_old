@@ -34,7 +34,7 @@ namespace cerb
             return reference;
         }
 
-        constexpr ReferenceWrapper() = default;
+        ReferenceWrapper() = default;
         constexpr explicit ReferenceWrapper(T &ref) : reference(&ref)
         {}
 

@@ -84,7 +84,7 @@ namespace cerb
             return true;
         }
 
-        constexpr StringPool() = default;
+        StringPool() = default;
         constexpr StringPool(std::initializer_list<value_type> const &nodes) : available_chars(4)
         {
             auto emplace_node = [this](value_type const &node) { this->emplace(node); };
