@@ -5,7 +5,7 @@ namespace cerb::debug
 {
     using namespace lex;
 
-    auto lexicalAnalyzerTest() -> int
+    auto testLexicalAnalyzer() -> int
     {
         LexicalAnalyzer<char, u32> lexical_analyzer{
             { '\'', 0 }, { '\"', 1 }, { "//", "/*", "*/" }, { { "\"u\"[0-9-]+", 2 } }, {}
