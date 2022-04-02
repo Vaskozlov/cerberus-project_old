@@ -57,7 +57,12 @@ namespace cerb::lex
         }
 
     public:
-        constexpr auto parseString() -> std::basic_string<CharT> const &
+        CERBLIB_DECL auto getProcessedLength() const -> size_t
+        {
+            return index;
+        }
+
+        constexpr auto parseString() -> std::basic_string<CharT> &
         {
             if (not isBeginOfString(getChar())) {
                 throw StringToCodesTranslationError("Unable to open string!");
@@ -70,22 +75,28 @@ namespace cerb::lex
                     return parsed_string;
                 }
 
-                if (chr == CharEnum<CharT>::Backlash) {
-                    parseEscapeSequence();
-                } else {
-                    parsed_string.push_back(chr);
-                }
+                processChar(chr);
             }
 
             throw StringToCodesTranslationError("Unable to close string!");
         }
 
         StringToCodes() = default;
+
         constexpr StringToCodes(CharT string_opener, BasicStringView<CharT> const &str)
           : parsing_text(str), string_begin_char(string_opener)
         {}
 
     private:
+        constexpr auto processChar(CharT chr) -> void
+        {
+            if (chr == CharEnum<CharT>::Backlash) {
+                parseEscapeSequence();
+            } else {
+                parsed_string.push_back(chr);
+            }
+        }
+
         constexpr auto parseEscapeSequence() -> void
         {
             CharT chr = getNextCharAndCheckForEoF();

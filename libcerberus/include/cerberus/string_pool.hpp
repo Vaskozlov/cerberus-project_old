@@ -8,20 +8,21 @@
 
 namespace cerb
 {
-    template<CharacterLiteral CharT, typename TokenType>
+    template<CharacterLiteral CharT, typename TokenType, bool UseStdString = false>
     struct StringPool
     {
         constexpr static u32 number_of_chars = pow2<u32>(bitsizeof(CharT));
 
-        using str_view_t = BasicStringView<CharT>;
-        using tokens_storage_t = std::map<str_view_t, TokenType>;
+        using str_t =
+            std::conditional_t<UseStdString, std::basic_string<CharT>, BasicStringView<CharT>>;
+        using tokens_storage_t = std::map<str_t, TokenType>;
         using strings_storage_t = std::vector<ConstBitmap<1, number_of_chars>>;
 
         using node_type = typename tokens_storage_t::node_type;
         using value_type = typename tokens_storage_t::value_type;
         using string_storage_const_iterator = typename strings_storage_t::const_iterator;
 
-        constexpr auto insert(str_view_t const &string) -> decltype(auto)
+        constexpr auto insert(str_t const &string) -> decltype(auto)
         {
             addStringToBitmap(string);
             return tokens_by_strings.insert(string);
@@ -48,12 +49,12 @@ namespace cerb
             return tokens_by_strings.insert(node);
         }
 
-        constexpr auto operator[](str_view_t const &string) const -> TokenType
+        constexpr auto operator[](str_t const &string) const -> TokenType
         {
             return tokens_by_strings.at(string);
         }
 
-        CERBLIB_DECL auto findLongestStringInPool(str_view_t const &string) const -> str_view_t
+        CERBLIB_DECL auto findLongestStringInPool(str_t const &string) const -> str_t
         {
             size_t fetched_string_size = 0;
             auto level = available_chars.begin();
@@ -70,7 +71,7 @@ namespace cerb
             return { string.begin(), fetched_string_size };
         }
 
-        CERBLIB_DECL auto contains(str_view_t const &string) const -> bool
+        CERBLIB_DECL auto contains(str_t const &string) const -> bool
         {
             auto level = available_chars.begin();
 
@@ -85,6 +86,7 @@ namespace cerb
         }
 
         StringPool() = default;
+
         constexpr StringPool(std::initializer_list<value_type> const &nodes) : available_chars(4)
         {
             auto emplace_node = [this](value_type const &node) { this->emplace(node); };
@@ -98,7 +100,7 @@ namespace cerb
             return level->template at<0>(asUInt(chr));
         }
 
-        constexpr auto addStringToBitmap(str_view_t const &string)
+        constexpr auto addStringToBitmap(str_t const &string)
         {
             resizeIfNeed(string);
             auto level = available_chars.begin();
@@ -110,7 +112,7 @@ namespace cerb
             std::ranges::for_each(string, set_level);
         }
 
-        constexpr auto resizeIfNeed(str_view_t const &string)
+        constexpr auto resizeIfNeed(str_t const &string)
         {
             auto length_of_string = string.size();
             auto length_of_chars_storage = available_chars.size();

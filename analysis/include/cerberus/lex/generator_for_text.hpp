@@ -93,10 +93,17 @@ namespace cerb::lex
             return text[getOffset()];
         }
 
+        constexpr auto skip(size_t times) -> void
+        {
+            for (size_t i = 0; i < times; ++i) {
+                getRawChar();
+            }
+        }
+
         GeneratorForText() = default;
-        constexpr GeneratorForText(
+        constexpr explicit GeneratorForText(
             BasicStringView<CharT> const &file_content,
-            BasicStringView<FileNameT> const &name_of_file)
+            BasicStringView<FileNameT> const &name_of_file = {})
           : location(name_of_file), text(file_content)
         {
             updateCurrentLine();

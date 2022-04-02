@@ -6,7 +6,8 @@ namespace cerb::debug
     auto testGeneratorForText() -> int;
     auto testLexicalAnalyzer() -> int;
     auto testStringToCodes() -> int;
-    auto testRegexItem() -> int;
+
+    auto testDotItem() -> int;
 }// namespace cerb::debug
 
 auto main() -> int
@@ -19,6 +20,8 @@ auto main() -> int
     testGeneratorForText();
     testLexicalAnalyzer();
     testStringToCodes();
-    testRegexItem();
+
+    testDotItem();
+
     return 0;
 }
