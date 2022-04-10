@@ -49,7 +49,7 @@ namespace cerb
             return tokens_by_strings.insert(node);
         }
 
-        constexpr auto operator[](str_t const &string) const -> TokenType
+        CERBLIB_DECL auto operator[](str_t const &string) const -> TokenType
         {
             return tokens_by_strings.at(string);
         }
@@ -94,15 +94,16 @@ namespace cerb
         }
 
     private:
-        constexpr auto doesLevelContainChar(string_storage_const_iterator level, CharT chr) const
+        CERBLIB_DECL auto doesLevelContainChar(string_storage_const_iterator level, CharT chr) const
             -> bool
         {
             return level->template at<0>(asUInt(chr));
         }
 
-        constexpr auto addStringToBitmap(str_t const &string)
+        constexpr auto addStringToBitmap(str_t const &string) -> void
         {
             resizeIfNeed(string);
+
             auto level = available_chars.begin();
             auto set_level = [&level](CharT chr) {
                 level->template set<1, 0>(asUInt(chr));
@@ -112,13 +113,12 @@ namespace cerb
             std::ranges::for_each(string, set_level);
         }
 
-        constexpr auto resizeIfNeed(str_t const &string)
+        constexpr auto resizeIfNeed(str_t const &string) -> void
         {
             auto length_of_string = string.size();
             auto length_of_chars_storage = available_chars.size();
-            auto need_to_resize_storage = length_of_string > length_of_chars_storage;
 
-            if (need_to_resize_storage) {
+            if (length_of_string > length_of_chars_storage) {
                 available_chars.resize(string.size());
             }
         }

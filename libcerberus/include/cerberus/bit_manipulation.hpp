@@ -28,7 +28,7 @@ namespace cerb::bit
     constexpr auto at(T const &number, size_t index) -> bool
     {
         auto bit_index = index % bitsizeof(T);
-        auto target_bit = pow2<size_t>(bit_index);
+        size_t target_bit = pow2<size_t>(bit_index);
 
         return (number & target_bit) == target_bit;
     }
@@ -36,7 +36,7 @@ namespace cerb::bit
     template<u16 BitValue, std::integral ValueType, typename Iterator>
     constexpr auto set(Iterator iterator, size_t index) -> void
     {
-        static_assert(BitValue == 0 || BitValue == 1, "Bit of value can be represented as 0 or 1");
+        static_assert(isOneOf(BitValue, 0, 1), "Bit of value can be represented as 0 or 1");
 
         auto array_index = index / bitsizeof(ValueType);
         auto bit_index = index % bitsizeof(ValueType);

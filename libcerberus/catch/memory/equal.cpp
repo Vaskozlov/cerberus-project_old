@@ -4,7 +4,7 @@
 
 namespace cerb::debug
 {
-    CERBLIB_DECL auto testEqualOnSimpleArray() -> bool
+    CERBLIB_DECL auto testEqualOnArrayOfInts() -> bool
     {
         std::array first_array = { 10, 20, 30, 40, 50 };
         std::array second_array = { 10, 20, 30, 40, 51 };
@@ -31,7 +31,7 @@ namespace cerb::debug
 
     auto testEqual() -> int
     {
-        CERBERUS_TEST(testEqualOnSimpleArray());
+        CERBERUS_TEST(testEqualOnArrayOfInts());
         CERBERUS_TEST(testEqualOnString());
         return 0;
     }

@@ -14,14 +14,36 @@ namespace cerb
     };
 
     template<typename T1, typename T2, PairComparison ComparisonRule = PairComparison::DEFAULT>
-    struct CERBLIB_TRIVIAL Pair
+    class CERBLIB_TRIVIAL Pair
     {
+        constexpr static auto assertIfPairIsDefaultComparable() -> void
+        {
+            static_assert(ComparisonRule != PairComparison::DEFAULT);
+        }
+
         template<Pairable PairT>
-        CERBLIB_DECL auto operator==(PairT const &other) const -> bool
+        constexpr static auto assertIfPairIncomparable(PairT const &other) -> void
         {
             static_assert(
                 std::equality_comparable_with<decltype(other.first), T1> and
                 std::equality_comparable_with<decltype(other.second), T2>);
+        }
+
+        template<typename U>
+        constexpr static auto assertIfPairIncomparableWithValue() -> void
+        {
+            static_assert(
+                (ComparisonRule == PairComparison::BY_FIRST_VALUE &&
+                 std::equality_comparable_with<U, T1>) ||
+                (ComparisonRule == PairComparison::BY_SECOND_VALUE &&
+                 std::equality_comparable_with<U, T2>));
+        }
+
+    public:
+        template<Pairable PairT>
+        CERBLIB_DECL auto operator==(PairT const &other) const -> bool
+        {
+            assertIfPairIncomparable(other);
 
             if constexpr (ComparisonRule == PairComparison::DEFAULT) {
                 return safeEqual<T1>(first, other.first) && safeEqual<T2>(second, other.second);
@@ -35,11 +57,7 @@ namespace cerb
         template<typename U>
         CERBLIB_DECL auto operator==(U const &other) const -> bool
         {
-            static_assert(
-                (ComparisonRule == PairComparison::BY_FIRST_VALUE &&
-                 std::equality_comparable_with<U, T1>) ||
-                (ComparisonRule == PairComparison::BY_SECOND_VALUE &&
-                 std::equality_comparable_with<U, T2>));
+            assertIfPairIncomparableWithValue<U>();
 
             if constexpr (ComparisonRule == PairComparison::BY_FIRST_VALUE) {
                 return safeEqual<T1>(first, other);
@@ -65,9 +83,7 @@ namespace cerb
 
         CERBLIB_DECL auto operator<=>(auto const &other) const
         {
-            static_assert(
-                ComparisonRule == PairComparison::BY_FIRST_VALUE ||
-                ComparisonRule == PairComparison::BY_SECOND_VALUE);
+            assertIfPairIsDefaultComparable();
 
             if constexpr (ComparisonRule == PairComparison::BY_FIRST_VALUE) {
                 return first <=> other;

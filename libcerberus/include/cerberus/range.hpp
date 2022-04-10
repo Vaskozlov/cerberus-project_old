@@ -141,6 +141,7 @@ namespace cerb
         }
 
         iterator() = default;
+
         constexpr iterator(T current_state, T inc) : state(current_state), increment(inc)
         {}
 

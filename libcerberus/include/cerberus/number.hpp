@@ -75,9 +75,9 @@ namespace cerb
 
         constexpr bool is_32bit_size = sizeof(T) == sizeof(u32);
 
-        constexpr i64 exponent_bit = is_32bit_size ? F32ExponentBit : F64ExponentBit;
-        constexpr i64 zero_exponent = is_32bit_size ? F32ZeroExponent : F64ZeroExponent;
-        constexpr u64 exponent_mask = is_32bit_size ? F32ExponentMask : F64ExponentMask;
+        constexpr ssize_t exponent_bit = is_32bit_size ? F32ExponentBit : F64ExponentBit;
+        constexpr ssize_t zero_exponent = is_32bit_size ? F32ZeroExponent : F64ZeroExponent;
+        constexpr size_t exponent_mask = is_32bit_size ? F32ExponentMask : F64ExponentMask;
 
         auto mask = std::bit_cast<decltype(asUInt(number))>(number);
         auto exponent_of_mask = mask & exponent_mask;

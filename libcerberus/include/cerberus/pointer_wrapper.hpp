@@ -141,6 +141,7 @@ namespace cerb
         }
 
         RawPointerWrapper() = default;
+
         constexpr RawPointerWrapper(T *ptr, size_t len) : pointer(ptr), length(len)
         {}
 

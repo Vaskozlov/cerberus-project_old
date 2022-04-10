@@ -105,10 +105,10 @@ namespace cerb::lex
 
             BasicStringView<CharT> const &nonterminal_repr = rule_generator.getRestOfTheText();
             StringToCodes<CharT> string_parser(cast('\''), nonterminal_repr);
-            std::basic_string<CharT> &str = convertStringToCodes(cast('\''), nonterminal_repr);
+            std::basic_string<CharT> &str = string_parser.parseString();
 
             skipNonterminalFromStream(string_parser);
-            makeNonterminalGlobal(str);
+            makeNonterminalGlobal(std::move(str));
 
             flags |= ItemFlags::NONTERMINAL;
         }
