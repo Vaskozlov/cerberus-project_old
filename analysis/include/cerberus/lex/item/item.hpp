@@ -46,15 +46,15 @@ namespace cerb::lex
                 break;
 
             case cast('\"'):
-
+                addString();
                 break;
 
             case cast('('):
-
+                addItem();
                 break;
 
             case cast('['):
-
+                addRegex();
                 break;
 
             case cast('{'):
@@ -97,6 +97,23 @@ namespace cerb::lex
             checkItemExistence();
             checkRuleOverloading(new_rule);
             recent_item->flags |= new_rule;
+        }
+
+        constexpr auto addString() -> void
+        {}
+
+        constexpr auto addItem() -> void
+        {}
+
+        constexpr auto addRegex() -> void
+        {}
+
+        template<typename T, typename... Ts>
+        constexpr auto allocateNewItem(Ts &&...args) -> std::unique_ptr<BasicItem<CharT>>
+        {
+            static_assert(std::is_base_of_v<BasicItem<CharT>, T>);
+
+            return std::make_unique<T>(std::forward(args)...);
         }
 
         constexpr auto addNonTerminal() -> void
