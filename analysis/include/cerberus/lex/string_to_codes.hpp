@@ -156,7 +156,7 @@ namespace cerb::lex
             CharT resulted_char = CharEnum<CharT>::EoF;
 
             for (CERBLIB_UNUSED(u32) : Range(length)) {
-                if (isNotSuitableForNotation(getFutureChar(), notation)) {
+                if (doesNotFitIntoNotation(getFutureChar(), notation)) {
                     break;
                 }
 
@@ -167,7 +167,7 @@ namespace cerb::lex
             return resulted_char;
         }
 
-        CERBLIB_DECL static auto isNotSuitableForNotation(CharT chr, u32 notation) -> bool
+        CERBLIB_DECL static auto doesNotFitIntoNotation(CharT chr, u32 notation) -> bool
         {
             if (not hexadecimal_chars.contains(chr)) {
                 return true;

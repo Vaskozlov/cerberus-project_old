@@ -30,6 +30,11 @@ namespace cerb::lex
         }
 
     private:
+        constexpr auto asStringItem(BasicItem<CharT> *item) -> string::StringItem<CharT> *
+        {
+            return dynamic_cast<string::StringItem<CharT> *>(item);
+        }
+
         constexpr auto parseRule() -> void
         {
             while (not isEoF(rule_generator.getCleanChar())) {
@@ -100,7 +105,11 @@ namespace cerb::lex
         }
 
         constexpr auto addString() -> void
-        {}
+        {
+            auto current_text = rule_generator.getText();
+            auto new_item = createNewItem<string::StringItem<CharT>>(current_text);
+            skipStringItemCharacters(new_item);
+        }
 
         constexpr auto addItem() -> void
         {}
@@ -109,11 +118,29 @@ namespace cerb::lex
         {}
 
         template<typename T, typename... Ts>
-        constexpr auto allocateNewItem(Ts &&...args) -> std::unique_ptr<BasicItem<CharT>>
+        constexpr auto createNewItem(Ts &&...args) -> BasicItem<CharT> *
         {
             static_assert(std::is_base_of_v<BasicItem<CharT>, T>);
 
-            return std::make_unique<T>(std::forward(args)...);
+            item_ptr new_item = allocateNewItem<T>(std::forward<Ts>(args)...);
+            BasicItem<CharT> *new_item_ptr = new_item.get();
+
+            items.emplace_back(std::move(new_item));
+            return new_item_ptr;
+        }
+
+        template<typename T, typename... Ts>
+        constexpr auto allocateNewItem(Ts &&...args) -> item_ptr
+        {
+            static_assert(std::is_base_of_v<BasicItem<CharT>, T>);
+
+            return std::make_unique<T>(analysis_globals, std::forward<Ts>(args)...);
+        }
+
+        constexpr auto skipStringItemCharacters(BasicItem<CharT> *item) -> void
+        {
+            auto string_item = asStringItem(item);
+            rule_generator.skip(string_item->getParsedStringLength());
         }
 
         constexpr auto addNonTerminal() -> void

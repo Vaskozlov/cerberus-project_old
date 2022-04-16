@@ -8,7 +8,8 @@ namespace cerb::debug
         lex::AnalysisGlobals<char> parameters{};
 
         CERBLIB_UNUSED(auto) = lex::DotItem<char>(0, "\'+\'", parameters);
-        CERBLIB_UNUSED(auto) = lex::DotItem<char>(1, "(\"for\"p*)+[a-z]+", parameters);
+        CERBLIB_UNUSED(auto) = lex::DotItem<char>(1, "\"Hello, World!\"", parameters);
+        // CERBLIB_UNUSED(auto  ) = lex::DotItem<char>(1, "(\"for\"p*)+[a-z]+", parameters);
 
         return 0;
     }

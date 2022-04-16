@@ -101,6 +101,7 @@ namespace cerb::lex
         }
 
         GeneratorForText() = default;
+
         constexpr explicit GeneratorForText(
             BasicStringView<CharT> const &file_content,
             BasicStringView<FileNameT> const &name_of_file = {})
