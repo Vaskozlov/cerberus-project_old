@@ -10,11 +10,19 @@ namespace cerb::lex::regex
     struct RegexItem : public BasicItem<CharT>
     {
         CERBLIB_BASIC_ITEM_ACCESS(CharT);
+        using bitmap_t = typename RegexParser<CharT>::bitmap_t;
 
-        constexpr explicit RegexItem(
-            CERBLIB_BASIC_ITEM_ARGS, BasicStringView<CharT> const &regex_rule)
+        constexpr explicit RegexItem(CERBLIB_BASIC_ITEM_ARGS, GeneratorForText<CharT> &regex_rule)
           : CERBLIB_CONSTRUCT_BASIC_ITEM
         {}
+
+    private:
+        constexpr auto parseRegex(GeneratorForText<CharT> &regex_rule) -> void
+        {
+            RegexParser<CharT> regex_parser{ regex_rule, available_chars };
+        }
+
+        bitmap_t available_chars{};
     };
 }// namespace cerb::lex::regex
 

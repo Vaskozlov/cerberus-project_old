@@ -59,7 +59,6 @@ namespace cerb::lex
 
                 default:
                     parsed_string.push_back(chr);
-                    break;
                 }
             }
 

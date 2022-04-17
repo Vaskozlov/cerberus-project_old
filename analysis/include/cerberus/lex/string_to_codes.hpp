@@ -3,7 +3,7 @@
 
 #include <cerberus/exception.hpp>
 #include <cerberus/lex/char.hpp>
-#include <cerberus/string_view.hpp>
+#include <cerberus/lex/generator_for_text.hpp>
 #include <string>
 
 namespace cerb::lex
@@ -15,17 +15,17 @@ namespace cerb::lex
     {
         CERBLIB_DECL auto getChar() const -> CharT
         {
-            return parsing_text[index];
+            return parsing_text.getCurrentChar();
         }
 
         CERBLIB_DECL auto getFutureChar() const -> CharT
         {
-            return parsing_text[index + 1];
+            return parsing_text.getCurrentChar(1);
         }
 
         constexpr auto nextChar() -> void
         {
-            ++index;
+            parsing_text.getRawChar();
         }
 
         CERBLIB_DECL auto getNextChar() -> CharT
@@ -57,13 +57,10 @@ namespace cerb::lex
         }
 
     public:
-        CERBLIB_DECL auto getProcessedLength() const -> size_t
-        {
-            return index;
-        }
-
         constexpr auto parseString() -> std::basic_string<CharT> &
         {
+            checkInitialization();
+
             if (not isBeginOfString(getChar())) {
                 throw StringToCodesTranslationError("Unable to open string!");
             }
@@ -83,11 +80,18 @@ namespace cerb::lex
 
         StringToCodes() = default;
 
-        constexpr StringToCodes(CharT string_opener, BasicStringView<CharT> const &str)
-          : parsing_text(str), string_begin_char(string_opener)
+        constexpr StringToCodes(CharT string_opener, GeneratorForText<CharT> &text)
+          : parsing_text(text), string_begin_char(string_opener)
         {}
 
     private:
+        constexpr auto checkInitialization() -> void
+        {
+            if (not parsing_text.isInitialized()) {
+                nextChar();
+            }
+        }
+
         constexpr auto processChar(CharT chr) -> void
         {
             if (chr == CharEnum<CharT>::Backlash) {
@@ -185,8 +189,7 @@ namespace cerb::lex
         static constexpr auto hexadecimal_chars = HexadecimalCharsToInt<CharT>;
 
         std::basic_string<CharT> parsed_string{};
-        BasicStringView<CharT> parsing_text{};
-        size_t index{};
+        GeneratorForText<CharT> &parsing_text;
         CharT string_begin_char{};
     };
 }// namespace cerb::lex

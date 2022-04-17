@@ -100,22 +100,22 @@ namespace cerb::lex
         constexpr auto setRepetitionRule(ItemFlags new_rule) -> void
         {
             checkItemExistence();
-            checkRuleOverloading(new_rule);
+            checkRuleOverloading();
             recent_item->flags |= new_rule;
         }
 
         constexpr auto addString() -> void
         {
-            auto current_text = rule_generator.getText();
-            auto new_item = createNewItem<string::StringItem<CharT>>(current_text);
-            skipStringItemCharacters(new_item);
+            createNewItem<string::StringItem<CharT>>(rule_generator);
         }
 
         constexpr auto addItem() -> void
         {}
 
         constexpr auto addRegex() -> void
-        {}
+        {
+            createNewItem<regex::RegexItem<CharT>>(rule_generator);
+        }
 
         template<typename T, typename... Ts>
         constexpr auto createNewItem(Ts &&...args) -> BasicItem<CharT> *
@@ -123,10 +123,11 @@ namespace cerb::lex
             static_assert(std::is_base_of_v<BasicItem<CharT>, T>);
 
             item_ptr new_item = allocateNewItem<T>(std::forward<Ts>(args)...);
-            BasicItem<CharT> *new_item_ptr = new_item.get();
+            recent_item = new_item.get();
 
             items.emplace_back(std::move(new_item));
-            return new_item_ptr;
+
+            return recent_item;
         }
 
         template<typename T, typename... Ts>
@@ -137,21 +138,13 @@ namespace cerb::lex
             return std::make_unique<T>(analysis_globals, std::forward<Ts>(args)...);
         }
 
-        constexpr auto skipStringItemCharacters(BasicItem<CharT> *item) -> void
-        {
-            auto string_item = asStringItem(item);
-            rule_generator.skip(string_item->getParsedStringLength());
-        }
-
         constexpr auto addNonTerminal() -> void
         {
             checkThatNonTerminalCanBeAdded();
 
-            BasicStringView<CharT> const &nonterminal_repr = rule_generator.getRestOfTheText();
-            StringToCodes<CharT> string_parser(cast('\''), nonterminal_repr);
+            StringToCodes<CharT> string_parser(cast('\''), rule_generator);
             std::basic_string<CharT> &str = string_parser.parseString();
 
-            skipNonterminalFromStream(string_parser);
             makeNonterminalGlobal(std::move(str));
 
             flags |= ItemFlags::NONTERMINAL;
@@ -160,11 +153,6 @@ namespace cerb::lex
         constexpr auto makeNonterminalGlobal(std::basic_string<CharT> &&str) -> void
         {
             analysis_globals.emplaceNonterminal(std::move(str), id());
-        }
-
-        constexpr auto skipNonterminalFromStream(StringToCodes<CharT> const &string_parser) -> void
-        {
-            rule_generator.skip(string_parser.getProcessedLength());
         }
 
         constexpr auto checkForAlreadyExistsNonterminal() const -> void
@@ -190,14 +178,11 @@ namespace cerb::lex
             }
         }
 
-        constexpr auto checkRuleOverloading(ItemFlags new_rule) const -> void
+        constexpr auto checkRuleOverloading() const -> void
         {
-            ItemFlags other_repetition_rules =
-                ItemFlags::PLUS | ItemFlags::STAR | ItemFlags::QUESTION;
+            ItemFlags repetition_rules = ItemFlags::PLUS | ItemFlags::STAR | ItemFlags::QUESTION;
 
-            other_repetition_rules.clearFlag(new_rule);
-
-            if ((recent_item->flags & other_repetition_rules) > 0) {
+            if ((recent_item->flags & repetition_rules) != ItemFlags::NONE) {
                 throw DotItemParsingError("Unable to apply more than one rule!");
             }
         }

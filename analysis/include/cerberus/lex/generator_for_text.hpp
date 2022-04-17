@@ -12,6 +12,11 @@ namespace cerb::lex
     template<CharacterLiteral CharT, CharacterLiteral FileNameT = char>
     struct GeneratorForText
     {
+        CERBLIB_DECL auto isInitialized() const -> bool
+        {
+            return initialized;
+        }
+
         CERBLIB_DECL auto getLocation() const -> LocationInFile<FileNameT> const &
         {
             return location;
