@@ -23,8 +23,12 @@ namespace cerb::lex::string
         size_t index{};
     };
 
+#ifndef CERBERUS_HEADER_ONLY
     extern template struct StringItem<char>;
+    extern template struct StringItem<char8_t>;
     extern template struct StringItem<char16_t>;
+#endif /* CERBERUS_HEADER_ONLY */
+
 }// namespace cerb::lex::string
 
 #endif /* CERBERUS_LEX_STRING_HPP */

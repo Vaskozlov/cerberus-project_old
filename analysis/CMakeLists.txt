@@ -12,10 +12,21 @@ file(
         "analysis/catch/*.cpp"
 )
 
-add_library(
-        analysis_lib
-        ${ANALYSIS_OBJ}
-)
+if (USE_DYNAMIC_LIBRARY)
+    add_library(
+            analysis_lib
+            SHARED
+            ${ANALYSIS_OBJ}
+    )
+
+    set_target_properties(analysis_lib PROPERTIES COMPILE_FLAGS "-fpic")
+else ()
+    add_library(
+            analysis_lib
+            STATIC
+            ${ANALYSIS_OBJ}
+    )
+endif ()
 
 add_executable(
         analysis_catch

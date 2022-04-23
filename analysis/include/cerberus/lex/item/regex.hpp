@@ -27,8 +27,12 @@ namespace cerb::lex::regex
         bitmap_t available_chars{};
     };
 
+#ifndef CERBERUS_HEADER_ONLY
     extern template struct RegexItem<char>;
+    extern template struct RegexItem<char8_t>;
     extern template struct RegexItem<char16_t>;
+#endif /* CERBERUS_HEADER_ONLY */
+
 }// namespace cerb::lex::regex
 
 #endif /* CERBERUS_REGEX_HPP */

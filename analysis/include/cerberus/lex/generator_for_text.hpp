@@ -219,6 +219,15 @@ namespace cerb::lex
         BasicStringView<CharT> current_line{};
         bool initialized{ false };
     };
+
+#ifndef CERBERUS_HEADER_ONLY
+    extern template struct GeneratorForText<char>;
+    extern template struct GeneratorForText<char8_t>;
+    extern template struct GeneratorForText<char16_t>;
+    extern template struct GeneratorForText<char32_t>;
+    extern template struct GeneratorForText<wchar_t>;
+#endif /* CERBERUS_HEADER_ONLY */
+
 }// namespace cerb::lex
 
 #endif /* CERBERUS_TEXT_GENERATOR_HPP */

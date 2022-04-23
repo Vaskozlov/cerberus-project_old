@@ -16,8 +16,12 @@ namespace cerb::lex
         {}
     };
 
+#ifndef CERBERUS_HEADER_ONLY
     extern template struct LexicalAnalyzer<char>;
+    extern template struct LexicalAnalyzer<char8_t>;
     extern template struct LexicalAnalyzer<char16_t>;
+#endif /* CERBERUS_HEADER_ONLY */
+
 }// namespace cerb::lex
 
 #endif /* CERBERUS_LEXICAL_ANALYZER_HPP */

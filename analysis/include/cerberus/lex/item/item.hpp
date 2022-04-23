@@ -193,8 +193,12 @@ namespace cerb::lex
         size_t item_id{};
     };
 
+#ifndef CERBERUS_HEADER_ONLY
     extern template struct DotItem<char>;
+    extern template struct DotItem<char8_t>;
     extern template struct DotItem<char16_t>;
+#endif /* CERBERUS_HEADER_ONLY */
+
 }// namespace cerb::lex
 
 #endif /* CERBERUS_ITEM_HPP */

@@ -173,14 +173,20 @@ namespace cerb::scan
         lex::GeneratorForText<CharT> &text_generator;
     };
 
+#ifndef CERBERUS_HEADER_ONLY
     extern template struct ScanApi<false, char>;
     extern template struct ScanApi<true, char>;
+
+    extern template struct ScanApi<false, char8_t>;
+    extern template struct ScanApi<true, char8_t>;
 
     extern template struct ScanApi<false, char16_t>;
     extern template struct ScanApi<true, char16_t>;
 
     extern template struct ScanApi<false, char32_t>;
     extern template struct ScanApi<true, char32_t>;
+#endif /* CERBERUS_HEADER_ONLY */
+
 }// namespace cerb::scan
 
 #endif /* CERBERUS_SCAN_API_HPP */

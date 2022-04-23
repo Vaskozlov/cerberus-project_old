@@ -3,5 +3,6 @@
 namespace cerb::lex
 {
     template struct DotItem<char>;
+    template struct DotItem<char8_t>;
     template struct DotItem<char16_t>;
 }// namespace cerb::lex

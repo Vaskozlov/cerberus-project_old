@@ -63,8 +63,12 @@ namespace cerb::lex
         CharT string_begin_char{};
     };
 
+#ifndef CERBERUS_HEADER_ONLY
     extern template class StringToCodes<char>;
+    extern template class StringToCodes<char8_t>;
     extern template class StringToCodes<char16_t>;
+#endif /* CERBERUS_HEADER_ONLY */
+
 }// namespace cerb::lex
 
 #endif /* CERBERUS_STRING_TO_CODES_HPP */

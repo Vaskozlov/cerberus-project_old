@@ -12,7 +12,7 @@ namespace cerb
     template<CharacterLiteral CharT, typename TokenType, bool UseStdString = false>
     struct StringPool
     {
-        constexpr static u32 number_of_chars = pow2<u32>(bitsizeof(CharT));
+        constexpr static size_t number_of_chars = pow2<size_t>(bitsizeof(CharT));
 
         using str_t =
             std::conditional_t<UseStdString, std::basic_string<CharT>, BasicStringView<CharT>>;

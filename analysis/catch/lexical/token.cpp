@@ -1,5 +1,4 @@
 #include <cerberus/debug/debug.hpp>
-#include <cerberus/lexical/tokens/token.hpp>
 
 namespace cerb::debug
 {

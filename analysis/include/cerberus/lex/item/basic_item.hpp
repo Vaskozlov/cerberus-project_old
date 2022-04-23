@@ -58,11 +58,16 @@ namespace cerb::lex
         // NOLINTEND
     };
 
+#ifndef CERBERUS_HEADER_ONLY
     extern template struct AnalysisGlobals<char>;
+    extern template struct AnalysisGlobals<char8_t>;
     extern template struct AnalysisGlobals<char16_t>;
 
     extern template struct BasicItem<char>;
+    extern template struct BasicItem<char8_t>;
     extern template struct BasicItem<char16_t>;
+#endif /* CERBERUS_HEADER_ONLY */
+
 }// namespace cerb::lex
 
 #endif /* CERBERUS_BASIC_ITEM_HPP */
