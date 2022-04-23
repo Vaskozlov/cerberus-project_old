@@ -2,6 +2,8 @@
 #define CERBERUS_REGEX_PARSER_HPP
 
 #include <cerberus/bitmap.hpp>
+#include <cerberus/exception.hpp>
+#include <cerberus/lex/generator_for_text.hpp>
 #include <cerberus/number.hpp>
 #include <cerberus/reference_wrapper.hpp>
 #include <cerberus/string_view.hpp>
@@ -27,7 +29,9 @@ namespace cerb::lex::regex
 
         constexpr explicit RegexParser(GeneratorForText<CharT> &regex, bitmap_t &bitmap_for_chars)
           : regex_rule(regex), available_chars(bitmap_for_chars)
-        {}
+        {
+            parseRegex();
+        }
 
     private:
         constexpr auto parseRegex() -> void
@@ -43,18 +47,45 @@ namespace cerb::lex::regex
 
         constexpr auto processChar(CharT chr) -> void
         {
-            switch (chr) {
-            case cast('-'):
+            if (chr == cast('-')) {
+                is_range_of_chars = true;
+            } else {
+                addCharToBitmap(chr);
+            }
+        }
 
-                break;
+        constexpr auto addCharToBitmap(CharT chr) -> void
+        {
+            if (is_range_of_chars) {
+                fillRangeOfChars(previous_char, chr);
+            } else {
+                setChar(chr);
+            }
 
-            case cast(']'):
+            previous_char = chr;
+        }
 
-                break;
+        constexpr auto fillRangeOfChars(CharT begin, CharT end) -> void
+        {
+            checkCharsOrder(begin, end);
 
-            default:
+            for (; begin != end; ++begin) {
+                setChar(begin);
+            }
 
-                break;
+            is_range_of_chars = false;
+            previous_char = cast(0);
+        }
+
+        constexpr auto setChar(CharT chr) -> void
+        {
+            available_chars.template set<1, 0>(asUInt(chr));
+        }
+
+        constexpr static auto checkCharsOrder(CharT begin, CharT end) -> void
+        {
+            if (begin > end) {
+                throw RegexParsingError("Chars in regex are in a wrong order!");
             }
         }
 
@@ -72,7 +103,7 @@ namespace cerb::lex::regex
             }
         }
 
-        CERBLIB_DECL auto canContinueParsing() const -> bool
+        CERBLIB_DECL auto canContinueParsing() -> bool
         {
             CharT chr = getNextChar();
 
@@ -107,6 +138,7 @@ namespace cerb::lex::regex
 
         GeneratorForText<CharT> &regex_rule;
         bitmap_t &available_chars;
+        CharT previous_char{};
         bool is_range_of_chars{ false };
     };
 }// namespace cerb::lex::regex

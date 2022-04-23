@@ -8,6 +8,7 @@ namespace cerb::debug
     auto testStringToCodes() -> int;
 
     auto testDotItem() -> int;
+    auto testRegexParser() -> int;
 }// namespace cerb::debug
 
 auto main() -> int
@@ -22,6 +23,7 @@ auto main() -> int
     testStringToCodes();
 
     testDotItem();
+    testRegexParser();
 
     return 0;
 }

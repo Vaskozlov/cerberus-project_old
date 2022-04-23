@@ -60,22 +60,14 @@ namespace cerb::lex
         constexpr auto parseString() -> std::basic_string<CharT> &
         {
             checkInitialization();
+            checkStringStart();
 
-            if (not isBeginOfString(getChar())) {
-                throw StringToCodesTranslationError("Unable to open string!");
-            }
-
-            while (not isEoF(getNextChar())) {
+            while (canContinueParsing()) {
                 CharT chr = getChar();
-
-                if (isBeginOfString(chr)) {
-                    return parsed_string;
-                }
-
                 processChar(chr);
             }
 
-            throw StringToCodesTranslationError("Unable to close string!");
+            return parsed_string;
         }
 
         StringToCodes() = default;
@@ -85,13 +77,6 @@ namespace cerb::lex
         {}
 
     private:
-        constexpr auto checkInitialization() -> void
-        {
-            if (not parsing_text.isInitialized()) {
-                nextChar();
-            }
-        }
-
         constexpr auto processChar(CharT chr) -> void
         {
             if (chr == CharEnum<CharT>::Backlash) {
@@ -171,6 +156,36 @@ namespace cerb::lex
             return resulted_char;
         }
 
+        CERBLIB_DECL static auto convertSymbolToInt(CharT chr) -> CharT
+        {
+            return cast(hexadecimal_chars[chr]);
+        }
+
+        constexpr auto canContinueParsing() -> bool
+        {
+            CharT chr = getNextChar();
+
+            if (isEoF(chr)) {
+                throw StringToCodesTranslationError("Unable to close string!");
+            }
+
+            return chr != cast(string_begin_char);
+        }
+
+        constexpr auto checkStringStart() const -> void
+        {
+            if (not isBeginOfString(getChar())) {
+                throw StringToCodesTranslationError("Unable to open string!");
+            }
+        }
+
+        constexpr auto checkInitialization() -> void
+        {
+            if (not parsing_text.isInitialized()) {
+                nextChar();
+            }
+        }
+
         CERBLIB_DECL static auto doesNotFitIntoNotation(CharT chr, u32 notation) -> bool
         {
             if (not hexadecimal_chars.contains(chr)) {
@@ -179,11 +194,6 @@ namespace cerb::lex
 
             auto code = convertSymbolToInt(chr);
             return static_cast<i32>(code) >= static_cast<i32>(notation);
-        }
-
-        CERBLIB_DECL static auto convertSymbolToInt(CharT chr) -> CharT
-        {
-            return cast(hexadecimal_chars[chr]);
         }
 
         static constexpr auto hexadecimal_chars = HexadecimalCharsToInt<CharT>;

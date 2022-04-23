@@ -14,7 +14,9 @@ namespace cerb::lex::regex
 
         constexpr explicit RegexItem(CERBLIB_BASIC_ITEM_ARGS, GeneratorForText<CharT> &regex_rule)
           : CERBLIB_CONSTRUCT_BASIC_ITEM
-        {}
+        {
+            parseRegex(regex_rule);
+        }
 
     private:
         constexpr auto parseRegex(GeneratorForText<CharT> &regex_rule) -> void

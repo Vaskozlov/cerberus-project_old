@@ -22,6 +22,15 @@ namespace cerb::debug
         u"    \t\tHello, World! \nIt's a test \xFF \0 \077 \0555 Привет мир! \uFFFF"
         "\t\t  string."sv;
 
+    auto testStringToCodesOnEmptyBasicString() -> bool
+    {
+        GeneratorForText<char> text_generator{ "\"\"" };
+        StringToCodes string_to_codes{ '\"', text_generator };
+        auto const &parsed_string = string_to_codes.parseString();
+
+        return parsed_string == "";
+    }
+
     auto testStringToCodesOnBasicString() -> bool
     {
         GeneratorForText<char> text_generator{ TestInput };
