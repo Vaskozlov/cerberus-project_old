@@ -19,7 +19,9 @@ if (USE_DYNAMIC_LIBRARY)
             ${ANALYSIS_OBJ}
     )
 
-    set_target_properties(analysis_lib PROPERTIES COMPILE_FLAGS "-fpic")
+    if (!MSVC)
+        set_target_properties(analysis_lib PROPERTIES COMPILE_FLAGS "-fpic")
+    endif ()
 else ()
     add_library(
             analysis_lib

@@ -1,6 +1,7 @@
 #ifndef CERBERUS_FLAT_MAP_HPP
 #define CERBERUS_FLAT_MAP_HPP
 
+#include <cerberus/exception.hpp>
 #include <cerberus/memory.hpp>
 #include <cerberus/pair.hpp>
 

@@ -3,10 +3,17 @@
 
 namespace cerb::debug
 {
+    using namespace lex;
+    using namespace regex;
+
     static constexpr cerb::string_view TestInput = "[_0-9A-Za-z]";
 
-    constexpr auto testRegexParserOnBasicString() -> bool
+    auto testRegexParserOnBasicString() -> bool
     {
+        ConstBitmap<1, 256> bitmap;
+        GeneratorForText<char> text_generator{ TestInput };
+        RegexParser<char> regex_parser{ text_generator, bitmap };
+
         return true;
     }
 
