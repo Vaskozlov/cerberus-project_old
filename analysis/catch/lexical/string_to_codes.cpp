@@ -51,6 +51,7 @@ namespace cerb::debug
 
     auto testStringToCodes() -> int
     {
+        EXPECT_TRUE(testStringToCodesOnEmptyBasicString());
         EXPECT_TRUE(testStringToCodesOnBasicString());
         EXPECT_TRUE(testStringToCodesOnUtf16String());
         return 0;
