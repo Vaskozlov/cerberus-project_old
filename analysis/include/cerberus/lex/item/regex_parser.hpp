@@ -98,6 +98,13 @@ namespace cerb::lex::regex
         CharT previous_char{};
         bool is_range_of_chars{ false };
     };
+
+#ifndef CERBERUS_HEADER_ONLY
+    extern template struct RegexParser<char>;
+    extern template struct RegexParser<char8_t>;
+    extern template struct RegexParser<char16_t>;
+#endif /* CERBERUS_HEADER_ONLY */
+
 }// namespace cerb::lex::regex
 
 #endif /* CERBERUS_REGEX_PARSER_HPP */

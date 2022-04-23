@@ -13,4 +13,4 @@ namespace cerb::scan
 
     template struct ScanApi<false, char32_t>;
     template struct ScanApi<true, char32_t>;
-}
+}// namespace cerb::scan
