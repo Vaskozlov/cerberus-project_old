@@ -3,7 +3,6 @@
 
 #include <cerberus/exception.hpp>
 #include <cerberus/lex/char.hpp>
-#include <cerberus/lex/generator_for_text.hpp>
 #include <cerberus/lex/scan_api.hpp>
 #include <string>
 
@@ -63,6 +62,9 @@ namespace cerb::lex
         std::basic_string<CharT> parsed_string{};
         CharT string_begin_char{};
     };
+
+    extern template class StringToCodes<char>;
+    extern template class StringToCodes<char16_t>;
 }// namespace cerb::lex
 
 #endif /* CERBERUS_STRING_TO_CODES_HPP */

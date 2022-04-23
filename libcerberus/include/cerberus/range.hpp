@@ -146,7 +146,8 @@ namespace cerb
         {}
 
     private:
-        T state{}, increment{};
+        T state{};
+        T increment{};
     };
 }// namespace cerb
 

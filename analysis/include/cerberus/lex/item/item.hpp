@@ -192,6 +192,9 @@ namespace cerb::lex
         BasicItem<CharT> *recent_item{};
         size_t item_id{};
     };
+
+    extern template struct DotItem<char>;
+    extern template struct DotItem<char16_t>;
 }// namespace cerb::lex
 
 #endif /* CERBERUS_ITEM_HPP */

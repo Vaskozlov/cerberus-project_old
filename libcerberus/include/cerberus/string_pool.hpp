@@ -2,6 +2,7 @@
 #define CERBERUS_STRING_POOL_HPP
 
 #include <cerberus/bitmap.hpp>
+#include <cerberus/number.hpp>
 #include <cerberus/string_view.hpp>
 #include <map>
 #include <vector>

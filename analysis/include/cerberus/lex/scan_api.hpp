@@ -2,7 +2,7 @@
 #define CERBERUS_SCAN_API_HPP
 
 #include <cerberus/lex/char.hpp>
-#include <cerberus/lex/string_to_codes.hpp>
+#include <cerberus/lex/generator_for_text.hpp>
 
 #define CERBLIB_SCAN_API_ACCESS(UseCleanChars, CharT)                                              \
     using scan_api_t = cerb::scan::ScanApi<UseCleanChars, CharT>;                                  \
@@ -172,6 +172,15 @@ namespace cerb::scan
         static constexpr auto hexadecimal_chars = lex::HexadecimalCharsToInt<CharT>;
         lex::GeneratorForText<CharT> &text_generator;
     };
+
+    extern template struct ScanApi<false, char>;
+    extern template struct ScanApi<true, char>;
+
+    extern template struct ScanApi<false, char16_t>;
+    extern template struct ScanApi<true, char16_t>;
+
+    extern template struct ScanApi<false, char32_t>;
+    extern template struct ScanApi<true, char32_t>;
 }// namespace cerb::scan
 
 #endif /* CERBERUS_SCAN_API_HPP */

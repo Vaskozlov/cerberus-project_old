@@ -1,6 +1,7 @@
 #ifndef CERBERUS_TEXT_GENERATOR_HPP
 #define CERBERUS_TEXT_GENERATOR_HPP
 
+#include <cerberus/exception.hpp>
 #include <cerberus/lex/char.hpp>
 #include <cerberus/lex/location_in_file.hpp>
 #include <string>

@@ -5,21 +5,14 @@
 #include <cerberus/lex/string_to_codes.hpp>
 #include <cerberus/string_pool.hpp>
 
-#ifndef CERBLIB_BASIC_ITEM_ACCESS
-#    define CERBLIB_BASIC_ITEM_ACCESS(CharT)                                                       \
-        using parent = BasicItem<CharT>;                                                           \
-        using parent::analysis_globals;                                                            \
-        using parent::cast;                                                                        \
-        using parent::flags
-#endif /* CERBLIB_BASIC_ITEM_ACCESS */
+#define CERBLIB_BASIC_ITEM_ACCESS(CharT)                                                           \
+    using parent = BasicItem<CharT>;                                                               \
+    using parent::analysis_globals;                                                                \
+    using parent::cast;                                                                            \
+    using parent::flags
 
-#ifndef CERBLIB_BASIC_ITEM_ARGS
-#    define CERBLIB_BASIC_ITEM_ARGS AnalysisGlobals<CharT> &analysis_parameters
-#endif /* CERBLIB_BASIC_ITEM_ARGS */
-
-#ifndef CERBLIB_CONSTRUCT_BASIC_ITEM
-#    define CERBLIB_CONSTRUCT_BASIC_ITEM parent(analysis_parameters)
-#endif /* CERBLIB_CONSTRUCT_BASIC_ITEM */
+#define CERBLIB_BASIC_ITEM_ARGS AnalysisGlobals<CharT> &analysis_parameters
+#define CERBLIB_CONSTRUCT_BASIC_ITEM parent(analysis_parameters)
 
 namespace cerb::lex
 {
@@ -64,6 +57,12 @@ namespace cerb::lex
         AnalysisGlobals<CharT> &analysis_globals;
         // NOLINTEND
     };
+
+    extern template struct AnalysisGlobals<char>;
+    extern template struct AnalysisGlobals<char16_t>;
+
+    extern template struct BasicItem<char>;
+    extern template struct BasicItem<char16_t>;
 }// namespace cerb::lex
 
 #endif /* CERBERUS_BASIC_ITEM_HPP */

@@ -22,6 +22,9 @@ namespace cerb::lex::string
         std::basic_string<CharT> string{};
         size_t index{};
     };
+
+    extern template struct StringItem<char>;
+    extern template struct StringItem<char16_t>;
 }// namespace cerb::lex::string
 
 #endif /* CERBERUS_LEX_STRING_HPP */

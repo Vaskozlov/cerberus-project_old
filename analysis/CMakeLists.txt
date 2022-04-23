@@ -12,6 +12,11 @@ file(
         "analysis/catch/*.cpp"
 )
 
+add_library(
+        analysis_lib
+        ${ANALYSIS_OBJ}
+)
+
 add_executable(
         analysis_catch
         ${ANALYSIS_CATCH_OBJ}
@@ -23,5 +28,6 @@ target_link_libraries(
 )
 
 target_link_libraries(analysis_catch Threads::Threads)
+target_link_libraries(analysis_catch analysis_lib)
 
 add_test(ANALYSIS_TEST analysis_catch)

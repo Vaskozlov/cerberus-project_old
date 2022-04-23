@@ -26,6 +26,9 @@ namespace cerb::lex::regex
 
         bitmap_t available_chars{};
     };
+
+    extern template struct RegexItem<char>;
+    extern template struct RegexItem<char16_t>;
 }// namespace cerb::lex::regex
 
 #endif /* CERBERUS_REGEX_HPP */

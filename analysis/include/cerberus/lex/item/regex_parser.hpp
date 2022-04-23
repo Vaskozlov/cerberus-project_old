@@ -2,8 +2,7 @@
 #define CERBERUS_REGEX_PARSER_HPP
 
 #include <cerberus/bitmap.hpp>
-#include <cerberus/lex/generator_for_text.hpp>
-#include <cerberus/lex/string_to_codes.hpp>
+#include <cerberus/lex/scan_api.hpp>
 #include <cerberus/number.hpp>
 #include <cerberus/reference_wrapper.hpp>
 
@@ -12,21 +11,17 @@ namespace cerb::lex::regex
     CERBERUS_EXCEPTION(RegexParsingError);
 
     template<CharacterLiteral CharT>
-    struct RegexParser
+    struct RegexParser : scan::ScanApi<true, CharT>
     {
         constexpr static size_t number_of_chars = pow2<size_t>(bitsizeof(CharT));
-        using bitmap_t = ConstBitmap<1, number_of_chars>;
 
-        template<std::integral T>
-        static constexpr auto cast(T value) -> CharT
-        {
-            return static_cast<CharT>(value);
-        }
+        using bitmap_t = ConstBitmap<1, number_of_chars>;
+        CERBLIB_SCAN_API_ACCESS(true, CharT);
 
         RegexParser() = default;
 
-        constexpr explicit RegexParser(GeneratorForText<CharT> &regex, bitmap_t &bitmap_for_chars)
-          : regex_rule(regex), available_chars(bitmap_for_chars)
+        constexpr RegexParser(GeneratorForText<CharT> &regex, bitmap_t &bitmap_for_chars)
+          : scan_api_t(regex), available_chars(bitmap_for_chars)
         {
             parseRegex();
         }
@@ -34,10 +29,10 @@ namespace cerb::lex::regex
     private:
         constexpr auto parseRegex() -> void
         {
-            checkInitialization();
+            setupGenerator();
             checkRegexStart();
 
-            while (canContinueParsing()) {
+            while (canContinueParsing(cast(']'))) {
                 CharT chr = getChar();
                 processChar(chr);
             }
@@ -75,81 +70,9 @@ namespace cerb::lex::regex
             previous_char = cast(0);
         }
 
-        constexpr auto parseEscapeSequence() -> void
-        {
-            auto chr = getNextCharAndCheckForEoF();
-
-
-            switch (chr) {
-            case cast('\\'):
-                return cast('\\');
-
-            case cast('\''):
-                return cast('\'');
-
-            case cast('\"'):
-                return cast('\"');
-
-            case cast('t'):
-                return cast('\r');
-
-            case cast('n'):
-                return cast('\n');
-
-            case cast('r'):
-                return cast('\r');
-
-            case cast('f'):
-                return cast('\f');
-
-            case cast('b'):
-
-
-            case cast('0'):
-
-
-            case cast('x'):
-
-
-            case cast('u'):
-
-                return;
-
-            default:
-                break;
-            }
-        }
-
         constexpr auto setChar(CharT chr) -> void
         {
             available_chars.template set<1, 0>(asUInt(chr));
-        }
-
-        constexpr auto getChar() const -> CharT
-        {
-            return regex_rule.getCurrentChar();
-        }
-
-        constexpr auto nextChar() -> void
-        {
-            regex_rule.getCleanChar();
-        }
-
-        CERBLIB_DECL auto getNextChar() -> CharT
-        {
-            nextChar();
-            return getChar();
-        }
-
-        CERBLIB_DECL auto getNextCharAndCheckForEoF() -> CharT
-        {
-            auto chr = getNextChar();
-
-            if (isEoF(chr)) {
-                throw RegexParsingError("Unexpected EoF");
-            }
-
-            return chr;
         }
 
         CERBLIB_DECL static auto isBeginOfRegex(CharT chr) -> bool
@@ -171,26 +94,6 @@ namespace cerb::lex::regex
             }
         }
 
-        constexpr auto checkInitialization() -> void
-        {
-            if (not regex_rule.isInitialized()) {
-                regex_rule.getRawChar();
-            }
-        }
-
-        CERBLIB_DECL auto canContinueParsing() -> bool
-        {
-            CharT chr = getNextChar();
-
-            if (isEoF(chr)) {
-                throw RegexParsingError(
-                    "End of regular expression reached, but it has not been closed!");
-            }
-
-            return chr != cast(']');
-        }
-
-        GeneratorForText<CharT> &regex_rule;
         bitmap_t &available_chars;
         CharT previous_char{};
         bool is_range_of_chars{ false };
