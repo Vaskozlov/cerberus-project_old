@@ -3,7 +3,6 @@
 
 #include <cerberus/lex/item/regex.hpp>
 #include <cerberus/lex/item/string.hpp>
-#include <fmt/format.h>
 #include <vector>
 
 namespace cerb::lex
