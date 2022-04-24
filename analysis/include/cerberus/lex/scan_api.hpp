@@ -82,7 +82,8 @@ namespace cerb::scan
             }
         }
 
-        constexpr auto parseEscapeSequence(CharT special_symbol = cast(0)) -> CharT
+        template<CharacterLiteral... Ts>
+        constexpr auto parseEscapeSequence(Ts... special_symbols) -> CharT
         {
             CharT chr = getNextCharAndCheckForEoF();
 
@@ -124,11 +125,7 @@ namespace cerb::scan
                 break;
             }
 
-            if (logicalAnd(not lex::isEoF(special_symbol), chr == special_symbol)) {
-                return special_symbol;
-            } else {
-                throw ScanApiError("Unable to match any escape sequence");
-            }
+            return checkSpecialSymbol(chr, special_symbols...);
         }
 
         ScanApi() = default;
@@ -138,6 +135,19 @@ namespace cerb::scan
         {}
 
     private:
+        template<CharacterLiteral... Ts>
+        CERBLIB_DECL auto checkSpecialSymbol(CharT chr, Ts... special_symbols) -> CharT
+        {
+            CharT result = cast(0);
+            ((result = safeEqual(chr, special_symbols) ? chr : result), ...);
+
+            if (result == cast(0)) {
+                throw ScanApiError("Unable to match any escape sequence");
+            }
+
+            return result;
+        }
+
         CERBLIB_DECL auto convertStringToChar(u32 notation, u32 length) -> CharT
         {
             CharT resulted_char = lex::CharEnum<CharT>::EoF;

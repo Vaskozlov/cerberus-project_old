@@ -28,7 +28,7 @@ namespace cerb::debug
         StringToCodes string_to_codes{ '\"', text_generator };
         auto const &parsed_string = string_to_codes.parseString();
 
-        return parsed_string == "";
+        return parsed_string.empty();
     }
 
     auto testStringToCodesOnBasicString() -> bool

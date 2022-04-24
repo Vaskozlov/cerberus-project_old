@@ -11,12 +11,12 @@ namespace cerb::lex::regex
     CERBERUS_EXCEPTION(RegexParsingError);
 
     template<CharacterLiteral CharT>
-    struct RegexParser : scan::ScanApi<true, CharT>
+    struct RegexParser : scan::ScanApi<false, CharT>
     {
         constexpr static size_t number_of_chars = pow2<size_t>(bitsizeof(CharT));
 
         using bitmap_t = ConstBitmap<1, number_of_chars>;
-        CERBLIB_SCAN_API_ACCESS(true, CharT);
+        CERBLIB_SCAN_API_ACCESS(false, CharT);
 
         RegexParser() = default;
 
@@ -43,6 +43,7 @@ namespace cerb::lex::regex
             if (chr == cast('-')) {
                 is_range_of_chars = true;
             } else {
+                chr = processEscapeSymbol(chr);
                 addCharToBitmap(chr);
             }
         }
@@ -62,12 +63,21 @@ namespace cerb::lex::regex
         {
             checkCharsOrder(begin, end);
 
-            for (; begin != end; ++begin) {
+            for (; begin <= end; ++begin) {
                 setChar(begin);
             }
 
             is_range_of_chars = false;
             previous_char = cast(0);
+        }
+
+        constexpr auto processEscapeSymbol(CharT chr) -> CharT
+        {
+            if (chr == cast('\\')) {
+                return parseEscapeSequence(chr, cast('-'));
+            } else {
+                return chr;
+            }
         }
 
         constexpr auto setChar(CharT chr) -> void
