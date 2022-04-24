@@ -9,6 +9,7 @@ namespace cerb::debug
 
     auto testDotItem() -> int;
     auto testRegexParser() -> int;
+    auto testBracketFinder() -> int;
 }// namespace cerb::debug
 
 auto main() -> int
@@ -24,6 +25,7 @@ auto main() -> int
 
     testDotItem();
     testRegexParser();
+    testBracketFinder();
 
     return 0;
 }
