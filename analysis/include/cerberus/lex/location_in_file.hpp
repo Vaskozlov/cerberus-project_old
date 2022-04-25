@@ -41,6 +41,7 @@ namespace cerb::lex
         }
 
         LocationInFile() = default;
+
         constexpr explicit LocationInFile(
             BasicStringView<CharT> const &filename, size_t current_line = 1,
             size_t current_char = 1, size_t offset_from_the_begging = 0)

@@ -32,6 +32,18 @@
 #    define CERBLIB_JOIN_STR(x, y) CERBLIB_STR(x##y)
 #endif /* CERBLIB_JOIN_STR */
 
+#ifndef CERBLIB_FORCE_EXPAND
+#    define CERBLIB_FORCE_EXPAND(x, y) CERBLIB_CONCATENATE(x, y)
+#endif /* CERBLIB_FORCE_EXPAND */
+
+#ifndef CERBLIB_CONCATENATE
+#    define CERBLIB_CONCATENATE(x, y) x##y
+#endif /* CERBLIB_CONCATENATE */
+
+#ifndef CERBLIB_UNIQUE_IDENT
+#    define CERBLIB_UNIQUE_IDENT CERBLIB_FORCE_EXPAND(_uid, __COUNTER__)
+#endif /* CERBLIB_UNIQUE_IDENT */
+
 #ifndef CERBLIB_AMD64
 #    ifdef __x86_64__
 #        define CERBLIB_AMD64 1
@@ -92,13 +104,6 @@
 #    define CERBLIB_DEPRECATED_SUGGEST(ALT) [[deprecated(ALT)]]
 #endif /* CERBLIB_DEPRECATED_SUGGEST */
 
-#ifndef CERBLIB_IGNORE
-#    define CERBLIB_IGNORE(X)                                                                      \
-        {                                                                                          \
-            [[maybe_unused]] auto _ = (X);                                                         \
-        }
-#endif /* CERBLIB_IGNORE */
-
 #ifndef CERBLIB_DO_PRAGMA
 #    ifdef _MSC_VER
 #        define CERBLIB_DO_PRAGMA(x) __pragma(#        x)
@@ -156,7 +161,7 @@
 #endif /* CERBLIB_CLANG_ENABLE_WARNING */
 
 #ifndef CERBLIB_UNUSED
-#    define CERBLIB_UNUSED(x) [[maybe_unused]] x _
+#    define CERBLIB_UNUSED(x) [[maybe_unused]] x CERBLIB_UNIQUE_IDENT
 #endif /* CERBLIB_UNUSED */
 
 namespace cerb

@@ -22,9 +22,19 @@ namespace cerb::debug
         u"    \t\tHello, World! \nIt's a test \xFF \0 \077 \0555 Привет мир! \uFFFF"
         "\t\t  string."sv;
 
+    auto testStringToCodesOnEmptyBasicString() -> bool
+    {
+        GeneratorForText<char> text_generator{ "\"\"" };
+        StringToCodes string_to_codes{ '\"', text_generator };
+        auto const &parsed_string = string_to_codes.parseString();
+
+        return parsed_string.empty();
+    }
+
     auto testStringToCodesOnBasicString() -> bool
     {
-        StringToCodes<char> string_to_codes{ '\"', TestInput };
+        GeneratorForText<char> text_generator{ TestInput };
+        StringToCodes string_to_codes{ '\"', text_generator };
         auto const &processed_string = string_to_codes.parseString();
 
         return processed_string == ExpectedOutput;
@@ -32,7 +42,8 @@ namespace cerb::debug
 
     auto testStringToCodesOnUtf16String() -> bool
     {
-        StringToCodes<char16_t> string_to_codes{ u'\"', TestInputU16 };
+        GeneratorForText<char16_t> text_generator{ TestInputU16 };
+        StringToCodes string_to_codes{ u'\"', text_generator };
         auto const &processed_string = string_to_codes.parseString();
 
         return processed_string == ExpectedOutputU16;
@@ -40,6 +51,7 @@ namespace cerb::debug
 
     auto testStringToCodes() -> int
     {
+        EXPECT_TRUE(testStringToCodesOnEmptyBasicString());
         EXPECT_TRUE(testStringToCodesOnBasicString());
         EXPECT_TRUE(testStringToCodesOnUtf16String());
         return 0;

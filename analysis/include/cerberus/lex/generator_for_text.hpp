@@ -1,6 +1,7 @@
 #ifndef CERBERUS_TEXT_GENERATOR_HPP
 #define CERBERUS_TEXT_GENERATOR_HPP
 
+#include <cerberus/exception.hpp>
 #include <cerberus/lex/char.hpp>
 #include <cerberus/lex/location_in_file.hpp>
 #include <string>
@@ -12,6 +13,11 @@ namespace cerb::lex
     template<CharacterLiteral CharT, CharacterLiteral FileNameT = char>
     struct GeneratorForText
     {
+        CERBLIB_DECL auto isInitialized() const -> bool
+        {
+            return initialized;
+        }
+
         CERBLIB_DECL auto getLocation() const -> LocationInFile<FileNameT> const &
         {
             return location;
@@ -93,10 +99,18 @@ namespace cerb::lex
             return text[getOffset()];
         }
 
+        constexpr auto skip(size_t times) -> void
+        {
+            for (size_t i = 0; i < times; ++i) {
+                getRawChar();
+            }
+        }
+
         GeneratorForText() = default;
-        constexpr GeneratorForText(
+
+        constexpr explicit GeneratorForText(
             BasicStringView<CharT> const &file_content,
-            BasicStringView<FileNameT> const &name_of_file)
+            BasicStringView<FileNameT> const &name_of_file = {})
           : location(name_of_file), text(file_content)
         {
             updateCurrentLine();
@@ -205,6 +219,15 @@ namespace cerb::lex
         BasicStringView<CharT> current_line{};
         bool initialized{ false };
     };
+
+#ifndef CERBERUS_HEADER_ONLY
+    extern template struct GeneratorForText<char>;
+    extern template struct GeneratorForText<char8_t>;
+    extern template struct GeneratorForText<char16_t>;
+    extern template struct GeneratorForText<char32_t>;
+    extern template struct GeneratorForText<wchar_t>;
+#endif /* CERBERUS_HEADER_ONLY */
+
 }// namespace cerb::lex
 
 #endif /* CERBERUS_TEXT_GENERATOR_HPP */

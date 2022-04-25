@@ -13,7 +13,7 @@ namespace cerb::debug
         EXPECT_TRUE(string_pool.findLongestStringInPool("WorldIt'sATest") == "World");
 
         try {
-            string_pool["Test"];
+            CERBLIB_UNUSED(auto) = string_pool["Test"];
             EXPECT_FALSE(1);
         } catch (std::out_of_range const &) {
             EXPECT_TRUE(1);

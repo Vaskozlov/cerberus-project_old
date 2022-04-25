@@ -141,11 +141,13 @@ namespace cerb
         }
 
         iterator() = default;
+
         constexpr iterator(T current_state, T inc) : state(current_state), increment(inc)
         {}
 
     private:
-        T state{}, increment{};
+        T state{};
+        T increment{};
     };
 }// namespace cerb
 

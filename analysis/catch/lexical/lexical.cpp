@@ -4,8 +4,12 @@ namespace cerb::debug
     auto testToken() -> int;
     auto testStringParser() -> int;
     auto testGeneratorForText() -> int;
-    auto lexicalAnalyzerTest() -> int;
+    auto testLexicalAnalyzer() -> int;
     auto testStringToCodes() -> int;
+
+    auto testDotItem() -> int;
+    auto testRegexParser() -> int;
+    auto testBracketFinder() -> int;
 }// namespace cerb::debug
 
 auto main() -> int
@@ -16,8 +20,12 @@ auto main() -> int
     testToken();
     testStringParser();
     testGeneratorForText();
-    lexicalAnalyzerTest();
+    testLexicalAnalyzer();
     testStringToCodes();
+
+    testDotItem();
+    testRegexParser();
+    testBracketFinder();
 
     return 0;
 }

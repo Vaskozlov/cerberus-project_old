@@ -18,7 +18,7 @@ cd ..\..\..
 mkdir build
 
 cd build
-powershell -Command "%cmake_dir%\cmake.exe -DCMAKE_BUILD_TYPE=Release -DUSE_SANITIZERS=OFF -G 'Visual Studio 17 2022' -A x64 -S .. -DCMAKE_TOOLCHAIN_FILE=%CMAKE_TOOLCHAIN_FILE%"
+powershell -Command "%cmake_dir%\cmake.exe -DCMAKE_TOOLCHAIN_FILE=%CMAKE_TOOLCHAIN_FILE% -DUSE_DYNAMIC_LIBRARY=OFF -DCMAKE_BUILD_TYPE=Release -DUSE_SANITIZERS=OFF -G 'Visual Studio 17 2022' -A x64 -S .."
 cd ..
 
 echo "SUCCESS! Installation is completed"

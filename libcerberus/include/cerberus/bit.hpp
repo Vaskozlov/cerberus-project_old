@@ -77,7 +77,7 @@ namespace cerb::bit
         }
 
         template<std::unsigned_integral T>
-        CERBLIB_DECL auto systemScanForward(T value) -> size_t
+        CERBLIB_DECL auto callSystemScanForward(T value) -> size_t
         {
 #ifdef _MSC_VER
             if CERBLIB_COMPILE_TIME {
@@ -91,7 +91,7 @@ namespace cerb::bit
         }
 
         template<std::unsigned_integral T>
-        CERBLIB_DECL auto systemScanReverse(T value) -> size_t
+        CERBLIB_DECL auto callSystemScanReverse(T value) -> size_t
         {
 #ifdef _MSC_VER
             if CERBLIB_COMPILE_TIME {
@@ -121,14 +121,14 @@ namespace cerb::bit
     template<u64 PowerOf2, std::integral T>
     CERBLIB_DECL auto align(T value) -> T
     {
-        bool const need_to_align = value % private_::pow2<T>(PowerOf2) == 0;
+        bool need_to_align = value % private_::pow2<T>(PowerOf2) == 0;
         return need_to_align ? value : ceil<PowerOf2, T>(value);
     }
 
     template<unsigned BitValue, std::unsigned_integral T>
     CERBLIB_DECL auto scanForward(T value) -> size_t
     {
-        static_assert(BitValue == 0 || BitValue == 1);
+        static_assert(isOneOf(BitValue, 0, 1));
 
         if constexpr (BitValue == 0) {
             value = ~value;
@@ -137,13 +137,13 @@ namespace cerb::bit
             return bitsizeof(size_t);
         }
 
-        return private_::systemScanForward(value);
+        return private_::callSystemScanForward(value);
     }
 
     template<unsigned BitValue, std::unsigned_integral T>
     CERBLIB_DECL auto scanReverse(T value) -> size_t
     {
-        static_assert(BitValue == 0 || BitValue == 1);
+        static_assert(isOneOf(BitValue, 0, 1));
 
         if constexpr (BitValue == 0) {
             value = ~value;
@@ -152,7 +152,7 @@ namespace cerb::bit
             return bitsizeof(size_t);
         }
 
-        return private_::systemScanReverse(value);
+        return private_::callSystemScanReverse(value);
     }
 }// namespace cerb::bit
 

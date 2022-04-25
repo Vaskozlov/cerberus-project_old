@@ -1,6 +1,7 @@
 #ifndef CERBERUS_FLAT_MAP_HPP
 #define CERBERUS_FLAT_MAP_HPP
 
+#include <cerberus/exception.hpp>
 #include <cerberus/memory.hpp>
 #include <cerberus/pair.hpp>
 
@@ -55,38 +56,38 @@ namespace cerb
 
         constexpr auto insert(value_type const &new_value) -> void
         {
-            throwIfFull();
+            throwWhenFull();
             storage[number_of_elems++] = new_value;
         }
 
         template<typename... Ts>
         constexpr auto emplace(KeyForFlatMap key, Ts &&...args) -> void
         {
-            throwIfFull();
+            throwWhenFull();
             storage[number_of_elems++] = { key, Value(args...) };
         }
 
-        constexpr auto contains(KeyForFlatMap key) const -> bool
+        CERBLIB_DECL auto contains(KeyForFlatMap key) const -> bool
         {
             return findByKey(key) != end();
         }
 
-        constexpr auto count(KeyForFlatMap key) const -> u32
+        CERBLIB_DECL auto count(KeyForFlatMap key) const -> u32
         {
             return static_cast<u32>(contains(key));
         }
 
-        constexpr auto operator[](KeyForFlatMap key) -> Value &
+        CERBLIB_DECL auto operator[](KeyForFlatMap key) -> Value &
         {
             return at(key);
         }
 
-        constexpr auto operator[](KeyForFlatMap key) const -> Value const &
+        CERBLIB_DECL auto operator[](KeyForFlatMap key) const -> Value const &
         {
             return at(key);
         }
 
-        constexpr auto at(KeyForFlatMap key) -> Value &
+        CERBLIB_DECL auto at(KeyForFlatMap key) -> Value &
         {
             auto searched_elem = findByKey(key);
 
@@ -97,7 +98,7 @@ namespace cerb
             return searched_elem->second;
         }
 
-        constexpr auto at(KeyForFlatMap key) const -> Value const &
+        CERBLIB_DECL auto at(KeyForFlatMap key) const -> Value const &
         {
             auto searched_elem = findByKey(key);
 
@@ -109,6 +110,7 @@ namespace cerb
         }
 
         FlatMap() = default;
+
         constexpr FlatMap(std::initializer_list<value_type> const &storage_values)
         {
             auto insert_value = [this](value_type const &value) { this->insert(value); };
@@ -126,7 +128,7 @@ namespace cerb
             return std::find(begin(), end(), key);
         }
 
-        constexpr auto throwIfFull() const -> void
+        constexpr auto throwWhenFull() const -> void
         {
             if (number_of_elems == storage.size()) {
                 throw std::out_of_range("Cerberus flat map is full");
