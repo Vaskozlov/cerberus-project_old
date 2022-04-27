@@ -3,15 +3,57 @@
 
 namespace cerb::debug
 {
+    using namespace lex;
+    using namespace regex;
+    using namespace string;
+
+    AnalysisGlobals<char> Parameters{};
+
+    auto dotItemErrorCaseEmptyRegex() -> void
+    {
+        try {
+            CERBLIB_UNUSED(auto) = lex::DotItem<char>(Parameters, 0, "[]");
+            CANT_BE_REACHED;
+        } catch (RegexParsingError const &) {
+            MUST_BE_REACHED;
+        }
+    }
+
+    auto dotItemErrorCaseEmptyString() -> void
+    {
+        try {
+            CERBLIB_UNUSED(auto) = lex::DotItem<char>(Parameters, 0, "\"\"");
+            CANT_BE_REACHED;
+        } catch (StringItemError const &) {
+            MUST_BE_REACHED;
+        }
+    }
+
+    auto dotItemErrorCaseEmptyItem() -> void
+    {
+        try {
+            CERBLIB_UNUSED(auto) = lex::DotItem<char>(Parameters, 0, "()");
+            CANT_BE_REACHED;
+        } catch (DotItemParsingError const &) {
+            MUST_BE_REACHED;
+        }
+    }
+
+    auto testDotItemCreationOnErrorCases() -> void
+    {
+        dotItemErrorCaseEmptyRegex();
+        dotItemErrorCaseEmptyString();
+        dotItemErrorCaseEmptyItem();
+    }
+
     auto testDotItem() -> int
     {
-        lex::AnalysisGlobals<char> parameters{};
+        CERBLIB_UNUSED(auto) = lex::DotItem<char>(Parameters, 0, "\'+\'");
+        CERBLIB_UNUSED(auto) = lex::DotItem<char>(Parameters, 1, "\"Hello, World!\"");
+        CERBLIB_UNUSED(auto) = lex::DotItem<char>(Parameters, 2, "\"for\"p+[a-z]*");
+        CERBLIB_UNUSED(auto) = lex::DotItem<char>(Parameters, 3, "(\"for\"p*)+[a-z]+");
 
-        CERBLIB_UNUSED(auto) = lex::DotItem<char>(0, "\'+\'", parameters);
-        CERBLIB_UNUSED(auto) = lex::DotItem<char>(1, "\"Hello, World!\"", parameters);
-        CERBLIB_UNUSED(auto) = lex::DotItem<char>(2, "\"for\"p+[a-z]*", parameters);
-        // CERBLIB_UNUSED(auto  ) = lex::DotItem<char>(1, "(\"for\"p*)+[a-z]+", parameters);
-
+        testDotItemCreationOnErrorCases();
         return 0;
     }
 }// namespace cerb::debug

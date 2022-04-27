@@ -17,14 +17,14 @@ namespace cerb::lex
         }
 
     public:
-        constexpr auto getPosition() const -> ssize_t
+        CERBLIB_DECL auto getPosition() const -> ssize_t
         {
             return getChar() == close_bracket ? static_cast<ssize_t>(index) : -1;
         }
 
         BracketFinder() = default;
 
-        constexpr explicit BracketFinder(
+        constexpr BracketFinder(
             CharT opening_bracket, CharT closing_bracket, BasicStringView<CharT> const &str)
           : text(str), open_bracket(opening_bracket), close_bracket(closing_bracket)
         {}
@@ -92,7 +92,7 @@ namespace cerb::lex
     };
 
     template<CharacterLiteral CharT>
-    constexpr auto
+    CERBLIB_DECL auto
         findBracket(CharT opening_bracket, CharT closing_bracket, BasicStringView<CharT> const &str)
             -> size_t
     {

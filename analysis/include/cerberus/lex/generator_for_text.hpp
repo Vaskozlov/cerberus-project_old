@@ -72,7 +72,9 @@ namespace cerb::lex
             auto real_offset = static_cast<ssize_t>(getOffset()) + offset;
             checkOffset(real_offset);
 
-            return text[static_cast<size_t>(real_offset)];
+            auto converted_offset = static_cast<size_t>(real_offset);
+            return converted_offset >= text.size() ? CharEnum<CharT>::EoF
+                                                   : text[static_cast<size_t>(real_offset)];
         }
 
         constexpr auto getRawChar() -> CharT
@@ -87,7 +89,7 @@ namespace cerb::lex
                 processRawChar();
             }
 
-            return text[getOffset()];
+            return getCurrentChar();
         }
 
         constexpr auto getCleanChar() -> CharT
@@ -96,7 +98,7 @@ namespace cerb::lex
                 // empty loop
             }
 
-            return text[getOffset()];
+            return getCurrentChar();
         }
 
         constexpr auto skip(size_t times) -> void
@@ -119,7 +121,7 @@ namespace cerb::lex
     private:
         constexpr auto checkOffset(ssize_t offset) const -> void
         {
-            if (logicalOr(offset > static_cast<ssize_t>(text.size()), offset < 0)) {
+            if (offset < 0) {
                 throw TextGeneratorError("Unable to access char at given offset");
             }
         }

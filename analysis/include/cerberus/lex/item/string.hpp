@@ -3,22 +3,29 @@
 
 #include <cerberus/lex/item/basic_item.hpp>
 
-
 namespace cerb::lex::string
 {
+    CERBERUS_EXCEPTION(StringItemError);
+
     template<CharacterLiteral CharT>
     struct StringItem : public BasicItem<CharT>
     {
         CERBLIB_BASIC_ITEM_ACCESS(CharT);
 
-        constexpr explicit StringItem(CERBLIB_BASIC_ITEM_ARGS, GeneratorForText<CharT> &str)
-          : CERBLIB_CONSTRUCT_BASIC_ITEM
+        constexpr StringItem(CERBLIB_BASIC_ITEM_ARGS, GeneratorForText<CharT> &str)
+          : CERBLIB_CONSTRUCT_BASIC_ITEM, string(convertStringToCodes(cast('\"'), str))
         {
-            StringToCodes<CharT> string_to_codes{ cast('\"'), str };
-            string = std::move(string_to_codes.parseString());
+            checkThatStringIsNotEmpty();
         }
 
     private:
+        constexpr auto checkThatStringIsNotEmpty() const -> void
+        {
+            if (string.empty()) {
+                throw StringItemError("Empty strings are not allowed!");
+            }
+        }
+
         std::basic_string<CharT> string{};
         size_t index{};
     };

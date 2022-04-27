@@ -6,13 +6,13 @@
 #include <cerberus/string_pool.hpp>
 
 #define CERBLIB_BASIC_ITEM_ACCESS(CharT)                                                           \
-    using parent = BasicItem<CharT>;                                                               \
-    using parent::analysis_globals;                                                                \
-    using parent::cast;                                                                            \
-    using parent::flags
+    using basic_item_t = BasicItem<CharT>;                                                         \
+    using basic_item_t::analysis_globals;                                                          \
+    using basic_item_t::cast;                                                                      \
+    using basic_item_t::flags
 
 #define CERBLIB_BASIC_ITEM_ARGS AnalysisGlobals<CharT> &analysis_parameters
-#define CERBLIB_CONSTRUCT_BASIC_ITEM parent(analysis_parameters)
+#define CERBLIB_CONSTRUCT_BASIC_ITEM basic_item_t(analysis_parameters)
 
 namespace cerb::lex
 {
