@@ -4,8 +4,6 @@
 #include <cerberus/lex/bracket_finder.hpp>
 #include <cerberus/lex/item/regex.hpp>
 #include <cerberus/lex/item/string.hpp>
-#include <fmt/format.h>
-#include <iostream>
 
 #define CERBLIB_ITEM_PARSER_ACCESS(CharT)                                                          \
     using item_parser_t = cerb::lex::ItemParser<CharT>;                                            \
@@ -36,8 +34,11 @@ namespace cerb::lex
 
         ItemParser() = default;
 
-        constexpr ItemParser(CERBLIB_BASIC_ITEM_ARGS, size_t id, BasicStringView<CharT> const &rule)
-          : CERBLIB_CONSTRUCT_BASIC_ITEM, rule_generator(rule), item_id(id)
+        constexpr ItemParser(
+            CERBLIB_BASIC_ITEM_ARGS,
+            size_t id_of_item,
+            BasicStringView<CharT> const &rule)
+          : CERBLIB_CONSTRUCT_BASIC_ITEM, rule_generator(rule), item_id(id_of_item)
         {
             parseRule();
         }

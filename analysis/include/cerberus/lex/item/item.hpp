@@ -11,9 +11,9 @@ namespace cerb::lex
         CERBLIB_ITEM_PARSER_ACCESS(CharT);
 
         constexpr DotItem(
-            AnalysisGlobals<CharT> &analysis_parameters, size_t id,
+            AnalysisGlobals<CharT> &analysis_parameters, size_t id_of_item,
             BasicStringView<CharT> const &rule)
-          : item_parser_t(analysis_parameters, id, rule)
+          : item_parser_t(analysis_parameters, id_of_item, rule)
         {}
     };
 
