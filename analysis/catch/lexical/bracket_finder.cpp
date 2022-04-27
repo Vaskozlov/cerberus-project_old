@@ -30,7 +30,7 @@ namespace cerb::debug
     constexpr auto testBracketFinderOnErrorCase() -> bool
     {
         try {
-            findBracket('(', ')', TestErrorInput);
+            CERBLIB_UNUSED(auto) = findBracket('(', ')', TestErrorInput);
             CANT_BE_REACHED;
         } catch (BracketFinderError const &) {
             MUST_BE_REACHED;
@@ -42,7 +42,7 @@ namespace cerb::debug
     constexpr auto testBracketFinderOnErrorCaseU16() -> bool
     {
         try {
-            findBracket(u'(', u')', TestErrorInputU16);
+            CERBLIB_UNUSED(auto) = findBracket(u'(', u')', TestErrorInputU16);
             CANT_BE_REACHED;
         } catch (BracketFinderError const &) {
             MUST_BE_REACHED;

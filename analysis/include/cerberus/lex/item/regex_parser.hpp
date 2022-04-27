@@ -36,6 +36,9 @@ namespace cerb::lex::regex
                 CharT chr = getChar();
                 processChar(chr);
             }
+
+            checkRangeClosing();
+            checkRangeNonEmpty();
         }
 
         constexpr auto processChar(CharT chr) -> void
@@ -82,6 +85,7 @@ namespace cerb::lex::regex
 
         constexpr auto setChar(CharT chr) -> void
         {
+            is_filled = true;
             available_chars.template set<1, 0>(asUInt(chr));
         }
 
@@ -104,8 +108,23 @@ namespace cerb::lex::regex
             }
         }
 
+        constexpr auto checkRangeClosing() const -> void
+        {
+            if (is_range_of_chars) {
+                throw RegexParsingError("Range of chars is not closed!");
+            }
+        }
+
+        constexpr auto checkRangeNonEmpty() const -> void
+        {
+            if (not is_filled) {
+                throw RegexParsingError("There are no characters in regex!");
+            }
+        }
+
         bitmap_t &available_chars;
         CharT previous_char{};
+        bool is_filled{ false };
         bool is_range_of_chars{ false };
     };
 

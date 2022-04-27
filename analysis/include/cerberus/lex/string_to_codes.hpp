@@ -63,6 +63,14 @@ namespace cerb::lex
         CharT string_begin_char{};
     };
 
+    template<CharacterLiteral CharT>
+    CERBLIB_DECL auto convertStringToCodes(CharT string_opener, GeneratorForText<CharT> &text)
+        -> std::basic_string<CharT>
+    {
+        StringToCodes<CharT> string_to_codes{ string_opener, text };
+        return std::move(string_to_codes.parseString());
+    }
+
 #ifndef CERBERUS_HEADER_ONLY
     extern template class StringToCodes<char>;
     extern template class StringToCodes<char8_t>;

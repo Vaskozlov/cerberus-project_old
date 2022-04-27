@@ -21,12 +21,7 @@ namespace cerb::debug
         EXPECT_TRUE(isEoF(text_generator.getRawChar()));
         EXPECT_TRUE(isEoF(text_generator.getRawChar()));
 
-        try {
-            [[maybe_unused]] char _ = text_generator.getCurrentChar(1);
-            CANT_BE_REACHED;
-        } catch (TextGeneratorError const &) {
-            MUST_BE_REACHED;
-        }
+        EXPECT_TRUE(text_generator.getCurrentChar(1) == '\0');
     }
 
     auto testCleanGeneratorForText() -> void
@@ -75,13 +70,7 @@ namespace cerb::debug
 
         EXPECT_TRUE(isEoF(text_generator.getCleanChar()));
         EXPECT_TRUE(isEoF(text_generator.getCleanChar()));
-
-        try {
-            [[maybe_unused]] char _ = text_generator.getCurrentChar(1);
-            CANT_BE_REACHED;
-        } catch (TextGeneratorError const &) {
-            MUST_BE_REACHED;
-        }
+        EXPECT_TRUE(text_generator.getCurrentChar(1) == '\0');
     }
 
     auto testGeneratorForText() -> int
