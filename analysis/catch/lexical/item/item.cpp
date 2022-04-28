@@ -46,13 +46,33 @@ namespace cerb::debug
         dotItemErrorCaseEmptyItem();
     }
 
-    auto testDotItem() -> int
+    auto testDotItemOnNonTerminal() -> void
     {
         CERBLIB_UNUSED(auto) = lex::DotItem<char>(Parameters, 0, "\'+\'");
-        CERBLIB_UNUSED(auto) = lex::DotItem<char>(Parameters, 1, "\"Hello, World!\"");
-        CERBLIB_UNUSED(auto) = lex::DotItem<char>(Parameters, 2, "\"for\"p+[a-z]*");
-        CERBLIB_UNUSED(auto) = lex::DotItem<char>(Parameters, 3, "(\"for\"p*)+[a-z]+");
+    }
 
+
+    auto testDotItemOnString() -> void
+    {
+        CERBLIB_UNUSED(auto) = lex::DotItem<char>(Parameters, 1, "\"Hello, World!\"");
+    }
+
+    auto testDotItemOnStringAndRegex() -> void
+    {
+        CERBLIB_UNUSED(auto) = lex::DotItem<char>(Parameters, 2, "\"for\"p+[a-z]*");
+    }
+
+    auto testComplexDotItem() -> void
+    {
+        CERBLIB_UNUSED(auto) = lex::DotItem<char>(Parameters, 3, "(\"for\"p*)+[a-z]+");
+    }
+
+    auto testDotItem() -> int
+    {
+        testDotItemOnNonTerminal();
+        testDotItemOnString();
+        testDotItemOnStringAndRegex();
+        testComplexDotItem();
         testDotItemCreationOnErrorCases();
         return 0;
     }

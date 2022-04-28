@@ -14,9 +14,9 @@ namespace cerb::debug
 
         try {
             CERBLIB_UNUSED(auto) = string_pool["Test"];
-            EXPECT_FALSE(1);
+            CANT_BE_REACHED;
         } catch (std::out_of_range const &) {
-            EXPECT_TRUE(1);
+            MUST_BE_REACHED;
         }
 
         string_pool.emplace("Test", 3);

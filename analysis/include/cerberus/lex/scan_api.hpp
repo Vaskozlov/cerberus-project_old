@@ -125,7 +125,7 @@ namespace cerb::scan
                 break;
             }
 
-            return checkSpecialSymbol(chr, special_symbols...);
+            return parseUserDefinedEscapeSymbols(chr, special_symbols...);
         }
 
         ScanApi() = default;
@@ -136,7 +136,7 @@ namespace cerb::scan
 
     private:
         template<CharacterLiteral... Ts>
-        CERBLIB_DECL auto checkSpecialSymbol(CharT chr, Ts... special_symbols) -> CharT
+        CERBLIB_DECL auto parseUserDefinedEscapeSymbols(CharT chr, Ts... special_symbols) -> CharT
         {
             CharT result = cast(0);
             ((result = safeEqual(chr, special_symbols) ? chr : result), ...);
