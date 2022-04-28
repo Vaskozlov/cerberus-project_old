@@ -1,6 +1,7 @@
 #ifndef CERBERUS_BASIC_ITEM_HPP
 #define CERBERUS_BASIC_ITEM_HPP
 
+#include <cerberus/lex/analysis_exception.hpp>
 #include <cerberus/lex/generator_for_text.hpp>
 #include <cerberus/lex/string_to_codes.hpp>
 #include <cerberus/string_pool.hpp>

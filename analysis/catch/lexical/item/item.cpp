@@ -34,7 +34,7 @@ namespace cerb::debug
         try {
             CERBLIB_UNUSED(auto) = lex::DotItem<char>(Parameters, 0, "()");
             CANT_BE_REACHED;
-        } catch (DotItemParsingError const &) {
+        } catch (AnalysisException<char> const &) {
             MUST_BE_REACHED;
         }
     }

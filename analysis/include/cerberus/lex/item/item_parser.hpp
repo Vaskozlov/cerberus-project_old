@@ -206,10 +206,10 @@ namespace cerb::lex
             analysis_globals.emplaceNonterminal(std::move(str), id());
         }
 
-        constexpr static auto checkItemNonEmpty(const ItemParser<CharT> *item_to_check) -> void
+        constexpr auto checkItemNonEmpty(const ItemParser<CharT> *item_to_check) const -> void
         {
             if (item_to_check->items.empty()) {
-                throw DotItemParsingError("Empty items are not allowed");
+                throw AnalysisException<CharT>("Empty items are not allowed", rule_generator);
             }
         }
 
