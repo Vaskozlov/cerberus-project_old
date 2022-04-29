@@ -114,7 +114,7 @@ namespace cerb
         if constexpr (std::unsigned_integral<T>) {
             return value;
         }
-        return cmov(value < 0, -value, value);
+        return value < 0 ? -value : value;
     }
 
     template<std::floating_point T>
