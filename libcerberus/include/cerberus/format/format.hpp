@@ -30,7 +30,7 @@ namespace cerb::fmt
 
             template<typename... Ts>
             constexpr explicit Converter(
-                BasicStringView<CharT> const &string_to_format,
+                BasicStringView<char> const &string_to_format,
                 Ts &&...args)
               : formatter(string_to_format)
             {
@@ -130,7 +130,7 @@ namespace cerb::fmt
                     return lex::CharEnum<CharT>::EoF;
                 }
 
-                return formatter[current_char_index];
+                return cast(formatter[current_char_index]);
             }
 
             CERBLIB_DECL auto getFutureChar() const -> CharT
@@ -139,7 +139,7 @@ namespace cerb::fmt
                     return lex::CharEnum<CharT>::EoF;
                 }
 
-                return formatter[current_char_index + 1];
+                return cast(formatter[current_char_index + 1]);
             }
 
             constexpr auto nextChar() -> CharT
@@ -174,7 +174,7 @@ namespace cerb::fmt
             }
 
             std::basic_string<CharT> formatted_string{};
-            BasicStringView<CharT> formatter{};
+            BasicStringView<char> formatter{};
             size_t current_char_index{};
             bool fmt_open{};
             bool initialized{};
@@ -183,7 +183,7 @@ namespace cerb::fmt
     }// namespace private_
 
     template<typename CharT, typename... Ts>
-    CERBLIB_DECL auto format(BasicStringView<CharT> const &formatter, Ts &&...args)
+    CERBLIB_DECL auto format(BasicStringView<char> const &formatter, Ts &&...args)
         -> std::basic_string<CharT>
     {
         private_::Converter<CharT> converter{ formatter, std::forward<Ts>(args)... };

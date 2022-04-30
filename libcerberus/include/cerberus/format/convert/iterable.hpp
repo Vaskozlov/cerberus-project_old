@@ -46,6 +46,7 @@ namespace cerb::fmt
             constexpr auto addElem(auto const &elem) -> void
             {
                 conversion_result += convert<CharT>(elem);
+                addElemSeparator();
             }
 
             constexpr auto addElemSeparator() -> void

@@ -2,8 +2,8 @@
 #define CERBERUS_ANALYSIS_EXCEPTION_HPP
 
 #include <cerberus/exception.hpp>
+#include <cerberus/format/format.hpp>
 #include <cerberus/lex/generator_for_text.hpp>
-#include <fmt/format.h>
 
 namespace cerb
 {
@@ -16,18 +16,25 @@ namespace cerb
         {}
 
         explicit constexpr AnalysisException(
-            std::string_view exception_message,
-            lex::GeneratorForText<CharT> const &)
-          : message(exception_message)
+            BasicStringView<char> const &exception_message,
+            lex::GeneratorForText<CharT> const &generator)
+          : message(fmt::format<CharT>(
+                "Analysis error occurred: {}. File: {}, line: {}, char: {}\n{}", exception_message,
+                generator.getFilename(), generator.getLine(), generator.getCharPosition(),
+                generator.getCurrentLine()))
         {}
 
         [[nodiscard]] auto what() const noexcept -> char const * override
         {
-            return message.c_str();
+            if constexpr (std::is_same_v<char, CharT>) {
+                return message.c_str();
+            } else {
+                return "Unable to show message";
+            }
         }
 
     private:
-        std::string message{};
+        std::basic_string<CharT> message{};
     };
 }// namespace cerb
 

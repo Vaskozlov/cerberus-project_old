@@ -35,7 +35,7 @@ namespace cerb::fmt
             constexpr auto convertNumber() -> void
             {
                 if constexpr (CharacterLiteral<T>) {
-                    converted_number = std::basic_string<CharT>{ number };
+                    converted_number = std::basic_string<CharT>{ cast(number) };
                     return;
                 }
 

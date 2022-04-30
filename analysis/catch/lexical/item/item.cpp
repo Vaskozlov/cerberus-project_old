@@ -34,7 +34,8 @@ namespace cerb::debug
         try {
             CERBLIB_UNUSED(auto) = lex::DotItem<char>(Parameters, 0, "()");
             CANT_BE_REACHED;
-        } catch (AnalysisException<char> const &) {
+        } catch (AnalysisException<char> const &error) {
+            ::fmt::print("{}\n", error.what());
             MUST_BE_REACHED;
         }
     }
@@ -50,7 +51,6 @@ namespace cerb::debug
     {
         CERBLIB_UNUSED(auto) = lex::DotItem<char>(Parameters, 0, "\'+\'");
     }
-
 
     auto testDotItemOnString() -> void
     {
