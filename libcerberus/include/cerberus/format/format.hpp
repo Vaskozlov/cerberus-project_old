@@ -2,6 +2,7 @@
 #define CERBERUS_FORMAT_HPP
 
 #include <cerberus/exception.hpp>
+#include <cerberus/format/convert/char_pointer.hpp>
 #include <cerberus/format/convert/int.hpp>
 #include <cerberus/format/convert/iterable.hpp>
 #include <cerberus/format/convert/standart_containers.hpp>

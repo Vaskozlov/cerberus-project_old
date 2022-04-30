@@ -3,6 +3,7 @@
 
 #include <cerberus/cerberus.hpp>
 #include <cerberus/memory.hpp>
+#include <cerberus/number.hpp>
 #include <cerberus/range.hpp>
 #include <cerberus/type.hpp>
 #include <string_view>

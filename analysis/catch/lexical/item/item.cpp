@@ -8,13 +8,14 @@ namespace cerb::debug
     using namespace string;
 
     AnalysisGlobals<char> Parameters{};
+    AnalysisGlobals<char16_t> ParametersUtf16{};
 
     auto dotItemErrorCaseEmptyRegex() -> void
     {
         try {
             CERBLIB_UNUSED(auto) = lex::DotItem<char>(Parameters, 0, "[]");
             CANT_BE_REACHED;
-        } catch (RegexParsingError const &) {
+        } catch (lex::regex::RegexParser<char>::RegexParsingError const &) {
             MUST_BE_REACHED;
         }
     }
@@ -24,7 +25,7 @@ namespace cerb::debug
         try {
             CERBLIB_UNUSED(auto) = lex::DotItem<char>(Parameters, 0, "\"\"");
             CANT_BE_REACHED;
-        } catch (StringItemError const &) {
+        } catch (lex::string::StringItem<char>::StringItemError const &) {
             MUST_BE_REACHED;
         }
     }

@@ -54,8 +54,8 @@ namespace cerb::lex
         {}
 
         // NOLINTBEGIN
-        ItemFlags flags{ ItemFlags::NONE };
         AnalysisGlobals<CharT> &analysis_globals;
+        ItemFlags flags{ ItemFlags::NONE };
         // NOLINTEND
     };
 

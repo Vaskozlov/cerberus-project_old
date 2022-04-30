@@ -5,24 +5,24 @@
 
 namespace cerb::lex::string
 {
-    CERBERUS_EXCEPTION(StringItemError);
-
     template<CharacterLiteral CharT>
     struct StringItem : public BasicItem<CharT>
     {
         CERBLIB_BASIC_ITEM_ACCESS(CharT);
+        CERBERUS_ANALYSIS_EXCEPTION(StringItemError, CharT);
 
-        constexpr StringItem(CERBLIB_BASIC_ITEM_ARGS, GeneratorForText<CharT> &str)
-          : CERBLIB_CONSTRUCT_BASIC_ITEM, string(convertStringToCodes(cast('\"'), str))
+        constexpr StringItem(CERBLIB_BASIC_ITEM_ARGS, GeneratorForText<CharT> &generator)
+          : CERBLIB_CONSTRUCT_BASIC_ITEM, string(convertStringToCodes(cast('\"'), generator))
         {
-            checkThatStringIsNotEmpty();
+            checkThatStringIsNotEmpty(generator);
         }
 
     private:
-        constexpr auto checkThatStringIsNotEmpty() const -> void
+        constexpr auto checkThatStringIsNotEmpty(GeneratorForText<CharT> const &generator) const
+            -> void
         {
             if (string.empty()) {
-                throw StringItemError("Empty strings are not allowed!");
+                throw StringItemError("Empty strings are not allowed!", generator);
             }
         }
 
