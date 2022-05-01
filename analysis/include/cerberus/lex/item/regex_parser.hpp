@@ -43,6 +43,8 @@ namespace cerb::lex::regex
 
         constexpr auto processChar(CharT chr) -> void
         {
+            checkDoubleRegexOpening(chr);
+
             if (chr == cast('-')) {
                 is_range_of_chars = true;
             } else {
@@ -77,7 +79,7 @@ namespace cerb::lex::regex
         constexpr auto processEscapeSymbol(CharT chr) -> CharT
         {
             if (chr == cast('\\')) {
-                return parseEscapeSequence(chr, cast('-'));
+                return parseEscapeSequence(chr, cast('-'), cast('['), cast(']'));
             } else {
                 return chr;
             }
@@ -119,6 +121,16 @@ namespace cerb::lex::regex
         {
             if (not is_filled) {
                 throw RegexParsingError("There are no characters in regex!", getGenerator());
+            }
+        }
+
+        constexpr auto checkDoubleRegexOpening(CharT chr) const -> void
+        {
+            if (chr == cast('[')) {
+                throw RegexParsingError(
+                    "Unable to open regex inside regex. If you want to use "
+                    "'[' as a character type use '\\[' instead.",
+                    getGenerator());
             }
         }
 

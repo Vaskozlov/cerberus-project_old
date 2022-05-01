@@ -55,8 +55,9 @@ namespace cerb::lex
             constexpr size_t left_border_max_length = 20;
             size_t left_border_length = error_index - left_error_border;
 
-            return left_border_length < left_border_max_length && left_error_border > 0 &&
-                   not isLayout(line[left_error_border]);
+            return (left_border_length < left_border_max_length ||
+                    not isLayout(line[left_error_border])) &&
+                   left_error_border > 0;
         }
 
         CERBLIB_DECL auto rightBorderReducingNeeded() const -> bool
@@ -64,9 +65,9 @@ namespace cerb::lex
             constexpr size_t right_border_max_length = 20;
             size_t right_border_length = right_error_border - error_index;
 
-            return right_error_border < line.size() &&
-                   right_border_length < right_border_max_length &&
-                   not isLayout(line[right_error_border]);
+            return (right_border_length < right_border_max_length ||
+                    not isLayout(line[right_error_border])) &&
+                   right_error_border < line.size();
         }
 
         BasicStringView<CharT> reduced_string{};
