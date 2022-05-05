@@ -33,7 +33,7 @@ namespace cerb::lex
             reduceLeftBorder();
             reduceRightBorder();
             reduced_string = { line.begin() + left_error_border,
-                               line.begin() + right_error_border };
+                               right_error_border - left_error_border };
         }
 
         constexpr auto reduceLeftBorder() -> void
@@ -55,9 +55,11 @@ namespace cerb::lex
             constexpr size_t left_border_max_length = 20;
             size_t left_border_length = error_index - left_error_border;
 
-            return (left_border_length < left_border_max_length ||
-                    not isLayout(line[left_error_border])) &&
-                   left_error_border > 0;
+            bool is_not_end_of_string = left_error_border > 0;
+            bool in_border = left_border_length < left_border_max_length;
+            bool is_not_layout_char = not isLayout(line[left_error_border]);
+
+            return (in_border || is_not_layout_char) && is_not_end_of_string;
         }
 
         CERBLIB_DECL auto rightBorderReducingNeeded() const -> bool
@@ -65,9 +67,11 @@ namespace cerb::lex
             constexpr size_t right_border_max_length = 20;
             size_t right_border_length = right_error_border - error_index;
 
-            return (right_border_length < right_border_max_length ||
-                    not isLayout(line[right_error_border])) &&
-                   right_error_border < line.size();
+            bool is_not_end_of_string = right_error_border < line.size();
+            bool in_border = right_border_length < right_border_max_length;
+            bool is_not_layout_char = not isLayout(line[right_error_border]);
+
+            return (in_border || is_not_layout_char) && is_not_end_of_string;
         }
 
         BasicStringView<CharT> reduced_string{};
