@@ -31,10 +31,10 @@ jobs:
       - name: Build
         run: |
           cmake -B build -DCMAKE_BUILD_TYPE=Release -DCERBERUS_STRICT_COMPILATION=ON -DUSE_LIBCPP=OFF
-          cmake --build -- -j3 build
+          cmake --build build -- -j3
       - name: Test
         run: |
-          ctest build
+          ctest ./build
       - name: Install
         run: |
           sudo cmake --install build
