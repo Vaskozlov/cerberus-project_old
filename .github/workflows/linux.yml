@@ -30,11 +30,16 @@ jobs:
           brew install ${{ matrix.config.dependencies }}
       - name: Build
         run: |
-          cmake -B build -DCMAKE_BUILD_TYPE=Release -DCERBERUS_STRICT_COMPILATION=ON -DUSE_LIBCPP=OFF
+          mkdir -p build
+          cd ./build
+          cmake -DCMAKE_BUILD_TYPE=Release -DCERBERUS_STRICT_COMPILATION=ON -DUSE_LIBCPP=OFF ..
           cmake --build build -- -j3
+          cd ..
       - name: Test
         run: |
+          cd ./build
           ctest ./build
+          cd ..
       - name: Install
         run: |
           sudo cmake --install build
