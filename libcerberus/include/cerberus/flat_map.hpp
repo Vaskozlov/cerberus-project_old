@@ -131,7 +131,7 @@ namespace cerb
         constexpr auto throwWhenFull() const -> void
         {
             if (number_of_elems == storage.size()) {
-                throw std::out_of_range("Cerberus flat map is full");
+                throw std::out_of_range("Cerberus flat map is full!");
             }
         }
 

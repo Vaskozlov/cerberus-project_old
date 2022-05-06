@@ -1,5 +1,5 @@
-#ifndef LIBCERBERUS_PAIR_HPP
-#define LIBCERBERUS_PAIR_HPP
+#ifndef CERBERUS_PAIR_HPP
+#define CERBERUS_PAIR_HPP
 
 #include <cerberus/cerberus.hpp>
 #include <cerberus/number.hpp>
@@ -153,4 +153,4 @@ namespace cerb
     }
 }// namespace cerb
 
-#endif /* LIBCERBERUS_PAIR_HPP */
+#endif /* CERBERUS_PAIR_HPP */

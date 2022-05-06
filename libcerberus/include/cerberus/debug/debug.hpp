@@ -1,5 +1,5 @@
-#ifndef LIBCERBERUS_CATCH_CATCH_HPP
-#define LIBCERBERUS_CATCH_CATCH_HPP
+#ifndef CERBERUS_CATCH_CATCH_HPP
+#define CERBERUS_CATCH_CATCH_HPP
 
 #include <cerberus/cerberus.hpp>
 #include <cerberus/debug/location.hpp>
@@ -20,8 +20,8 @@
 
 namespace cerb::debug
 {
-    CERBERUS_EXCEPTION(RuntimeError);
-    CERBERUS_EXCEPTION(CompileTimeError);
+    CERBERUS_EXCEPTION(RuntimeError, std::exception);
+    CERBERUS_EXCEPTION(CompileTimeError, std::exception);
 
     inline auto failure(bool condition, Location const &loc = CERBLIB_LOCATION) -> void
     {
@@ -55,4 +55,4 @@ namespace cerb::debug
     }
 }// namespace cerb::debug
 
-#endif /* LIBCERBERUS_CATCH_CATCH_HPP */
+#endif /* CERBERUS_CATCH_CATCH_HPP */

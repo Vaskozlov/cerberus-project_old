@@ -1,8 +1,8 @@
-#include <cerberus/lex/analysis_exception.hpp>
+#include "cerberus/analysis/analysis_exception.hpp"
 
-namespace cerb
+namespace cerb::analysis
 {
     template struct AnalysisException<char>;
     template struct AnalysisException<char8_t>;
     template struct AnalysisException<char16_t>;
-}// namespace cerb
+}// namespace cerb::analysis

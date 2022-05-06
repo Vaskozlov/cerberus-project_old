@@ -1,7 +1,7 @@
 #ifndef CERBERUS_SCAN_API_HPP
 #define CERBERUS_SCAN_API_HPP
 
-#include <cerberus/lex/analysis_exception.hpp>
+#include "cerberus/analysis/analysis_exception.hpp"
 #include <cerberus/lex/char.hpp>
 #include <cerberus/lex/generator_for_text.hpp>
 
@@ -23,7 +23,7 @@ namespace cerb::scan
     template<bool UseCleanChars, CharacterLiteral CharT>
     struct ScanApi
     {
-        CERBERUS_ANALYSIS_EXCEPTION(ScanApiError, CharT);
+        CERBERUS_ANALYSIS_EXCEPTION(ScanApiError, CharT, lex::BasicLexicalAnalysisException);
 
         template<std::integral T>
         static constexpr auto cast(T value) -> CharT
@@ -60,7 +60,7 @@ namespace cerb::scan
             auto chr = nextChar();
 
             if (lex::isEoF(chr)) {
-                throw ScanApiError("Unexpected EoF", text_generator);
+                throw ScanApiError("Unexpected EoF!", text_generator);
             }
 
             return chr;
@@ -150,7 +150,7 @@ namespace cerb::scan
             ((result = safeEqual(chr, special_symbols) ? chr : result), ...);
 
             if (result == cast(0)) {
-                throw ScanApiError("Unable to match any escape sequence", text_generator);
+                throw ScanApiError("Unable to match any escape sequence!", text_generator);
             }
 
             return result;

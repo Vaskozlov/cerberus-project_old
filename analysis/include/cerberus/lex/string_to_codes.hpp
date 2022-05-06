@@ -14,7 +14,8 @@ namespace cerb::lex
         CERBLIB_SCAN_API_ACCESS(false, CharT);
 
     public:
-        CERBERUS_ANALYSIS_EXCEPTION(StringToCodesTranslationError, CharT);
+        CERBERUS_ANALYSIS_EXCEPTION(
+            StringToCodesTranslationError, CharT, BasicLexicalAnalysisException);
 
         constexpr auto parseString() -> std::basic_string<CharT> &
         {

@@ -9,7 +9,12 @@ namespace cerb::lex::string
     struct StringItem : public BasicItem<CharT>
     {
         CERBLIB_BASIC_ITEM_ACCESS(CharT);
-        CERBERUS_ANALYSIS_EXCEPTION(StringItemError, CharT);
+        CERBERUS_ANALYSIS_EXCEPTION(StringItemError, CharT, BasicLexicalAnalysisException);
+
+        CERBLIB_DECL auto getString() const -> std::basic_string<CharT> const &
+        {
+            return string;
+        }
 
         constexpr StringItem(CERBLIB_BASIC_ITEM_ARGS, GeneratorForText<CharT> &generator)
           : CERBLIB_CONSTRUCT_BASIC_ITEM, string(convertStringToCodes(cast('\"'), generator))

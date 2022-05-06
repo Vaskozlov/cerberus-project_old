@@ -1,14 +1,14 @@
 #ifndef CERBERUS_TEXT_GENERATOR_HPP
 #define CERBERUS_TEXT_GENERATOR_HPP
 
-#include <cerberus/exception.hpp>
 #include <cerberus/lex/char.hpp>
+#include <cerberus/lex/lexical_analysis_exception.hpp>
 #include <cerberus/lex/location_in_file.hpp>
 #include <string>
 
 namespace cerb::lex
 {
-    CERBERUS_EXCEPTION(TextGeneratorError);
+    CERBERUS_EXCEPTION(TextGeneratorError, BasicLexicalAnalysisException);
 
     template<CharacterLiteral CharT, CharacterLiteral FileNameT = char>
     struct GeneratorForText
@@ -215,7 +215,7 @@ namespace cerb::lex
         constexpr auto checkOffset(ssize_t offset) const -> void
         {
             if (offset < 0) {
-                throw TextGeneratorError("Unable to access char at given offset");
+                throw TextGeneratorError("Unable to access char at given offset!");
             }
         }
 

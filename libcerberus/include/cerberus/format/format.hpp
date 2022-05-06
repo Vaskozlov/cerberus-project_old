@@ -1,7 +1,6 @@
 #ifndef CERBERUS_FORMAT_HPP
 #define CERBERUS_FORMAT_HPP
 
-#include <cerberus/exception.hpp>
 #include <cerberus/format/convert/char_pointer.hpp>
 #include <cerberus/format/convert/int.hpp>
 #include <cerberus/format/convert/iterable.hpp>
@@ -10,7 +9,7 @@
 
 namespace cerb::fmt
 {
-    CERBERUS_EXCEPTION(FmtConverterError);
+    CERBERUS_EXCEPTION(FmtConverterError, std::exception);
 
     namespace private_
     {
@@ -170,7 +169,7 @@ namespace cerb::fmt
                 if (fmt_open) {
                     throw FmtConverterError(
                         "Arguments for cerb::fmt::format are not supported at the "
-                        "moment");
+                        "moment!");
                 }
             }
 

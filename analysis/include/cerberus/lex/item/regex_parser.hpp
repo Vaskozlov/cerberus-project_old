@@ -11,12 +11,11 @@ namespace cerb::lex::regex
     template<CharacterLiteral CharT>
     struct RegexParser : scan::ScanApi<false, CharT>
     {
-        constexpr static size_t number_of_chars = pow2<size_t>(bitsizeof(CharT));
-
-        using bitmap_t = ConstBitmap<1, number_of_chars>;
-
         CERBLIB_SCAN_API_ACCESS(false, CharT);
-        CERBERUS_ANALYSIS_EXCEPTION(RegexParsingError, CharT);
+        CERBERUS_ANALYSIS_EXCEPTION(RegexParsingError, CharT, BasicLexicalAnalysisException);
+
+        constexpr static size_t number_of_chars = pow2<size_t>(bitsizeof(CharT));
+        using bitmap_t = ConstBitmap<1, number_of_chars>;
 
         RegexParser() = default;
 
@@ -106,7 +105,7 @@ namespace cerb::lex::regex
         constexpr auto checkRegexStart() -> void
         {
             if (not isBeginOfRegex(getChar())) {
-                throw RegexParsingError("Unable to parse a regular expression", getGenerator());
+                throw RegexParsingError("Unable to parse a regular expression!", getGenerator());
             }
         }
 
