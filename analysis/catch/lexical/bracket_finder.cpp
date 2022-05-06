@@ -42,8 +42,7 @@ namespace cerb::debug
     auto testBracketFinderOnErrorCaseU16() -> bool
     {
         try {
-            CERBLIB_UNUSED(auto) =
-                findBracket(u'(', u')', GeneratorForText(TestErrorInputU16));
+            CERBLIB_UNUSED(auto) = findBracket(u'(', u')', GeneratorForText(TestErrorInputU16));
             CANT_BE_REACHED;
         } catch (BracketFinderError const &) {
             MUST_BE_REACHED;

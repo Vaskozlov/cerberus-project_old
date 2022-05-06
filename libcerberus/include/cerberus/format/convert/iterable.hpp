@@ -34,12 +34,12 @@ namespace cerb::fmt
         private:
             constexpr auto convertObject() -> void
             {
-                auto conversion_function = [this](auto const &elem) {
-                    this->template addElem(elem);
-                };
-
                 addBeginOfObject();
-                std::ranges::for_each(converted_object, conversion_function);
+
+                for (auto const &elem : converted_object) {
+                    addElem(elem);
+                }
+
                 addEndOfObject();
             }
 
