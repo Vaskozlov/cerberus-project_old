@@ -178,9 +178,14 @@ namespace cerb
         std::copy(src.begin(), src.end(), dest.begin());
     }
 
+    template<typename T, size_t N>
+    CERBLIB_DECL auto find(T const (&array)[N], AutoCopyType<T> value, size_t limit)
+    {
+        return std::find(&array[0], &array[std::min(N, limit)], value);
+    }
+
     template<typename T>
-    CERBLIB_DECL auto find(T const *location, cerb::AutoCopyType<T> value, size_t limit)
-        -> T const *
+    CERBLIB_DECL auto find(T const *location, AutoCopyType<T> value, size_t limit) -> T const *
     {
         [[maybe_unused]] constexpr bool suitable_for_fast_search =
             CanBeStoredInIntegral<T> && std::is_trivial_v<T>;
