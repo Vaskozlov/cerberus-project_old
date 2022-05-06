@@ -28,18 +28,8 @@ jobs:
         if: ${{ matrix.config.os == 'macos-latest' }}
         run: |
           brew install ${{ matrix.config.dependencies }}
-      - name: Build
+      - name: Build and test
         run: |
-          mkdir -p build
-          cd ./build
-          cmake -DCMAKE_BUILD_TYPE=Release -DCERBERUS_STRICT_COMPILATION=ON -DUSE_LIBCPP=OFF ..
+          cmake -B build -DCMAKE_BUILD_TYPE=Release -DCERBERUS_STRICT_COMPILATION=ON -DUSE_LIBCPP=OFF
           cmake --build build -- -j3
-          cd ..
-      - name: Test
-        run: |
-          cd ./build
           ctest ./build
-          cd ..
-      - name: Install
-        run: |
-          sudo cmake --install build
