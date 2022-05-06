@@ -1,6 +1,7 @@
 #ifndef CERBERUS_SCAN_API_HPP
 #define CERBERUS_SCAN_API_HPP
 
+#include "cerberus/analysis/analysis_exception.hpp"
 #include <cerberus/lex/char.hpp>
 #include <cerberus/lex/generator_for_text.hpp>
 
@@ -12,21 +13,27 @@
     using scan_api_t::nextChar;                                                                    \
     using scan_api_t::canContinueParsing;                                                          \
     using scan_api_t::getNextCharAndCheckForEoF;                                                   \
+    using scan_api_t::getGenerator;                                                                \
     using scan_api_t::isGeneratorInitialized;                                                      \
     using scan_api_t::parseEscapeSequence;                                                         \
     using scan_api_t::setupGenerator
 
 namespace cerb::scan
 {
-    CERBERUS_EXCEPTION(ScanApiError);
-
     template<bool UseCleanChars, CharacterLiteral CharT>
     struct ScanApi
     {
+        CERBERUS_ANALYSIS_EXCEPTION(ScanApiError, CharT, lex::BasicLexicalAnalysisException);
+
         template<std::integral T>
         static constexpr auto cast(T value) -> CharT
         {
             return static_cast<CharT>(value);
+        }
+
+        CERBLIB_DECL auto getGenerator() const -> lex::GeneratorForText<CharT> const &
+        {
+            return text_generator;
         }
 
         CERBLIB_DECL auto getChar() const -> CharT
@@ -53,7 +60,7 @@ namespace cerb::scan
             auto chr = nextChar();
 
             if (lex::isEoF(chr)) {
-                throw ScanApiError("Unexpected EoF");
+                throw ScanApiError("Unexpected EoF!", text_generator);
             }
 
             return chr;
@@ -64,7 +71,8 @@ namespace cerb::scan
             CharT chr = nextChar();
 
             if (lex::isEoF(chr)) {
-                throw ScanApiError("Unable to close sequence, because of unexpected EoF!");
+                throw ScanApiError(
+                    "Unable to close sequence, because of unexpected EoF!", text_generator);
             }
 
             return chr != end_symbol;
@@ -125,7 +133,7 @@ namespace cerb::scan
                 break;
             }
 
-            return checkSpecialSymbol(chr, special_symbols...);
+            return parseUserDefinedEscapeSymbols(chr, special_symbols...);
         }
 
         ScanApi() = default;
@@ -136,13 +144,13 @@ namespace cerb::scan
 
     private:
         template<CharacterLiteral... Ts>
-        CERBLIB_DECL auto checkSpecialSymbol(CharT chr, Ts... special_symbols) -> CharT
+        CERBLIB_DECL auto parseUserDefinedEscapeSymbols(CharT chr, Ts... special_symbols) -> CharT
         {
             CharT result = cast(0);
             ((result = safeEqual(chr, special_symbols) ? chr : result), ...);
 
             if (result == cast(0)) {
-                throw ScanApiError("Unable to match any escape sequence");
+                throw ScanApiError("Unable to match any escape sequence!", text_generator);
             }
 
             return result;

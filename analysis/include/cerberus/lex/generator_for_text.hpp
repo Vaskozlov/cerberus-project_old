@@ -1,14 +1,14 @@
 #ifndef CERBERUS_TEXT_GENERATOR_HPP
 #define CERBERUS_TEXT_GENERATOR_HPP
 
-#include <cerberus/exception.hpp>
 #include <cerberus/lex/char.hpp>
+#include <cerberus/lex/lexical_analysis_exception.hpp>
 #include <cerberus/lex/location_in_file.hpp>
 #include <string>
 
 namespace cerb::lex
 {
-    CERBERUS_EXCEPTION(TextGeneratorError);
+    CERBERUS_EXCEPTION(TextGeneratorError, BasicLexicalAnalysisException);
 
     template<CharacterLiteral CharT, CharacterLiteral FileNameT = char>
     struct GeneratorForText
@@ -69,12 +69,8 @@ namespace cerb::lex
                 return CharEnum<CharT>::EoF;
             }
 
-            auto real_offset = static_cast<ssize_t>(getOffset()) + offset;
-            checkOffset(real_offset);
-
-            auto converted_offset = static_cast<size_t>(real_offset);
-            return converted_offset >= text.size() ? CharEnum<CharT>::EoF
-                                                   : text[static_cast<size_t>(real_offset)];
+            auto real_offset = calculateRealOffset(offset);
+            return real_offset >= text.size() ? CharEnum<CharT>::EoF : text[real_offset];
         }
 
         constexpr auto getRawChar() -> CharT
@@ -119,13 +115,6 @@ namespace cerb::lex
         }
 
     private:
-        constexpr auto checkOffset(ssize_t offset) const -> void
-        {
-            if (offset < 0) {
-                throw TextGeneratorError("Unable to access char at given offset");
-            }
-        }
-
         constexpr auto processFirstRawChar() -> void
         {
             initialized = true;
@@ -213,6 +202,21 @@ namespace cerb::lex
             return logicalAnd(
                 not tabs_and_spaces.empty(), text[offset] != CharEnum<CharT>::Tab,
                 text[offset] != CharEnum<CharT>::Space);
+        }
+
+        CERBLIB_DECL auto calculateRealOffset(ssize_t offset) const -> size_t
+        {
+            auto real_offset = static_cast<ssize_t>(getOffset()) + offset;
+            checkOffset(real_offset);
+
+            return static_cast<size_t>(real_offset);
+        }
+
+        constexpr auto checkOffset(ssize_t offset) const -> void
+        {
+            if (offset < 0) {
+                throw TextGeneratorError("Unable to access char at given offset!");
+            }
         }
 
         LocationInFile<FileNameT> location{};

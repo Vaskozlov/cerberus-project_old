@@ -9,6 +9,8 @@ namespace cerb::debug
     auto testBit() -> int;
     auto memoryTest() -> int;
     auto testStringModule() -> int;
+
+    auto testFmt() -> int;
 }// namespace cerb::debug
 
 auto main() -> int
@@ -24,6 +26,8 @@ auto main() -> int
     testBit();
     memoryTest();
     testStringModule();
+
+    testFmt();
 
     return 0;
 }

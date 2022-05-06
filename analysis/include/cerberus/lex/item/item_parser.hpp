@@ -19,17 +19,22 @@
 
 namespace cerb::lex
 {
-    CERBERUS_EXCEPTION(DotItemParsingError);
-
     template<CharacterLiteral CharT>
     struct ItemParser : public BasicItem<CharT>
     {
         CERBLIB_BASIC_ITEM_ACCESS(CharT);
         using item_ptr = std::unique_ptr<BasicItem<CharT>>;
 
+        CERBERUS_ANALYSIS_EXCEPTION(DotItemParsingError, CharT, BasicLexicalAnalysisException);
+
         CERBLIB_DECL auto id() const -> size_t
         {
             return item_id;
+        }
+
+        CERBLIB_DECL auto getItems() const -> std::vector<item_ptr> const &
+        {
+            return items;
         }
 
         ItemParser() = default;
@@ -96,7 +101,8 @@ namespace cerb::lex
                 break;
 
             default:
-                throw DotItemParsingError("Error in regex during the rule parsing");
+                throw DotItemParsingError(
+                    "Error in regex during the rule parsing!", rule_generator);
             }
         }
 
@@ -121,7 +127,7 @@ namespace cerb::lex
         constexpr auto addItem() -> void
         {
             BasicStringView<CharT> text = rule_generator.getRestOfTheText();
-            size_t border = getBorder(text);
+            size_t border = getBorder(rule_generator);
 
             text = extractTextForNewItem(text, border);
             BasicItem<CharT> *new_item = createNewItem<ItemParser<CharT>>(id(), text);
@@ -158,8 +164,7 @@ namespace cerb::lex
 
         constexpr auto skipItemBorder(size_t border) -> void
         {
-            constexpr size_t length_of_item_end = 1;
-            rule_generator.skip(border + length_of_item_end);
+            rule_generator.skip(border);
         }
 
         CERBLIB_DECL static auto
@@ -175,9 +180,9 @@ namespace cerb::lex
             return { new_begin, new_length };
         }
 
-        CERBLIB_DECL static auto getBorder(BasicStringView<CharT> const &text) -> size_t
+        CERBLIB_DECL static auto getBorder(GeneratorForText<CharT> const &gen) -> size_t
         {
-            return findBracket(cast('('), cast(')'), text);
+            return findBracket(cast('('), cast(')'), gen);
         }
 
         template<typename T, typename... Ts>
@@ -206,24 +211,26 @@ namespace cerb::lex
             analysis_globals.emplaceNonterminal(std::move(str), id());
         }
 
-        constexpr static auto checkItemNonEmpty(const ItemParser<CharT> *item_to_check) -> void
+        constexpr auto checkItemNonEmpty(ItemParser<CharT> const *item_to_check) const -> void
         {
             if (item_to_check->items.empty()) {
-                throw DotItemParsingError("Empty items are not allowed");
+                throw DotItemParsingError("Empty items are not allowed!", rule_generator);
             }
         }
 
         constexpr auto checkForAlreadyExistsNonterminal() const -> void
         {
             if (flags.isSet(ItemFlags::NONTERMINAL)) {
-                throw DotItemParsingError("Nonterminals can't coexist with other rules");
+                throw DotItemParsingError(
+                    "Nonterminals can't coexist with other rules!", rule_generator);
             }
         }
 
         constexpr auto checkThatNonTerminalCanBeAdded() const -> void
         {
             if (recent_item != nullptr) {
-                throw DotItemParsingError("Non terminals can't coexist with other rules");
+                throw DotItemParsingError(
+                    "Non terminals can't coexist with other rules!", rule_generator);
             }
         }
 
@@ -232,16 +239,18 @@ namespace cerb::lex
             if (recent_item == nullptr) {
                 throw DotItemParsingError(
                     "Unable to apply operation, because current item hasn't"
-                    " been created");
+                    " been created!",
+                    rule_generator);
             }
         }
 
         constexpr auto checkRuleOverloading() const -> void
         {
-            ItemFlags repetition_rules = ItemFlags::PLUS | ItemFlags::STAR | ItemFlags::QUESTION;
+            constexpr ItemFlags repetition_rules =
+                ItemFlags::PLUS | ItemFlags::STAR | ItemFlags::QUESTION;
 
             if ((recent_item->flags & repetition_rules) != ItemFlags::NONE) {
-                throw DotItemParsingError("Unable to apply more than one rule!");
+                throw DotItemParsingError("Unable to apply more than one rule!", rule_generator);
             }
         }
 

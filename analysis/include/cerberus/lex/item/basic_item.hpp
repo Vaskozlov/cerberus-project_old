@@ -2,6 +2,7 @@
 #define CERBERUS_BASIC_ITEM_HPP
 
 #include <cerberus/lex/generator_for_text.hpp>
+#include <cerberus/lex/lexical_analysis_exception.hpp>
 #include <cerberus/lex/string_to_codes.hpp>
 #include <cerberus/string_pool.hpp>
 
@@ -11,7 +12,7 @@
     using basic_item_t::cast;                                                                      \
     using basic_item_t::flags
 
-#define CERBLIB_BASIC_ITEM_ARGS AnalysisGlobals<CharT> &analysis_parameters
+#define CERBLIB_BASIC_ITEM_ARGS cerb::lex::AnalysisGlobals<CharT> &analysis_parameters
 #define CERBLIB_CONSTRUCT_BASIC_ITEM basic_item_t(analysis_parameters)
 
 namespace cerb::lex
@@ -53,8 +54,8 @@ namespace cerb::lex
         {}
 
         // NOLINTBEGIN
-        ItemFlags flags{ ItemFlags::NONE };
         AnalysisGlobals<CharT> &analysis_globals;
+        ItemFlags flags{ ItemFlags::NONE };
         // NOLINTEND
     };
 

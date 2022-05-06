@@ -28,6 +28,11 @@ namespace cerb::lex
             return name_of_file;
         }
 
+        constexpr auto resetOffset() -> void
+        {
+            char_offset = 0;
+        }
+
         constexpr auto newChar() -> void
         {
             ++char_offset;

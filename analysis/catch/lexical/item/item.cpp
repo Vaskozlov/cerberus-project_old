@@ -8,13 +8,14 @@ namespace cerb::debug
     using namespace string;
 
     AnalysisGlobals<char> Parameters{};
+    AnalysisGlobals<char16_t> ParametersUtf16{};
 
     auto dotItemErrorCaseEmptyRegex() -> void
     {
         try {
-            CERBLIB_UNUSED(auto) = lex::DotItem<char>(Parameters, 0, "[]");
+            CERBLIB_UNUSED(auto) = DotItem<char>(Parameters, 0, "[]");
             CANT_BE_REACHED;
-        } catch (RegexParsingError const &) {
+        } catch (RegexParser<char>::RegexParsingError const &) {
             MUST_BE_REACHED;
         }
     }
@@ -22,9 +23,9 @@ namespace cerb::debug
     auto dotItemErrorCaseEmptyString() -> void
     {
         try {
-            CERBLIB_UNUSED(auto) = lex::DotItem<char>(Parameters, 0, "\"\"");
+            CERBLIB_UNUSED(auto) = DotItem<char>(Parameters, 0, "\"\"");
             CANT_BE_REACHED;
-        } catch (StringItemError const &) {
+        } catch (StringItem<char>::StringItemError const &) {
             MUST_BE_REACHED;
         }
     }
@@ -34,7 +35,8 @@ namespace cerb::debug
         try {
             CERBLIB_UNUSED(auto) = lex::DotItem<char>(Parameters, 0, "()");
             CANT_BE_REACHED;
-        } catch (DotItemParsingError const &) {
+        } catch (BasicLexicalAnalysisException const &error) {
+            ::fmt::print("{}\n", error.what());
             MUST_BE_REACHED;
         }
     }
@@ -46,13 +48,77 @@ namespace cerb::debug
         dotItemErrorCaseEmptyItem();
     }
 
+    auto testDotItemOnNonTerminal() -> void
+    {
+        DotItem<char> item{ Parameters, 0, "\'+\'" };
+        auto const &items = item.getItems();
+
+        EXPECT_TRUE(items.empty());
+    }
+
+    auto testDotItemOnString() -> void
+    {
+        DotItem<char> item{ Parameters, 1, "\"Hello, World!\"+" };
+        auto const &items = item.getItems();
+
+        EXPECT_TRUE(items.size() == 1);
+
+        auto const &front_item = items.front();
+        auto string_item = dynamic_cast<StringItem<char> *>(front_item.get());
+
+        EXPECT_TRUE(string_item != nullptr);
+        EXPECT_TRUE(string_item->flags.isSet(ItemFlags::PLUS));
+    }
+
+    auto testDotItemOnStringAndRegex() -> void
+    {
+        DotItem<char> item{ Parameters, 2, "\"for\"p+[a-zA-Z_]*" };
+        auto const &items = item.getItems();
+
+        EXPECT_TRUE(items.size() == 2);
+
+        auto const &front_item = items.front();
+        auto string_item = dynamic_cast<StringItem<char> *>(front_item.get());
+
+        EXPECT_TRUE(string_item != nullptr);
+        EXPECT_TRUE(string_item->getString() == "for");
+        EXPECT_TRUE(string_item->flags.isSet(ItemFlags::PLUS));
+        EXPECT_TRUE(string_item->flags.isSet(ItemFlags::PREFIX));
+
+        auto const &back_item = items.back();
+        auto regex_item = dynamic_cast<RegexItem<char> *>(back_item.get());
+
+        EXPECT_TRUE(regex_item != nullptr);
+        EXPECT_TRUE(regex_item->flags.isSet(ItemFlags::STAR));
+    }
+
+    auto testComplexDotItem() -> void
+    {
+        DotItem<char> item{ Parameters, 3, "(\"for\"p*)+[a-zA-Z_]+" };
+
+        auto const &items = item.getItems();
+
+        EXPECT_TRUE(items.size() == 2);
+
+        auto const &front_item = items.front();
+        auto parsing_item = dynamic_cast<ItemParser<char> *>(front_item.get());
+
+        EXPECT_TRUE(parsing_item != nullptr);
+        EXPECT_TRUE(parsing_item->flags.isSet(ItemFlags::PLUS));
+
+        auto const &back_item = items.back();
+        auto regex_item = dynamic_cast<RegexItem<char> *>(back_item.get());
+
+        EXPECT_TRUE(regex_item != nullptr);
+        EXPECT_TRUE(regex_item->flags.isSet(ItemFlags::PLUS));
+    }
+
     auto testDotItem() -> int
     {
-        CERBLIB_UNUSED(auto) = lex::DotItem<char>(Parameters, 0, "\'+\'");
-        CERBLIB_UNUSED(auto) = lex::DotItem<char>(Parameters, 1, "\"Hello, World!\"");
-        CERBLIB_UNUSED(auto) = lex::DotItem<char>(Parameters, 2, "\"for\"p+[a-z]*");
-        CERBLIB_UNUSED(auto) = lex::DotItem<char>(Parameters, 3, "(\"for\"p*)+[a-z]+");
-
+        testDotItemOnNonTerminal();
+        testDotItemOnString();
+        testDotItemOnStringAndRegex();
+        testComplexDotItem();
         testDotItemCreationOnErrorCases();
         return 0;
     }

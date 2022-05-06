@@ -1,14 +1,18 @@
 #ifndef CERBERUS_EXCEPTION_HPP
 #define CERBERUS_EXCEPTION_HPP
 
+#include <cerberus/cerberus.hpp>
+#include <cerberus/type.hpp>
 #include <exception>
 #include <stdexcept>
 #include <string_view>
 
-#define CERBERUS_EXCEPTION(name)                                                                   \
-    struct name : public std::exception                                                            \
+#define CERBERUS_EXCEPTION(name, base_exception)                                                   \
+    struct name : public base_exception                                                            \
     {                                                                                              \
-        name() = default;                                                                          \
+        static_assert(cerb::ExceptionType<base_exception>);                                        \
+                                                                                                   \
+        name() noexcept = default;                                                                 \
                                                                                                    \
         explicit name(std::string_view t_message) : message(t_message)                             \
         {}                                                                                         \

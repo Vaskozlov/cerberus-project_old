@@ -1,5 +1,5 @@
-#ifndef LIBCERBERUS_TYPE_HPP
-#define LIBCERBERUS_TYPE_HPP
+#ifndef CERBERUS_TYPE_HPP
+#define CERBERUS_TYPE_HPP
 
 #include <memory>
 #include <type_traits>
@@ -69,6 +69,9 @@ namespace cerb
     concept Enum = std::is_enum_v<T>;
 
     template<typename T>
+    concept ExceptionType = std::is_base_of_v<std::exception, T>;
+
+    template<typename T>
     concept CanBeStoredInIntegral = isOneOf(
         sizeof(T),
         sizeof(uint8_t),
@@ -121,4 +124,4 @@ namespace cerb
     concept PointerLike = std::is_pointer_v<decltype(T{}.get())> && requires(T ptr) { ptr.get(); };
 }// namespace cerb
 
-#endif /* LIBCERBERUS_TYPE_HPP */
+#endif /* CERBERUS_TYPE_HPP */

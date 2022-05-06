@@ -5,7 +5,7 @@
 
 namespace cerb::lex
 {
-    CERBERUS_EXCEPTION(BracketFinderError);
+    CERBERUS_EXCEPTION(BracketFinderError, BasicLexicalAnalysisException);
 
     template<CharacterLiteral CharT>
     class BracketFinder
@@ -19,18 +19,19 @@ namespace cerb::lex
     public:
         CERBLIB_DECL auto getPosition() const -> ssize_t
         {
-            return getChar() == close_bracket ? static_cast<ssize_t>(index) : -1;
+            return getChar() == close_bracket ? static_cast<ssize_t>(text.getOffset()) : -1;
         }
 
         BracketFinder() = default;
 
         constexpr BracketFinder(
-            CharT opening_bracket, CharT closing_bracket, BasicStringView<CharT> const &str)
-          : text(str), open_bracket(opening_bracket), close_bracket(closing_bracket)
+            CharT opening_bracket, CharT closing_bracket, GeneratorForText<CharT> const &gen)
+          : text(gen), open_bracket(opening_bracket), close_bracket(closing_bracket)
         {}
 
         constexpr auto findBracketPosition() -> size_t
         {
+            initialize();
             isBeginBracket();
             passed_brackets = 1;
 
@@ -39,10 +40,17 @@ namespace cerb::lex
                 processChar(chr);
             }
 
-            return index - 1;
+            return text.getOffset() - 1;
         }
 
     private:
+        constexpr auto initialize() -> void
+        {
+            if (not text.isInitialized()) {
+                text.getRawChar();
+            }
+        }
+
         constexpr auto processChar(CharT chr) -> void
         {
             if (chr == open_bracket) {
@@ -54,18 +62,18 @@ namespace cerb::lex
 
         CERBLIB_DECL auto getChar() const -> CharT
         {
-            return text[index];
+            return text.getCurrentChar();
         }
 
         constexpr auto nextChar() -> CharT
         {
-            return text[++index];
+            return text.getRawChar();
         }
 
         CERBLIB_DECL auto canContinueSearching() -> bool
         {
             if (isCurrentCharEoF()) {
-                throw BracketFinderError("Unexpected EoF");
+                throw BracketFinderError("Unexpected EoF!");
             }
 
             nextChar();
@@ -84,19 +92,17 @@ namespace cerb::lex
             }
         }
 
-        BasicStringView<CharT> text{};
+        GeneratorForText<CharT> text{};
         size_t passed_brackets{};
-        size_t index{};
         CharT open_bracket{};
         CharT close_bracket{};
     };
 
     template<CharacterLiteral CharT>
-    CERBLIB_DECL auto
-        findBracket(CharT opening_bracket, CharT closing_bracket, BasicStringView<CharT> const &str)
-            -> size_t
+    CERBLIB_DECL auto findBracket(
+        CharT opening_bracket, CharT closing_bracket, GeneratorForText<CharT> const &gen) -> size_t
     {
-        BracketFinder<CharT> finder{ opening_bracket, closing_bracket, str };
+        BracketFinder<CharT> finder{ opening_bracket, closing_bracket, gen };
         return finder.findBracketPosition();
     }
 

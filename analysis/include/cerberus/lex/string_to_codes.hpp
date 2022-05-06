@@ -8,14 +8,15 @@
 
 namespace cerb::lex
 {
-    CERBERUS_EXCEPTION(StringToCodesTranslationError);
-
     template<CharacterLiteral CharT>
     class StringToCodes : private scan::ScanApi<false, CharT>
     {
         CERBLIB_SCAN_API_ACCESS(false, CharT);
 
     public:
+        CERBERUS_ANALYSIS_EXCEPTION(
+            StringToCodesTranslationError, CharT, BasicLexicalAnalysisException);
+
         constexpr auto parseString() -> std::basic_string<CharT> &
         {
             setupGenerator();
@@ -48,7 +49,7 @@ namespace cerb::lex
         constexpr auto checkStringStart() const -> void
         {
             if (not isBeginOfString(getChar())) {
-                throw StringToCodesTranslationError("Unable to open string!");
+                throw StringToCodesTranslationError("Unable to open string!", getGenerator());
             }
         }
 

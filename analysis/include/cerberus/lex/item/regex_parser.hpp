@@ -8,15 +8,14 @@
 
 namespace cerb::lex::regex
 {
-    CERBERUS_EXCEPTION(RegexParsingError);
-
     template<CharacterLiteral CharT>
     struct RegexParser : scan::ScanApi<false, CharT>
     {
-        constexpr static size_t number_of_chars = pow2<size_t>(bitsizeof(CharT));
-
-        using bitmap_t = ConstBitmap<1, number_of_chars>;
         CERBLIB_SCAN_API_ACCESS(false, CharT);
+        CERBERUS_ANALYSIS_EXCEPTION(RegexParsingError, CharT, BasicLexicalAnalysisException);
+
+        constexpr static size_t number_of_chars = pow2<size_t>(bitsizeof(CharT));
+        using bitmap_t = ConstBitmap<1, number_of_chars>;
 
         RegexParser() = default;
 
@@ -43,6 +42,8 @@ namespace cerb::lex::regex
 
         constexpr auto processChar(CharT chr) -> void
         {
+            checkDoubleRegexOpening(chr);
+
             if (chr == cast('-')) {
                 is_range_of_chars = true;
             } else {
@@ -77,7 +78,7 @@ namespace cerb::lex::regex
         constexpr auto processEscapeSymbol(CharT chr) -> CharT
         {
             if (chr == cast('\\')) {
-                return parseEscapeSequence(chr, cast('-'));
+                return parseEscapeSequence(chr, cast('-'), cast('['), cast(']'));
             } else {
                 return chr;
             }
@@ -94,31 +95,41 @@ namespace cerb::lex::regex
             return chr == cast('[');
         }
 
-        constexpr static auto checkCharsOrder(CharT begin, CharT end) -> void
+        constexpr auto checkCharsOrder(CharT begin, CharT end) -> void
         {
             if (begin > end) {
-                throw RegexParsingError("Chars in regex are in a wrong order!");
+                throw RegexParsingError("Chars in regex are in a wrong order!", getGenerator());
             }
         }
 
         constexpr auto checkRegexStart() -> void
         {
             if (not isBeginOfRegex(getChar())) {
-                throw RegexParsingError("Unable to parse a regular expression");
+                throw RegexParsingError("Unable to parse a regular expression!", getGenerator());
             }
         }
 
         constexpr auto checkRangeClosing() const -> void
         {
             if (is_range_of_chars) {
-                throw RegexParsingError("Range of chars is not closed!");
+                throw RegexParsingError("Range of chars is not closed!", getGenerator());
             }
         }
 
         constexpr auto checkRangeNonEmpty() const -> void
         {
             if (not is_filled) {
-                throw RegexParsingError("There are no characters in regex!");
+                throw RegexParsingError("There are no characters in regex!", getGenerator());
+            }
+        }
+
+        constexpr auto checkDoubleRegexOpening(CharT chr) const -> void
+        {
+            if (chr == cast('[')) {
+                throw RegexParsingError(
+                    "Unable to open regex inside regex. If you want to use "
+                    "'[' as a character type use '\\[' instead.",
+                    getGenerator());
             }
         }
 

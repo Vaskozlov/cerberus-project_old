@@ -24,9 +24,9 @@ namespace cerb::debug
 
         try {
             flat_map.emplace(50, 60);
-            EXPECT_FALSE(1);
+            CANT_BE_REACHED;
         } catch (std::out_of_range const &) {
-            EXPECT_TRUE(1);
+            MUST_BE_REACHED;
         }
 
         return true;

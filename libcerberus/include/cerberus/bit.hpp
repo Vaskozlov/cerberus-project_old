@@ -8,11 +8,11 @@ namespace cerb::bit
 #ifdef _MSC_VER
     namespace msvc
     {
-        template<std::unsigned_integral T>
-        CERBLIB_DECL auto scanForwardCompileTime(T value) -> size_t
+        template<std::unsigned_integral ExceptionT>
+        CERBLIB_DECL auto scanForwardCompileTime(ExceptionT value) -> size_t
         {
             size_t bit_index = 0;
-            constexpr T mask = 0b1;
+            constexpr ExceptionT mask = 0b1;
 
             for (; value > 0; ++bit_index) {
                 if ((value & mask) == mask) {
@@ -24,8 +24,8 @@ namespace cerb::bit
             return bitsizeof(size_t);
         }
 
-        template<std::unsigned_integral T>
-        CERBLIB_DECL auto scanForwardRuntime(T value) -> size_t
+        template<std::unsigned_integral ExceptionT>
+        CERBLIB_DECL auto scanForwardRuntime(ExceptionT value) -> size_t
         {
             unsigned long bit_index;
 
@@ -37,11 +37,11 @@ namespace cerb::bit
             return static_cast<size_t>(bit_index);
         }
 
-        template<std::unsigned_integral T>
-        CERBLIB_DECL auto scanReverseCompileTime(T value) -> size_t
+        template<std::unsigned_integral ExceptionT>
+        CERBLIB_DECL auto scanReverseCompileTime(ExceptionT value) -> size_t
         {
-            size_t bit_index = bitsizeof(T) - 1;
-            constexpr T mask = static_cast<T>(1) << (bitsizeof(T) - 1);
+            size_t bit_index = bitsizeof(ExceptionT) - 1;
+            constexpr ExceptionT mask = static_cast<ExceptionT>(1) << (bitsizeof(ExceptionT) - 1);
 
             for (; value > 0; --bit_index) {
                 if ((value & mask) == mask) {
@@ -53,8 +53,8 @@ namespace cerb::bit
             return bitsizeof(size_t);
         }
 
-        template<std::unsigned_integral T>
-        CERBLIB_DECL auto scanReverseRuntime(T value) -> size_t
+        template<std::unsigned_integral ExceptionT>
+        CERBLIB_DECL auto scanReverseRuntime(ExceptionT value) -> size_t
         {
             unsigned long bit_index;
 
