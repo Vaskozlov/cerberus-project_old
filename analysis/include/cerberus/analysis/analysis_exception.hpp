@@ -89,10 +89,12 @@ namespace cerb::analysis
     private:
         static auto getNonCharErrorMessage() -> std::string
         {
+            using namespace string_view_literals;
+
             if constexpr (not std::is_same_v<char, CharT>) {
                 static const std::string message = fmt::format<char>(
                     "Unable to show "
-                    "error message, because AnalysisException character type is {}",
+                    "error message, because AnalysisException character type is {}"_sv,
                     typeid(CharT).name());
                 return message;
             } else {
@@ -103,11 +105,14 @@ namespace cerb::analysis
         auto getErrorMessage(BasicStringView<char> const &exception_message)
             -> std::basic_string<CharT>
         {
+            using namespace string_view_literals;
+
             lex::StringReducer<CharT> reducer{ text_generator };
 
             std::basic_string<CharT> result = fmt::format<CharT>(
-                "Analysis error occurred: {} File: {}, line: {}, char: {}\n{}\n", exception_message,
-                getFilename(), getLine(), getCharPosition(), reducer.getResult());
+                "Analysis error occurred: {} File: {}, line: {}, char: {}\n{}\n"_sv,
+                exception_message, getFilename(), getLine(), getCharPosition(),
+                reducer.getResult());
 
             addArrowToTheMessage(result, reducer.getErrorPositionAfterReducing());
 
