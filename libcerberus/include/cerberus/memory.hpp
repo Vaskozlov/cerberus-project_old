@@ -178,12 +178,6 @@ namespace cerb
         std::copy(src.begin(), src.end(), dest.begin());
     }
 
-    template<typename T, size_t N>
-    CERBLIB_DECL auto find(T const (&array)[N], AutoCopyType<T> value, size_t limit)
-    {
-        return std::find(&array[0], &array[std::min(N, limit)], value);
-    }
-
     template<typename T>
     CERBLIB_DECL auto find(T const *location, AutoCopyType<T> value, size_t limit) -> T const *
     {
@@ -278,7 +272,11 @@ namespace cerb
     template<CharacterLiteral CharT>
     CERBLIB_DECL auto strlen(CharT const *str) -> size_t
     {
-        return ptrdiff(str, find(str, static_cast<CharT>(0), std::numeric_limits<u32>::max()));
+        if CERBLIB_COMPILE_TIME {
+            return std::basic_string_view<CharT>(str).size();
+        } else {
+            return ptrdiff(str, find(str, static_cast<CharT>(0), std::numeric_limits<u32>::max()));
+        }
     }
 }// namespace cerb
 
