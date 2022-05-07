@@ -5,7 +5,7 @@ namespace cerb::debug {
     using namespace lex;
 
     auto testLexicalAnalyzer() -> int {
-        LexicalAnalyzer<char>({{0, "[0-9]+p\"for\""}});
+        CERBLIB_UNUSED(LexicalAnalyzer<char>) = {{0, "[0-9]+p\"for\""}};
         return 0;
     }
 }// namespace cerb::debug

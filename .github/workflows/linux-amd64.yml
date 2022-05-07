@@ -8,7 +8,7 @@ jobs:
       matrix:
         config:
           - name: Linux GCC
-            os: ubuntu
+            os: ubuntu-latest
             cc: gcc
             cxx: g++
             version: 11
@@ -19,7 +19,7 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v2
       - name: Install dependencies (Linux)
-        if: ${{ matrix.config.os == 'ubuntu' }}
+        if: ${{ matrix.config.os == 'ubuntu-latest' }}
         run: |
           sudo apt-get update
           sudo apt-get install -y ${{ matrix.config.dependencies }}
