@@ -26,7 +26,7 @@ jobs:
           sudo update-alternatives --install /usr/bin/gcc gcc /usr/bin/${{ matrix.config.cc }}-${{ matrix.config.version }} 200 --slave /usr/bin/g++ g++ /usr/bin/${{ matrix.config.cxx }}-${{ matrix.config.version }}
       - name: Build
         run: |
-          cmake -B build -DCMAKE_BUILD_TYPE=Release -DCERBERUS_STRICT_COMPILATION=ON -DUSE_LIBCPP=OFF
+          cmake -G Ninja -B build -DCMAKE_BUILD_TYPE=Release -DCERBERUS_STRICT_COMPILATION=ON -DUSE_LIBCPP=OFF
           cmake --build build -- -j3
       - name: Test
         run: |
