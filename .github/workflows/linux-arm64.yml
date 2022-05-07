@@ -18,4 +18,6 @@ jobs:
         run: |
           cmake -G Ninja -B build -DCMAKE_BUILD_TYPE=Release -DCERBERUS_STRICT_COMPILATION=ON -DUSE_LIBCPP=OFF
           cmake --build build -- -j4
-          ctest ./build
+          cd build
+          ctest
+          cd ..

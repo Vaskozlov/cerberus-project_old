@@ -30,4 +30,6 @@ jobs:
           cmake --build build -- -j3
       - name: Test
         run: |
+          cd build
           ctest
+          cd ..
