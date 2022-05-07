@@ -16,6 +16,6 @@ jobs:
         uses: actions/checkout@v2
       - name: Build and test
         run: |
-          cmake -B build -DCMAKE_BUILD_TYPE=Release -DCERBERUS_STRICT_COMPILATION=ON -DUSE_LIBCPP=OFF
+          cmake -G Ninja -B build -DCMAKE_BUILD_TYPE=Release -DCERBERUS_STRICT_COMPILATION=ON -DUSE_LIBCPP=OFF
           cmake --build build -- -j4
           ctest ./build
