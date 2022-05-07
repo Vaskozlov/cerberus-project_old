@@ -5,14 +5,11 @@
 #include <cerberus/type.hpp>
 #include <iterator>
 
-namespace cerb
-{
+namespace cerb {
 #if CERBLIB_AMD64
-    namespace amd64
-    {
+    namespace amd64 {
         template<typename T>
-        constexpr auto fill(T *dest, T value, size_t times) -> void
-        {
+        constexpr auto fill(T *dest, T value, size_t times) -> void {
             static_assert(CanBeStoredInIntegral<T> && std::is_trivially_copy_constructible_v<T>);
 
             if constexpr (sizeof(T) == sizeof(u8)) {
@@ -27,8 +24,7 @@ namespace cerb
         }
 
         template<typename T>
-        constexpr auto copy(T *dest, T const *src, size_t times) -> void
-        {
+        constexpr auto copy(T *dest, T const *src, size_t times) -> void {
             static_assert(std::is_trivially_copyable_v<T>);
 
             if constexpr (sizeof(T) % sizeof(u64) == 0) {
@@ -47,58 +43,56 @@ namespace cerb
         }
 
         template<CanBeStoredInIntegral T>
-        constexpr auto find(T const *location, T value, size_t limit) -> const T *
-        {
+        constexpr auto find(T const *location, T value, size_t limit) -> const T * {
             ++limit;
 
             if constexpr (sizeof(T) == sizeof(u8)) {
                 asm volatile("repnz scasb; adc $-1, %0;"
-                             : "+D"(location), "+c"(limit)
-                             : "a"(value)
-                             : "memory");
+                        : "+D"(location), "+c"(limit)
+                        : "a"(value)
+                        : "memory");
             } else if constexpr (sizeof(T) == sizeof(u16)) {
                 asm volatile("repnz scasw; adc $-2, %0;"
-                             : "+D"(location), "+c"(limit)
-                             : "a"(value)
-                             : "memory");
+                        : "+D"(location), "+c"(limit)
+                        : "a"(value)
+                        : "memory");
             } else if constexpr (sizeof(T) == sizeof(u32)) {
                 asm volatile("repnz scasl; adc $-4, %0;"
-                             : "+D"(location), "+c"(limit)
-                             : "a"(value)
-                             : "memory");
+                        : "+D"(location), "+c"(limit)
+                        : "a"(value)
+                        : "memory");
             } else if constexpr (sizeof(T) == sizeof(u64)) {
                 asm volatile("repnz scasq; adc $-4, %0;"
-                             : "+D"(location), "+c"(limit)
-                             : "a"(value)
-                             : "memory");
+                        : "+D"(location), "+c"(limit)
+                        : "a"(value)
+                        : "memory");
             }
 
             return location;
         }
 
         template<typename T>
-        constexpr auto memcmp(T const *dest, T const *src, size_t length) -> bool
-        {
+        constexpr auto memcmp(T const *dest, T const *src, size_t length) -> bool {
             ++length;
 
             if constexpr (sizeof(T) % sizeof(u64) == 0) {
                 length *= sizeof(T) / sizeof(u64);
                 asm volatile("repe cmpsq; shr $3, %2;"
-                             : "+D"(dest), "+S"(src), "+c"(length)
-                             :
-                             : "memory");
+                        : "+D"(dest), "+S"(src), "+c"(length)
+                        :
+                        : "memory");
             } else if constexpr (sizeof(T) == sizeof(u32)) {
                 length *= sizeof(T) / sizeof(u32);
                 asm volatile("repe cmpsl; shr $2, %2;"
-                             : "+D"(dest), "+S"(src), "+c"(length)
-                             :
-                             : "memory");
+                        : "+D"(dest), "+S"(src), "+c"(length)
+                        :
+                        : "memory");
             } else if constexpr (sizeof(T) == sizeof(u16)) {
                 length *= sizeof(T) / sizeof(u16);
                 asm volatile("repe cmpsw; shr $1, %2;"
-                             : "+D"(dest), "+S"(src), "+c"(length)
-                             :
-                             : "memory");
+                        : "+D"(dest), "+S"(src), "+c"(length)
+                        :
+                        : "memory");
             } else {
                 length *= sizeof(T);
                 asm volatile("repe cmpsb;" : "+D"(dest), "+S"(src), "+c"(length) : : "memory");
@@ -110,8 +104,7 @@ namespace cerb
 #endif
 
     template<typename T>
-    constexpr auto fill(T *dest, AutoCopyType<T> value, size_t times) -> void
-    {
+    constexpr auto fill(T *dest, AutoCopyType<T> value, size_t times) -> void {
 #if CERBLIB_AMD64
         if constexpr (std::is_trivially_copy_assignable_v<T> && CanBeStoredInIntegral<T>) {
             if CERBLIB_RUNTIME {
@@ -123,12 +116,11 @@ namespace cerb
     }
 
     template<Iterable T>
-    constexpr auto fill(T &dest, AutoCopyType<GetValueType<T>> value) -> void
-    {
+    constexpr auto fill(T &dest, AutoCopyType<GetValueType<T>> value) -> void {
 #if CERBLIB_AMD64
         if constexpr (
-            RawAccessible<T> && ClassValueFastCopiable<T> &&
-            CanBeStoredInIntegral<GetValueType<T>>) {
+                RawAccessible<T> && ClassValueFastCopiable<T> &&
+                CanBeStoredInIntegral<GetValueType<T>>) {
             if CERBLIB_RUNTIME {
                 return amd64::fill(std::data(dest), value, std::size(dest));
             }
@@ -144,8 +136,7 @@ namespace cerb
     }
 
     template<typename T>
-    constexpr auto copy(T *dest, T const *src, size_t times) -> void
-    {
+    constexpr auto copy(T *dest, T const *src, size_t times) -> void {
 #if CERBLIB_AMD64
         if constexpr (std::is_trivially_copy_assignable_v<T>) {
             if CERBLIB_RUNTIME {
@@ -157,8 +148,7 @@ namespace cerb
     }
 
     template<Iterable T1, Iterable T2>
-    constexpr auto copy(T1 &dest, T2 const &src) -> void
-    {
+    constexpr auto copy(T1 &dest, T2 const &src) -> void {
         using value_type = GetValueType<T1>;
         using value_type2 = GetValueType<T2>;
         static_assert(std::is_same_v<value_type, value_type2>);
@@ -179,10 +169,9 @@ namespace cerb
     }
 
     template<typename T>
-    CERBLIB_DECL auto find(T const *location, AutoCopyType<T> value, size_t limit) -> T const *
-    {
+    CERBLIB_DECL auto find(T const *location, AutoCopyType<T> value, size_t limit) -> T const * {
         [[maybe_unused]] constexpr bool suitable_for_fast_search =
-            CanBeStoredInIntegral<T> && std::is_trivial_v<T>;
+                CanBeStoredInIntegral<T> && std::is_trivial_v<T>;
 
 #if CERBLIB_AMD64
         if constexpr (suitable_for_fast_search) {
@@ -207,12 +196,11 @@ namespace cerb
     }
 
     template<Iterable T>
-    CERBLIB_DECL auto find(T const &iterable_class, GetValueType<T> value_to_find) -> decltype(auto)
-    {
+    CERBLIB_DECL auto find(T const &iterable_class, GetValueType<T> value_to_find) -> decltype(auto) {
 #if CERBLIB_AMD64
         [[maybe_unused]] constexpr bool suitable_for_fast_search =
-            RawAccessible<T> && CanBeStoredInIntegral<GetValueType<T>> &&
-            std::is_trivial_v<GetValueType<T>>;
+                RawAccessible<T> && CanBeStoredInIntegral<GetValueType<T>> &&
+                std::is_trivial_v<GetValueType<T>>;
 
         if constexpr (suitable_for_fast_search) {
             if CERBLIB_RUNTIME {
@@ -224,8 +212,7 @@ namespace cerb
     }
 
     template<Iterable T1, Iterable T2>
-    CERBLIB_DECL auto equal(T1 const &lhs, T2 const &rhs) -> bool
-    {
+    CERBLIB_DECL auto equal(T1 const &lhs, T2 const &rhs) -> bool {
         using value_type = GetValueType<T1>;
         static_assert(std::is_same_v<value_type, GetValueType<T2>>);
 
@@ -248,8 +235,7 @@ namespace cerb
     }
 
     template<typename T>
-    CERBLIB_DECL auto equal(T const *lhs, T const *rhs, size_t length) -> bool
-    {
+    CERBLIB_DECL auto equal(T const *lhs, T const *rhs, size_t length) -> bool {
 #if CERBLIB_AMD64
         constexpr bool can_be_fast_compared = CanBeStoredInIntegral<T> && std::is_trivial_v<T>;
 
@@ -264,18 +250,27 @@ namespace cerb
 
 
     template<typename T>
-    CERBLIB_DECL auto ptrdiff(T const first, T const last) -> size_t
-    {
+    CERBLIB_DECL auto ptrdiff(T const first, T const last) -> size_t {
         return static_cast<size_t>(static_cast<ptrdiff_t>(last - first));
     }
 
+    template<CharacterLiteral CharT, size_t Size>
+    CERBLIB_DECL auto strlenForArray(const CharT (&)[Size]) -> size_t {
+        return Size - 1;
+    }
+
     template<CharacterLiteral CharT>
-    CERBLIB_DECL auto strlen(CharT const *str) -> size_t
+    CERBLIB_DECL auto strlenForPointer(CharT const *str) -> size_t
     {
-        if CERBLIB_COMPILE_TIME {
-            return std::basic_string_view<CharT>(str).size();
+        return ptrdiff(str, find(str, static_cast<CharT>(0), std::numeric_limits<u32>::max()));
+    }
+
+    template<typename T>
+    CERBLIB_DECL auto strlen(T const &str) -> size_t {
+        if constexpr (std::is_array_v<T>) {
+            return strlenForArray<>(str);
         } else {
-            return ptrdiff(str, find(str, static_cast<CharT>(0), std::numeric_limits<u32>::max()));
+            return strlenForPointer(str);
         }
     }
 }// namespace cerb

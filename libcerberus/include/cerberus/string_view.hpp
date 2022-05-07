@@ -167,8 +167,8 @@ namespace cerb
 
         BasicStringView() = default;
 
-        // NOLINTNEXTLINE
-        constexpr BasicStringView(CharT const *str) : length(strlen(str)), string(str)
+        template<typename T>// NOLINTNEXTLINE
+        constexpr BasicStringView(T const &str) : length(strlen(str)), string(str)
         {}
 
         constexpr BasicStringView(CharT const *str, size_t length_of_string)
@@ -177,10 +177,6 @@ namespace cerb
 
         constexpr BasicStringView(iterator first, iterator last)
           : length(ptrdiff(first, last)), string(first)
-        {}
-
-        template<unsigned long Size>// NOLINTNEXTLINE
-        constexpr BasicStringView(CharT const (&str)[Size]) : length(Size), string(str)
         {}
 
         template<StringType T>// NOLINTNEXTLINE
