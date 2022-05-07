@@ -1,0 +1,33 @@
+name: Linux-amd64
+
+on: [ pull_request ]
+jobs:
+  build:
+    strategy:
+      fail-fast: false
+      matrix:
+        config:
+          - name: Linux GCC
+            os: ubuntu
+            cc: gcc
+            cxx: g++
+            version: 11
+            dependencies: libfmt-dev gcc-11 g++-11
+    name: CMake (${{ matrix.config.name }})
+    runs-on: ${{ matrix.config.os }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+      - name: Install dependencies (Linux)
+        if: ${{ matrix.config.os == 'ubuntu' }}
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y ${{ matrix.config.dependencies }}
+          sudo update-alternatives --install /usr/bin/gcc gcc /usr/bin/${{ matrix.config.cc }}-${{ matrix.config.version }} 200 --slave /usr/bin/g++ g++ /usr/bin/${{ matrix.config.cxx }}-${{ matrix.config.version }}
+      - name: Build
+        run: |
+          cmake -B build -DCMAKE_BUILD_TYPE=Release -DCERBERUS_STRICT_COMPILATION=ON -DUSE_LIBCPP=OFF
+          cmake --build build -- -j3
+      - name: Test
+        run: |
+          ctest
