@@ -109,6 +109,21 @@ namespace cerb
     }// namespace amd64
 #endif
 
+    namespace private_
+    {
+        template<CharacterLiteral CharT, size_t Size>
+        CERBLIB_DECL auto strlenForArray(const CharT (&)[Size]) -> size_t
+        {
+            return Size - 1;
+        }
+
+        template<CharacterLiteral CharT>
+        CERBLIB_DECL auto strlenForPointer(CharT const *str) -> size_t
+        {
+            return ptrdiff(str, find(str, static_cast<CharT>(0), std::numeric_limits<u32>::max()));
+        }
+    }// namespace private_
+
     template<typename T>
     constexpr auto fill(T *dest, AutoCopyType<T> value, size_t times) -> void
     {
@@ -179,8 +194,7 @@ namespace cerb
     }
 
     template<typename T>
-    CERBLIB_DECL auto find(T const *location, cerb::AutoCopyType<T> value, size_t limit)
-        -> T const *
+    CERBLIB_DECL auto find(T const *location, AutoCopyType<T> value, size_t limit) -> T const *
     {
         [[maybe_unused]] constexpr bool suitable_for_fast_search =
             CanBeStoredInIntegral<T> && std::is_trivial_v<T>;
@@ -263,17 +277,20 @@ namespace cerb
         return std::equal(lhs, lhs + length, rhs, rhs + length);
     }
 
-
     template<typename T>
     CERBLIB_DECL auto ptrdiff(T const first, T const last) -> size_t
     {
         return static_cast<size_t>(static_cast<ptrdiff_t>(last - first));
     }
 
-    template<CharacterLiteral CharT>
-    CERBLIB_DECL auto strlen(CharT const *str) -> size_t
+    template<typename T>
+    CERBLIB_DECL auto strlen(T const &str) -> size_t
     {
-        return ptrdiff(str, find(str, static_cast<CharT>(0), std::numeric_limits<u32>::max()));
+        if constexpr (std::is_array_v<T>) {
+            return private_::strlenForArray<>(str);
+        } else {
+            return private_::strlenForPointer(str);
+        }
     }
 }// namespace cerb
 

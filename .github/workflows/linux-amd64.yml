@@ -1,4 +1,4 @@
-name: Linux
+name: Linux-amd64
 
 on: [ pull_request ]
 jobs:
@@ -12,7 +12,7 @@ jobs:
             cc: gcc
             cxx: g++
             version: 11
-            dependencies: libfmt-dev gcc-11 g++-11
+            dependencies: ninja-build libfmt-dev gcc-11 g++-11
     name: CMake (${{ matrix.config.name }})
     runs-on: ${{ matrix.config.os }}
     steps:
@@ -24,17 +24,12 @@ jobs:
           sudo apt-get update
           sudo apt-get install -y ${{ matrix.config.dependencies }}
           sudo update-alternatives --install /usr/bin/gcc gcc /usr/bin/${{ matrix.config.cc }}-${{ matrix.config.version }} 200 --slave /usr/bin/g++ g++ /usr/bin/${{ matrix.config.cxx }}-${{ matrix.config.version }}
-      - name: Install dependencies (macOS)
-        if: ${{ matrix.config.os == 'macos-latest' }}
-        run: |
-          brew install ${{ matrix.config.dependencies }}
       - name: Build
         run: |
-          cmake -B build -DCMAKE_BUILD_TYPE=Release -DCERBERUS_STRICT_COMPILATION=ON -DUSE_LIBCPP=OFF
-          cmake --build build -j3
+          cmake -G Ninja -B build -DCMAKE_BUILD_TYPE=Release -DCERBERUS_STRICT_COMPILATION=ON -DUSE_LIBCPP=OFF
+          cmake --build build -- -j3
       - name: Test
         run: |
+          cd build
           ctest
-      - name: Install
-        run: |
-          sudo cmake --install build
+          cd ..

@@ -28,7 +28,7 @@ namespace cerb::bit
     constexpr auto at(T const &number, size_t index) -> bool
     {
         auto bit_index = index % bitsizeof(T);
-        size_t target_bit = pow2<size_t>(bit_index);
+        auto target_bit = pow2<size_t>(bit_index);
 
         return (number & target_bit) == target_bit;
     }

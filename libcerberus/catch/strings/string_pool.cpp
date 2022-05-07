@@ -5,23 +5,25 @@ namespace cerb::debug
 {
     auto testStringPool() -> int
     {
-        StringPool<char, unsigned> string_pool({ { "Hello", 0 }, { "World", 1 } });
+        using namespace string_view_literals;
 
-        EXPECT_TRUE(string_pool.contains("Hello"));
-        EXPECT_TRUE(string_pool["Hello"] == 0);
-        EXPECT_TRUE(string_pool["World"] == 1);
-        EXPECT_TRUE(string_pool.findLongestStringInPool("WorldIt'sATest") == "World");
+        StringPool<char, unsigned> string_pool({ { "Hello"_sv, 0 }, { "World"_sv, 1 } });
+
+        EXPECT_TRUE(string_pool.contains("Hello"_sv));
+        EXPECT_TRUE(string_pool["Hello"_sv] == 0);
+        EXPECT_TRUE(string_pool["World"_sv] == 1);
+        EXPECT_TRUE(string_pool.findLongestStringInPool("WorldIt'sATest"_sv) == "World"_sv);
 
         try {
-            CERBLIB_UNUSED(auto) = string_pool["Test"];
+            CERBLIB_UNUSED(auto) = string_pool["Test"_sv];
             CANT_BE_REACHED;
         } catch (std::out_of_range const &) {
             MUST_BE_REACHED;
         }
 
-        string_pool.emplace("Test", 3);
-        EXPECT_TRUE(string_pool.contains("Test"));
-        EXPECT_TRUE(string_pool["Test"] == 3);
+        string_pool.emplace("Test"_sv, 3);
+        EXPECT_TRUE(string_pool.contains("Test"_sv));
+        EXPECT_TRUE(string_pool["Test"_sv] == 3);
 
         return 0;
     }
