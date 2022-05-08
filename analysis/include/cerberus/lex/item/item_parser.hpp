@@ -255,12 +255,10 @@ namespace cerb::lex
         }
 
     protected:
-        // NOLINTBEGIN
         GeneratorForText<CharT> rule_generator{};
         std::vector<item_ptr> items{};
         BasicItem<CharT> *recent_item{};
         size_t item_id{};
-        // NOLINTEND
     };
 
 #ifndef CERBERUS_HEADER_ONLY
