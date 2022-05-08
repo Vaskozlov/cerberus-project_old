@@ -50,7 +50,7 @@ namespace cerb::debug
         static std::uniform_int_distribution<value_type2> second_distribution(
             std::numeric_limits<pair_v2_for_generation>::min(),
             std::numeric_limits<pair_v2_for_generation>::max());
-        
+
         std::unique_ptr<T[]> data = std::make_unique<T[]>(size);
 
         for (size_t i : Range(size)) {

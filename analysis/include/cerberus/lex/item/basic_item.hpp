@@ -55,7 +55,7 @@ namespace cerb::lex
         virtual ~BasicItem() = default;
 
         auto operator=(BasicItem const &) -> BasicItem & = default;
-        auto operator=(BasicItem  &&) noexcept -> BasicItem & = default;
+        auto operator=(BasicItem &&) noexcept -> BasicItem & = default;
 
         AnalysisGlobals<CharT> &analysis_globals;
         ItemFlags flags{ ItemFlags::NONE };
