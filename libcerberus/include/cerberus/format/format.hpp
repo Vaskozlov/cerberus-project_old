@@ -186,7 +186,9 @@ namespace cerb::fmt
     CERBLIB_DECL auto format(BasicStringView<char> const &formatter, Ts &&...args)
         -> std::basic_string<CharT>
     {
-        private_::Converter<CharT> converter{ formatter, std::forward<Ts>(args)... };
+        using namespace private_;
+
+        Converter<CharT> converter{ formatter, std::forward<Ts>(args)... };
         return converter.moveResult();
     }
 }// namespace cerb::fmt

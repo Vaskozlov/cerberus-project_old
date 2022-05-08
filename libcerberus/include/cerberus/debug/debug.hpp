@@ -36,9 +36,9 @@ namespace cerb::debug
         if (not static_cast<bool>(condition)) {
             if CERBLIB_COMPILE_TIME {
                 throw CompileTimeError("Cerberus test failure!");
-            } else {
-                failure(condition, loc);
             }
+
+            failure(condition, loc);
         }
     }
 
@@ -48,9 +48,9 @@ namespace cerb::debug
         if (static_cast<bool>(condition)) {
             if CERBLIB_COMPILE_TIME {
                 throw CompileTimeError("Cerberus test failure!");
-            } else {
-                failure(condition, loc);
             }
+
+            failure(condition, loc);
         }
     }
 }// namespace cerb::debug

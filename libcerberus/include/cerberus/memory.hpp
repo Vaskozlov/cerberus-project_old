@@ -112,6 +112,7 @@ namespace cerb
     namespace private_
     {
         template<CharacterLiteral CharT, size_t Size>
+        // NOLINTNEXTLINE
         CERBLIB_DECL auto strlenForArray(const CharT (&)[Size]) -> size_t
         {
             return Size - 1;
@@ -216,9 +217,9 @@ namespace cerb
             }
 
             return location;
-        } else {
-            return std::find(location, location + limit, value);
         }
+
+        return std::find(location, location + limit, value);
     }
 
     template<Iterable T>
@@ -286,10 +287,12 @@ namespace cerb
     template<typename T>
     CERBLIB_DECL auto strlen(T const &str) -> size_t
     {
+        using namespace private_;
+
         if constexpr (std::is_array_v<T>) {
-            return private_::strlenForArray<>(str);
+            return strlenForArray<>(str);
         } else {
-            return private_::strlenForPointer(str);
+            return strlenForPointer(str);
         }
     }
 }// namespace cerb
