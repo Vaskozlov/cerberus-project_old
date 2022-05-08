@@ -135,9 +135,9 @@ namespace cerb
         {
             if (increment > 0) {
                 return state < other.state;
-            } else {
-                return state > other.state;
             }
+
+            return state > other.state;
         }
 
         iterator() = default;
