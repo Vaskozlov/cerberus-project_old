@@ -5,8 +5,6 @@
 #include <cerberus/string_view.hpp>
 #include <string>
 
-#define CCHAR(x) static_cast<CharT>(x)
-
 namespace cerb::fmt
 {
     namespace private_
@@ -100,7 +98,5 @@ namespace cerb::fmt
         return converter.moveResult();
     }
 }// namespace cerb::fmt
-
-#undef CCHAR
 
 #endif /* CERBERUS_INT_HPP */

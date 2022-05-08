@@ -32,9 +32,7 @@ namespace cerb::lex
 
         AnalysisGlobals() = default;
 
-        // NOLINTBEGIN
         StringPool<CharT, size_t, true> nonterminals{};
-        // NOLINTEND
     };
 
     template<CharacterLiteral CharT>
@@ -47,16 +45,20 @@ namespace cerb::lex
         }
 
         BasicItem() = default;
+        BasicItem(BasicItem const &) = default;
+        BasicItem(BasicItem &&) noexcept = default;
 
-        constexpr virtual ~BasicItem() = default;
         constexpr explicit BasicItem(AnalysisGlobals<CharT> &analysis_parameters)
           : analysis_globals(analysis_parameters)
         {}
 
-        // NOLINTBEGIN
+        virtual ~BasicItem() = default;
+
+        auto operator=(BasicItem const &) -> BasicItem & = default;
+        auto operator=(BasicItem &&) noexcept -> BasicItem & = default;
+
         AnalysisGlobals<CharT> &analysis_globals;
         ItemFlags flags{ ItemFlags::NONE };
-        // NOLINTEND
     };
 
 #ifndef CERBERUS_HEADER_ONLY

@@ -94,6 +94,8 @@ namespace cerb::scan
         constexpr auto parseEscapeSequence(Ts... special_symbols) -> CharT
         {
             CharT chr = getNextCharAndCheckForEoF();
+            constexpr size_t octal_notation = 8;
+            constexpr size_t hexadecimal_notation = 16;
 
             switch (chr) {
             case cast('\\'):
@@ -121,13 +123,13 @@ namespace cerb::scan
                 return cast('\b');
 
             case cast('0'):
-                return convertStringToChar(8, 2);
+                return convertStringToChar(octal_notation, 2);
 
             case cast('x'):
-                return convertStringToChar(16, 2);
+                return convertStringToChar(hexadecimal_notation, 2);
 
             case cast('u'):
-                return convertStringToChar(16, 4);
+                return convertStringToChar(hexadecimal_notation, 4);
 
             default:
                 break;

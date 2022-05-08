@@ -120,8 +120,8 @@ namespace cerb
         constexpr explicit Pair(PairT const &pair) : first(pair.first), second(pair.second)
         {}
 
-        T1 first{}; // NOLINT
-        T2 second{};// NOLINT
+        T1 first{};
+        T2 second{};
     };
 
     template<PairComparison ComparisonRule = PairComparison::DEFAULT, Pairable T>

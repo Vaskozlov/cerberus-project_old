@@ -1,11 +1,29 @@
 ---
-Checks: >-
-    -*,
-  -fuchsia-*,
-  -google-*,
-  -zircon-*,
-  -abseil-*,
-  -llvm*,
-WarningsAsErrors: '*'
+Checks: "*,
+        -abseil-*,
+        -altera-*,
+        -android-*,
+        -fuchsia-*,
+        -google-*,
+        -llvm*,
+        -zircon-*,
+        -hicpp-avoid-c-arrays,
+        -modernize-avoid-c-arrays,
+        -cppcoreguidelines-avoid-c-arrays,
+        -hicpp-no-assembler,
+        -hicpp-signed-bitwise,
+        -readability-identifier-length,
+        -bugprone-easily-swappable-parameters,
+        -cppcoreguidelines-non-private-member-variables-in-classes,
+        -misc-non-private-member-variables-in-classes,
+        -cppcoreguidelines-pro-bounds-pointer-arithmetic,
+"
+WarningsAsErrors: ''
 HeaderFilterRegex: ''
-FormatStyle:     none
+FormatStyle: none
+
+
+
+
+
+

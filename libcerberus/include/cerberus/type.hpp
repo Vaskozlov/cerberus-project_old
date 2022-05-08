@@ -42,28 +42,42 @@ namespace cerb
     constexpr bool IsAnyOfV = IsAnyOf<TargetType, OtherTypes...>::value;
 
     template<typename T>
-    concept Pairable = requires(T value) {
-                           value.first;
-                           value.second;
-                       };
+    concept Pairable = requires(T value)
+    {
+        value.first;
+        value.second;
+    };
 
     template<typename T>
-    concept DataAccessible = requires(T value) {
-                                 value.getData();
-                                 value.size();
-                             };
+    concept DataAccessible = requires(T value)
+    {
+        value.getData();
+        value.size();
+    };
 
     template<typename T>
-    concept Iterable = requires(T value) { value.begin() != value.end(); };
+    concept Iterable = requires(T value)
+    {
+        value.begin() != value.end();
+    };
 
     template<typename T>
-    concept HasValueType = requires(T value) { typename T::value_type; };
+    concept HasValueType = requires(T value)
+    {
+        typename T::value_type;
+    };
 
     template<typename T>
-    concept HasSizeType = requires(T value) { typename T::size_type; };
+    concept HasSizeType = requires(T value)
+    {
+        typename T::size_type;
+    };
 
     template<typename T>
-    concept LessComparable = requires(T lhs, T rhs) { lhs < rhs; };
+    concept LessComparable = requires(T lhs, T rhs)
+    {
+        lhs < rhs;
+    };
 
     template<typename T>
     concept Enum = std::is_enum_v<T>;
@@ -81,11 +95,10 @@ namespace cerb
         sizeof(size_t));
 
     template<typename T>
-    concept Trivial = std::is_trivial_v<T> && (sizeof(T) <= sizeof(size_t) * 2);
+    concept Trivial = std::is_trivial_v<T> &&(sizeof(T) <= sizeof(size_t) * 2);
 
     template<typename T>
-    concept NotTrivial = !
-    Trivial<T>;
+    concept NotTrivial = !Trivial<T>;
 
     template<typename T>
     concept RawAccessible =
@@ -117,11 +130,13 @@ namespace cerb
     concept TriviallyCopiable = std::is_same_v<T const, AutoCopyType<T const>>;
 
     template<typename T>
-    concept NotTriviallyCopiable = not
-    TriviallyCopiable<T>;
+    concept NotTriviallyCopiable = not TriviallyCopiable<T>;
 
     template<typename T>
-    concept PointerLike = std::is_pointer_v<decltype(T{}.get())> && requires(T ptr) { ptr.get(); };
+    concept PointerLike = std::is_pointer_v<decltype(T{}.get())> && requires(T ptr)
+    {
+        ptr.get();
+    };
 }// namespace cerb
 
 #endif /* CERBERUS_TYPE_HPP */

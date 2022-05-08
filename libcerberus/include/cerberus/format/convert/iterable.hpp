@@ -23,7 +23,7 @@ namespace cerb::fmt
 
             IterableConverter() = default;
 
-            constexpr IterableConverter(// NOLINTNEXTLINE
+            constexpr IterableConverter(
                 char begin_for_object, char end_for_object, T const &object_to_convert)
               : converted_object(object_to_convert), object_begin(cast(begin_for_object)),
                 object_end(cast(end_for_object))

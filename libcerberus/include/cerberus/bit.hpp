@@ -109,25 +109,32 @@ namespace cerb::bit
     template<size_t PowerOf2, std::integral T>
     CERBLIB_DECL auto trunk(T number) -> T
     {
-        return number & ~(private_::pow2<T>(PowerOf2) - 1);
+        using namespace private_;
+
+        return number & ~(pow2<T>(PowerOf2) - 1);
     }
 
     template<size_t PowerOf2, std::integral T>
     CERBLIB_DECL auto ceil(T number) -> T
     {
-        return number + (private_::pow2<T>(PowerOf2) - number % private_::pow2<T>(PowerOf2));
+        using namespace private_;
+
+        return number + (pow2<T>(PowerOf2) - number % pow2<T>(PowerOf2));
     }
 
     template<u64 PowerOf2, std::integral T>
     CERBLIB_DECL auto align(T value) -> T
     {
-        bool need_to_align = value % private_::pow2<T>(PowerOf2) == 0;
+        using namespace private_;
+
+        bool need_to_align = value % pow2<T>(PowerOf2) == 0;
         return need_to_align ? value : ceil<PowerOf2, T>(value);
     }
 
     template<unsigned BitValue, std::unsigned_integral T>
     CERBLIB_DECL auto scanForward(T value) -> size_t
     {
+        using namespace private_;
         static_assert(isOneOf(BitValue, 0, 1));
 
         if constexpr (BitValue == 0) {
@@ -137,12 +144,13 @@ namespace cerb::bit
             return bitsizeof(size_t);
         }
 
-        return private_::callSystemScanForward(value);
+        return callSystemScanForward(value);
     }
 
     template<unsigned BitValue, std::unsigned_integral T>
     CERBLIB_DECL auto scanReverse(T value) -> size_t
     {
+        using namespace private_;
         static_assert(isOneOf(BitValue, 0, 1));
 
         if constexpr (BitValue == 0) {
@@ -152,7 +160,7 @@ namespace cerb::bit
             return bitsizeof(size_t);
         }
 
-        return private_::callSystemScanReverse(value);
+        return callSystemScanReverse(value);
     }
 }// namespace cerb::bit
 
