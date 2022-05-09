@@ -16,14 +16,15 @@ namespace cerb::lex::string
             return string;
         }
 
-        constexpr StringItem(CERBLIB_BASIC_ITEM_ARGS, GeneratorForText<CharT> &generator)
+        constexpr StringItem(CERBLIB_BASIC_ITEM_ARGS, text::GeneratorForText<CharT> &generator)
           : CERBLIB_CONSTRUCT_BASIC_ITEM, string(convertStringToCodes(cast('\"'), generator))
         {
             checkThatStringIsNotEmpty(generator);
         }
 
     private:
-        constexpr auto checkThatStringIsNotEmpty(GeneratorForText<CharT> const &generator) const
+        constexpr auto
+            checkThatStringIsNotEmpty(text::GeneratorForText<CharT> const &generator) const
             -> void
         {
             if (string.empty()) {

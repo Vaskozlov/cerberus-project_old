@@ -8,11 +8,11 @@ namespace cerb::bit
 #ifdef _MSC_VER
     namespace msvc
     {
-        template<std::unsigned_integral ExceptionT>
-        CERBLIB_DECL auto scanForwardCompileTime(ExceptionT value) -> size_t
+        template<std::unsigned_integral UInt>
+        CERBLIB_DECL auto scanForwardCompileTime(UInt value) -> size_t
         {
             size_t bit_index = 0;
-            constexpr ExceptionT mask = 0b1;
+            constexpr UInt mask = 0b1;
 
             for (; value > 0; ++bit_index) {
                 if ((value & mask) == mask) {
@@ -24,8 +24,8 @@ namespace cerb::bit
             return bitsizeof(size_t);
         }
 
-        template<std::unsigned_integral ExceptionT>
-        CERBLIB_DECL auto scanForwardRuntime(ExceptionT value) -> size_t
+        template<std::unsigned_integral UInt>
+        CERBLIB_DECL auto scanForwardRuntime(UInt value) -> size_t
         {
             unsigned long bit_index;
 
@@ -37,11 +37,11 @@ namespace cerb::bit
             return static_cast<size_t>(bit_index);
         }
 
-        template<std::unsigned_integral ExceptionT>
-        CERBLIB_DECL auto scanReverseCompileTime(ExceptionT value) -> size_t
+        template<std::unsigned_integral UInt>
+        CERBLIB_DECL auto scanReverseCompileTime(UInt value) -> size_t
         {
-            size_t bit_index = bitsizeof(ExceptionT) - 1;
-            constexpr ExceptionT mask = static_cast<ExceptionT>(1) << (bitsizeof(ExceptionT) - 1);
+            size_t bit_index = bitsizeof(UInt) - 1;
+            constexpr UInt mask = static_cast<UInt>(1) << (bitsizeof(UInt) - 1);
 
             for (; value > 0; --bit_index) {
                 if ((value & mask) == mask) {
@@ -53,8 +53,8 @@ namespace cerb::bit
             return bitsizeof(size_t);
         }
 
-        template<std::unsigned_integral ExceptionT>
-        CERBLIB_DECL auto scanReverseRuntime(ExceptionT value) -> size_t
+        template<std::unsigned_integral UInt>
+        CERBLIB_DECL auto scanReverseRuntime(UInt value) -> size_t
         {
             unsigned long bit_index;
 
@@ -70,14 +70,14 @@ namespace cerb::bit
 
     namespace private_
     {
-        template<std::unsigned_integral T, std::unsigned_integral PowerType>
-        CERBLIB_DECL auto pow2(PowerType power_of_2) -> T
+        template<std::unsigned_integral UInt, std::unsigned_integral PowerType>
+        CERBLIB_DECL auto pow2(PowerType power_of_2) -> UInt
         {
-            return static_cast<T>(1) << power_of_2;
+            return static_cast<UInt>(1) << power_of_2;
         }
 
-        template<std::unsigned_integral T>
-        CERBLIB_DECL auto callSystemScanForward(T value) -> size_t
+        template<std::unsigned_integral UInt>
+        CERBLIB_DECL auto callSystemScanForward(UInt value) -> size_t
         {
 #ifdef _MSC_VER
             if CERBLIB_COMPILE_TIME {
@@ -90,8 +90,8 @@ namespace cerb::bit
 #endif
         }
 
-        template<std::unsigned_integral T>
-        CERBLIB_DECL auto callSystemScanReverse(T value) -> size_t
+        template<std::unsigned_integral UInt>
+        CERBLIB_DECL auto callSystemScanReverse(UInt value) -> size_t
         {
 #ifdef _MSC_VER
             if CERBLIB_COMPILE_TIME {
@@ -106,33 +106,33 @@ namespace cerb::bit
         }
     }// namespace private_
 
-    template<size_t PowerOf2, std::integral T>
-    CERBLIB_DECL auto trunk(T number) -> T
+    template<size_t PowerOf2, std::integral Int>
+    CERBLIB_DECL auto trunk(Int number) -> Int
     {
         using namespace private_;
 
-        return number & ~(pow2<T>(PowerOf2) - 1);
+        return number & ~(pow2<Int>(PowerOf2) - 1);
     }
 
-    template<size_t PowerOf2, std::integral T>
-    CERBLIB_DECL auto ceil(T number) -> T
+    template<size_t PowerOf2, std::integral Int>
+    CERBLIB_DECL auto ceil(Int number) -> Int
     {
         using namespace private_;
 
-        return number + (pow2<T>(PowerOf2) - number % pow2<T>(PowerOf2));
+        return number + (pow2<Int>(PowerOf2) - number % pow2<Int>(PowerOf2));
     }
 
-    template<u64 PowerOf2, std::integral T>
-    CERBLIB_DECL auto align(T value) -> T
+    template<u64 PowerOf2, std::integral Int>
+    CERBLIB_DECL auto align(Int value) -> Int
     {
         using namespace private_;
 
-        bool need_to_align = value % pow2<T>(PowerOf2) == 0;
-        return need_to_align ? value : ceil<PowerOf2, T>(value);
+        bool need_to_align = value % pow2<Int>(PowerOf2) == 0;
+        return need_to_align ? value : ceil<PowerOf2, Int>(value);
     }
 
-    template<unsigned BitValue, std::unsigned_integral T>
-    CERBLIB_DECL auto scanForward(T value) -> size_t
+    template<unsigned BitValue, std::unsigned_integral UInt>
+    CERBLIB_DECL auto scanForward(UInt value) -> size_t
     {
         using namespace private_;
         static_assert(isOneOf(BitValue, 0, 1));
@@ -147,8 +147,8 @@ namespace cerb::bit
         return callSystemScanForward(value);
     }
 
-    template<unsigned BitValue, std::unsigned_integral T>
-    CERBLIB_DECL auto scanReverse(T value) -> size_t
+    template<unsigned BitValue, std::unsigned_integral UInt>
+    CERBLIB_DECL auto scanReverse(UInt value) -> size_t
     {
         using namespace private_;
         static_assert(isOneOf(BitValue, 0, 1));

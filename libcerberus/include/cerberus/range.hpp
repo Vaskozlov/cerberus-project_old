@@ -7,7 +7,7 @@
 
 namespace cerb
 {
-    template<std::integral T>
+    template<std::integral Int>
     struct Range
     {
         struct iterator;
@@ -55,30 +55,30 @@ namespace cerb
 
         Range() = default;
 
-        constexpr explicit Range(T to) : end_of_range(to)
+        constexpr explicit Range(Int to) : end_of_range(to)
         {}
 
-        constexpr Range(T from, T to) : begin_of_range(from), end_of_range(to)
+        constexpr Range(Int from, Int to) : begin_of_range(from), end_of_range(to)
         {}
 
-        constexpr Range(T from, T to, T inc)
+        constexpr Range(Int from, Int to, Int inc)
           : begin_of_range(from), end_of_range(to), increment(inc)
         {}
 
     private:
-        T begin_of_range{ 0 }, end_of_range{ 0 }, increment{ 1 };
+        Int begin_of_range{ 0 }, end_of_range{ 0 }, increment{ 1 };
     };
 
-    template<std::integral T>
-    struct Range<T>::iterator
+    template<std::integral Int>
+    struct Range<Int>::iterator
     {
-        using value_type = T;
-        using pointer = T *;
-        using refernce = T &;
+        using value_type = Int;
+        using pointer = Int *;
+        using refernce = Int &;
         using difference_type = ptrdiff_t;
         using iterator_category = std::random_access_iterator_tag;
 
-        CERBLIB_DECL auto operator*() const -> T
+        CERBLIB_DECL auto operator*() const -> Int
         {
             return state;
         }
@@ -142,12 +142,12 @@ namespace cerb
 
         iterator() = default;
 
-        constexpr iterator(T current_state, T inc) : state(current_state), increment(inc)
+        constexpr iterator(Int current_state, Int inc) : state(current_state), increment(inc)
         {}
 
     private:
-        T state{};
-        T increment{};
+        Int state{};
+        Int increment{};
     };
 }// namespace cerb
 

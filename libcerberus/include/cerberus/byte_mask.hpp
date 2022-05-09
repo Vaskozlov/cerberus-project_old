@@ -10,7 +10,7 @@ namespace cerb
     union CERBLIB_TRIVIAL ByteMask {
         CERBLIB_DECL auto getAsInt() -> decltype(auto)
         {
-            static_assert(CanBeStoredInIntegral<T>);
+            static_assert(CanBeStoredAsIntegral<T>);
 
             if constexpr (sizeof(T) == sizeof(u8)) {
                 return mask_8[0];
@@ -27,7 +27,7 @@ namespace cerb
 
         CERBLIB_DECL auto getAsInt() const -> decltype(auto)
         {
-            static_assert(CanBeStoredInIntegral<T>);
+            static_assert(CanBeStoredAsIntegral<T>);
 
             if constexpr (sizeof(T) == sizeof(u8)) {
                 return mask_8[0];

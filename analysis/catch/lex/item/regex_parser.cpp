@@ -5,12 +5,13 @@ namespace cerb::debug
 {
     using namespace lex;
     using namespace regex;
+    using namespace text;
 
     static constexpr cerb::string_view TestInput = "[\\t\\-_0-9A-Za-z]";
 
     auto testRegexParserOnBasicString() -> bool
     {
-        ConstBitmap<1, 256> bitmap;
+        ConstBitmap<1, pow2<size_t>(bitsizeof(char))> bitmap;
         GeneratorForText<char> text_generator{ TestInput };
         RegexParser<char> regex_parser{ text_generator, bitmap };
 

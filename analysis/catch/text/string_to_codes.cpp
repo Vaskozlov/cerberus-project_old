@@ -1,26 +1,27 @@
 #include <cerberus/debug/debug.hpp>
-#include <cerberus/lex/string_to_codes.hpp>
+#include <cerberus/text/string_to_codes.hpp>
 
 namespace cerb::debug
 {
     using namespace lex;
-    using namespace std::string_view_literals;
+    using namespace text;
+    using namespace string_view_literals;
 
-    constexpr static std::string_view TestInput =
+    constexpr static string_view TestInput =
         "\"    \\t\\tHello, World! \\nIt's a test \\xFF \\0 \\077 \\0555 Привет мир!"
-        "\\t\\t  string.\""sv;
+        "\\t\\t  string.\""_sv;
 
-    constexpr static std::string_view ExpectedOutput =
+    constexpr static string_view ExpectedOutput =
         "    \t\tHello, World! \nIt's a test \xFF \0 \077 \0555 Привет мир!"
-        "\t\t  string."sv;
+        "\t\t  string."_sv;
 
-    constexpr static std::u16string_view TestInputU16 =
+    constexpr static u16string_view TestInputU16 =
         u"\"    \\t\\tHello, World! \\nIt's a test \\xFF \\0 \\077 \\0555 Привет мир! \\uFFFF"
-        "\\t\\t  string.\""sv;
+        "\\t\\t  string.\""_sv;
 
-    constexpr static std::u16string_view ExpectedOutputU16 =
+    constexpr static u16string_view ExpectedOutputU16 =
         u"    \t\tHello, World! \nIt's a test \xFF \0 \077 \0555 Привет мир! \uFFFF"
-        "\t\t  string."sv;
+        "\t\t  string."_sv;
 
     auto testStringToCodesOnEmptyBasicString() -> bool
     {

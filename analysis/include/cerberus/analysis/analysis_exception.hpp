@@ -2,18 +2,17 @@
 #define CERBERUS_ANALYSIS_EXCEPTION_HPP
 
 #include <cerberus/analysis/analysis_basic_exception.hpp>
-#include <cerberus/exception.hpp>
 #include <cerberus/format/format.hpp>
-#include <cerberus/lex/generator_for_text.hpp>
-#include <cerberus/lex/string_reducer.hpp>
 #include <cerberus/reference_wrapper.hpp>
+#include <cerberus/text/generator_for_text.hpp>
+#include <cerberus/text/string_reducer.hpp>
 
 #define CERBERUS_ANALYSIS_EXCEPTION(name, CharT, from)                                             \
     struct name : public cerb::analysis::AnalysisException<CharT, from>                            \
     {                                                                                              \
         constexpr name(                                                                            \
             cerb::BasicStringView<char> const &exception_message,                                  \
-            cerb::lex::GeneratorForText<CharT> const &generator)                                   \
+            cerb::text::GeneratorForText<CharT> const &generator)                                  \
           : cerb::analysis::AnalysisException<CharT, from>(exception_message, generator)           \
         {}                                                                                         \
     }
@@ -23,14 +22,14 @@ namespace cerb::analysis
     template<CharacterLiteral CharT, ExceptionType ExceptionT = BasicAnalysisException>
     struct AnalysisException : public ExceptionT
     {
-        CERBLIB_DECL auto getLocation() const -> lex::LocationInFile<char> const &
+        CERBLIB_DECL auto getLocation() const -> text::LocationInFile<char> const &
         {
             return text_generator.getLocation();
         }
 
         CERBLIB_DECL auto getOffset() const -> size_t
         {
-            return text_generator.getOffset();
+            return text_generator.getTextOffset();
         }
 
         CERBLIB_DECL auto getLine() const -> size_t
@@ -72,7 +71,7 @@ namespace cerb::analysis
 
         explicit constexpr AnalysisException(
             BasicStringView<char> const &exception_message,
-            lex::GeneratorForText<CharT> const &generator)
+            text::GeneratorForText<CharT> const &generator)
           : text_generator(generator), unable_to_show_message(getNonCharErrorMessage()),
             message(getErrorMessage(exception_message))
         {}
@@ -107,7 +106,7 @@ namespace cerb::analysis
         {
             using namespace string_view_literals;
 
-            lex::StringReducer<CharT> reducer{ text_generator };
+            text::StringReducer<CharT> reducer{ text_generator };
 
             std::basic_string<CharT> result = fmt::format<CharT>(
                 "Analysis error occurred: {} File: {}, line: {}, char: {}\n{}\n"_sv,
@@ -125,7 +124,7 @@ namespace cerb::analysis
             result.push_back(static_cast<CharT>('^'));
         }
 
-        lex::GeneratorForText<CharT> const &text_generator;
+        text::GeneratorForText<CharT> const &text_generator;
         std::string unable_to_show_message{};
         std::basic_string<CharT> message{};
     };
@@ -134,6 +133,8 @@ namespace cerb::analysis
     extern template struct AnalysisException<char>;
     extern template struct AnalysisException<char8_t>;
     extern template struct AnalysisException<char16_t>;
+    extern template struct AnalysisException<char32_t>;
+    extern template struct AnalysisException<wchar_t>;
 #endif /* CERBERUS_HEADER_ONLY */
 
 }// namespace cerb::analysis

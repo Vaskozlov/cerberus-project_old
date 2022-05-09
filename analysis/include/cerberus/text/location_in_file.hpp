@@ -3,7 +3,7 @@
 
 #include <cerberus/string_view.hpp>
 
-namespace cerb::lex
+namespace cerb::text
 {
     template<CharacterLiteral CharT = char>
     struct LocationInFile
@@ -43,6 +43,7 @@ namespace cerb::lex
         {
             ++char_offset;
             ++line_number;
+            char_number = 0;
         }
 
         LocationInFile() = default;

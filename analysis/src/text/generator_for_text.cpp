@@ -1,6 +1,6 @@
-#include <cerberus/lex/generator_for_text.hpp>
+#include <cerberus/text/generator_for_text.hpp>
 
-namespace cerb::lex
+namespace cerb::text
 {
     template struct GeneratorForText<char>;
     template struct GeneratorForText<char8_t>;

@@ -24,10 +24,10 @@ namespace cerb::bit
         return (*(iterator + array_index) & target_bit) == target_bit;
     }
 
-    template<std::integral T>
-    constexpr auto at(T const &number, size_t index) -> bool
+    template<std::integral Int>
+    constexpr auto at(Int const &number, size_t index) -> bool
     {
-        auto bit_index = index % bitsizeof(T);
+        auto bit_index = index % bitsizeof(Int);
         auto target_bit = pow2<size_t>(bit_index);
 
         return (number & target_bit) == target_bit;
@@ -48,15 +48,15 @@ namespace cerb::bit
         }
     }
 
-    template<u16 BitValue, std::integral T>
-    constexpr auto set(T &number, size_t index) -> decltype(auto)
+    template<u16 BitValue, std::integral Int>
+    constexpr auto set(Int &number, size_t index) -> decltype(auto)
     {
-        auto bit_index = index % bitsizeof(T);
+        auto bit_index = index % bitsizeof(Int);
 
         if constexpr (BitValue == 0) {
-            number &= ~(pow2<T>(bit_index));
+            number &= ~(pow2<Int>(bit_index));
         } else {
-            number |= pow2<T>(bit_index);
+            number |= pow2<Int>(bit_index);
         }
     }
 

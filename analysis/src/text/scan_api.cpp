@@ -1,6 +1,6 @@
-#include <cerberus/lex/scan_api.hpp>
+#include <cerberus/text/scan_api.hpp>
 
-namespace cerb::scan
+namespace cerb::text
 {
     template struct ScanApi<false, char>;
     template struct ScanApi<true, char>;

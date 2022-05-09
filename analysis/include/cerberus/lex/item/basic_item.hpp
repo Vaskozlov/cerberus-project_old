@@ -1,9 +1,9 @@
 #ifndef CERBERUS_BASIC_ITEM_HPP
 #define CERBERUS_BASIC_ITEM_HPP
 
-#include <cerberus/lex/generator_for_text.hpp>
+#include <cerberus/text/generator_for_text.hpp>
 #include <cerberus/lex/lexical_analysis_exception.hpp>
-#include <cerberus/lex/string_to_codes.hpp>
+#include <cerberus/text/string_to_codes.hpp>
 #include <cerberus/string_pool.hpp>
 
 #define CERBLIB_BASIC_ITEM_ACCESS(CharT)                                                           \
@@ -12,7 +12,7 @@
     using basic_item_t::cast;                                                                      \
     using basic_item_t::flags
 
-#define CERBLIB_BASIC_ITEM_ARGS cerb::lex::AnalysisGlobals<CharT> &analysis_parameters
+#define CERBLIB_BASIC_ITEM_ARGS cerb::lex::AnalysisGlobalsParameters<CharT> &analysis_parameters
 #define CERBLIB_CONSTRUCT_BASIC_ITEM basic_item_t(analysis_parameters)
 
 namespace cerb::lex
@@ -22,15 +22,21 @@ namespace cerb::lex
         PREFIX = 0b10'000, REVERSE = 0b100'000, NONTERMINAL = 0b10'000'000);
 
     template<CharacterLiteral CharT>
-    struct AnalysisGlobals
+    struct AnalysisGlobalsParameters
     {
-        template<typename... Ts>
-        constexpr auto emplaceNonterminal(Ts &&...args) -> decltype(auto)
+        constexpr auto emplaceNonterminal(std::basic_string<CharT> &&str, size_t id)
+            -> decltype(auto)
         {
-            return nonterminals.emplace(std::forward<Ts>(args)...);
+            return nonterminals.emplace(std::move(str), id);
         }
 
-        AnalysisGlobals() = default;
+        constexpr auto emplaceNonterminal(std::basic_string<CharT> const &str, size_t id)
+            -> decltype(auto)
+        {
+            return nonterminals.emplace(str, id);
+        }
+
+        AnalysisGlobalsParameters() = default;
 
         StringPool<CharT, size_t, true> nonterminals{};
     };
@@ -38,8 +44,8 @@ namespace cerb::lex
     template<CharacterLiteral CharT>
     struct BasicItem
     {
-        template<std::integral T>
-        CERBLIB_DECL static auto cast(T value) -> CharT
+        template<std::integral Int>
+        CERBLIB_DECL static auto cast(Int value) -> CharT
         {
             return static_cast<CharT>(value);
         }
@@ -48,7 +54,7 @@ namespace cerb::lex
         BasicItem(BasicItem const &) = default;
         BasicItem(BasicItem &&) noexcept = default;
 
-        constexpr explicit BasicItem(AnalysisGlobals<CharT> &analysis_parameters)
+        constexpr explicit BasicItem(AnalysisGlobalsParameters<CharT> &analysis_parameters)
           : analysis_globals(analysis_parameters)
         {}
 
@@ -57,14 +63,14 @@ namespace cerb::lex
         auto operator=(BasicItem const &) -> BasicItem & = default;
         auto operator=(BasicItem &&) noexcept -> BasicItem & = default;
 
-        AnalysisGlobals<CharT> &analysis_globals;
+        AnalysisGlobalsParameters<CharT> &analysis_globals;
         ItemFlags flags{ ItemFlags::NONE };
     };
 
 #ifndef CERBERUS_HEADER_ONLY
-    extern template struct AnalysisGlobals<char>;
-    extern template struct AnalysisGlobals<char8_t>;
-    extern template struct AnalysisGlobals<char16_t>;
+    extern template struct AnalysisGlobalsParameters<char>;
+    extern template struct AnalysisGlobalsParameters<char8_t>;
+    extern template struct AnalysisGlobalsParameters<char16_t>;
 
     extern template struct BasicItem<char>;
     extern template struct BasicItem<char8_t>;

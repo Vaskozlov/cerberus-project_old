@@ -2,14 +2,15 @@
 #define CERBERUS_REGEX_PARSER_HPP
 
 #include <cerberus/bitmap.hpp>
-#include <cerberus/lex/scan_api.hpp>
+#include <cerberus/lex/lexical_analysis_exception.hpp>
 #include <cerberus/number.hpp>
 #include <cerberus/reference_wrapper.hpp>
+#include <cerberus/text/scan_api.hpp>
 
 namespace cerb::lex::regex
 {
     template<CharacterLiteral CharT>
-    struct RegexParser : scan::ScanApi<false, CharT>
+    struct RegexParser : text::ScanApi<false, CharT>
     {
         CERBLIB_SCAN_API_ACCESS(false, CharT);
         CERBERUS_ANALYSIS_EXCEPTION(RegexParsingError, CharT, BasicLexicalAnalysisException);
@@ -17,9 +18,7 @@ namespace cerb::lex::regex
         constexpr static size_t number_of_chars = pow2<size_t>(bitsizeof(CharT));
         using bitmap_t = ConstBitmap<1, number_of_chars>;
 
-        RegexParser() = default;
-
-        constexpr RegexParser(GeneratorForText<CharT> &regex, bitmap_t &bitmap_for_chars)
+        constexpr RegexParser(text::GeneratorForText<CharT> &regex, bitmap_t &bitmap_for_chars)
           : scan_api_t(regex), available_chars(bitmap_for_chars)
         {
             parseRegex();
@@ -72,16 +71,15 @@ namespace cerb::lex::regex
             }
 
             is_range_of_chars = false;
-            previous_char = cast(0);
+            previous_char = CharEnum<CharT>::EoF;
         }
 
         constexpr auto processEscapeSymbol(CharT chr) -> CharT
         {
             if (chr == cast('\\')) {
                 return parseEscapeSequence(chr, cast('-'), cast('['), cast(']'));
-            } else {
-                return chr;
             }
+            return chr;
         }
 
         constexpr auto setChar(CharT chr) -> void

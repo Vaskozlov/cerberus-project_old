@@ -1,6 +1,6 @@
-#include <cerberus/lex/bracket_finder.hpp>
+#include <cerberus/text/bracket_finder.hpp>
 
-namespace cerb::lex
+namespace cerb::text
 {
     template class BracketFinder<char>;
     template class BracketFinder<char8_t>;

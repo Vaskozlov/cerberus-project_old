@@ -2,13 +2,13 @@
 #define CERBERUS_TEXT_GENERATOR_HPP
 
 #include <cerberus/lex/char.hpp>
-#include <cerberus/lex/lexical_analysis_exception.hpp>
-#include <cerberus/lex/location_in_file.hpp>
+#include <cerberus/text/location_in_file.hpp>
+#include <cerberus/text/text_exception.hpp>
 #include <string>
 
-namespace cerb::lex
+namespace cerb::text
 {
-    CERBERUS_EXCEPTION(TextGeneratorError, BasicLexicalAnalysisException);
+    CERBERUS_EXCEPTION(TextGeneratorError, BasicTextAnalysisException);
 
     template<CharacterLiteral CharT, CharacterLiteral FileNameT = char>
     struct GeneratorForText
@@ -23,7 +23,7 @@ namespace cerb::lex
             return location;
         }
 
-        CERBLIB_DECL auto getOffset() const -> size_t
+        CERBLIB_DECL auto getTextOffset() const -> size_t
         {
             return location.offset();
         }
@@ -60,11 +60,13 @@ namespace cerb::lex
 
         CERBLIB_DECL auto getRestOfTheText() const -> BasicStringView<CharT>
         {
-            return { text.begin() + getOffset(), text.end() };
+            return {text.begin() + getTextOffset(), text.end() };
         }
 
         CERBLIB_DECL auto getCurrentChar(ssize_t offset = 0) const -> CharT
         {
+            using namespace lex;
+
             if (not initialized) {
                 return CharEnum<CharT>::EoF;
             }
@@ -75,7 +77,9 @@ namespace cerb::lex
 
         constexpr auto getRawChar() -> CharT
         {
-            if (isEoF(text[getOffset()])) {
+            using namespace lex;
+
+            if (isEoF(text[getTextOffset()])) {
                 return CharEnum<CharT>::EoF;
             }
 
@@ -90,7 +94,7 @@ namespace cerb::lex
 
         constexpr auto getCleanChar() -> CharT
         {
-            while (isLayout(getRawChar())) {
+            while (lex::isLayout(getRawChar())) {
                 // empty loop
             }
 
@@ -123,7 +127,7 @@ namespace cerb::lex
 
         constexpr auto processRawChar() -> void
         {
-            updateLocation();
+            updateLocationToTheNextChar();
             tryToUpdateLine();
         }
 
@@ -136,8 +140,8 @@ namespace cerb::lex
 
         CERBLIB_DECL auto needToUpdateLine() const -> bool
         {
-            auto offset = getOffset() - 1;
-            return text[offset] == CharEnum<CharT>::NewLine;
+            auto offset = getTextOffset() - 1;
+            return text[offset] == lex::CharEnum<CharT>::NewLine;
         }
 
         constexpr auto updateCurrentLine() -> void
@@ -145,16 +149,16 @@ namespace cerb::lex
             auto offset = location.offset();
             auto text_begin = text.begin();
             auto begin_of_line = text_begin + offset;
-            size_t line_size = text.find(CharEnum<CharT>::NewLine, offset) - offset;
+            size_t line_size = text.find(lex::CharEnum<CharT>::NewLine, offset) - offset;
 
             current_line = { begin_of_line, line_size };
         }
 
-        constexpr auto updateLocation() -> void
+        constexpr auto updateLocationToTheNextChar() -> void
         {
-            auto future_offset = getOffset() + 1;
+            auto future_offset = getTextOffset() + 1;
 
-            if (text[future_offset] == CharEnum<CharT>::NewLine) {
+            if (text[future_offset] == lex::CharEnum<CharT>::NewLine) {
                 processNewLine();
             } else {
                 processNewChar();
@@ -188,28 +192,37 @@ namespace cerb::lex
 
         constexpr auto tryToAddTabOrSpace() -> void
         {
-            auto offset = getOffset();
+            using namespace lex;
+
+            auto offset = getTextOffset();
             auto chr = text[offset];
 
-            if (logicalOr(chr == CharEnum<CharT>::Tab, chr == CharEnum<CharT>::Space)) {
+            if (isTabOrSpace(chr)) {
                 tabs_and_spaces.push_back(chr);
             }
         }
 
         CERBLIB_DECL auto needToClearTabsAndSpaces() const -> bool
         {
-            auto offset = getOffset();
-            return logicalAnd(
-                not tabs_and_spaces.empty(), text[offset] != CharEnum<CharT>::Tab,
-                text[offset] != CharEnum<CharT>::Space);
+            using namespace lex;
+            auto offset = getTextOffset();
+
+            return logicalAnd(not tabs_and_spaces.empty(), not isTabOrSpace(text[offset]));
         }
 
         CERBLIB_DECL auto calculateRealOffset(ssize_t offset) const -> size_t
         {
-            auto real_offset = static_cast<ssize_t>(getOffset()) + offset;
+            auto real_offset = static_cast<ssize_t>(getTextOffset()) + offset;
             checkOffset(real_offset);
 
             return static_cast<size_t>(real_offset);
+        }
+
+        CERBLIB_DECL static auto isTabOrSpace(CharT chr) -> bool
+        {
+            using namespace lex;
+
+            return logicalOr(chr == CharEnum<CharT>::Tab, chr == CharEnum<CharT>::Space);
         }
 
         constexpr auto checkOffset(ssize_t offset) const -> void
@@ -234,6 +247,6 @@ namespace cerb::lex
     extern template struct GeneratorForText<wchar_t>;
 #endif /* CERBERUS_HEADER_ONLY */
 
-}// namespace cerb::lex
+}// namespace cerb::text
 
 #endif /* CERBERUS_TEXT_GENERATOR_HPP */
