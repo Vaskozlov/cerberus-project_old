@@ -60,7 +60,7 @@ namespace cerb::text
 
         CERBLIB_DECL auto getRestOfTheText() const -> BasicStringView<CharT>
         {
-            return {text.begin() + getTextOffset(), text.end() };
+            return { text.begin() + getTextOffset(), text.end() };
         }
 
         CERBLIB_DECL auto getCurrentChar(ssize_t offset = 0) const -> CharT

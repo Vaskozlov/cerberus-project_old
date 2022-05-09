@@ -61,6 +61,6 @@ namespace cerb::text
         size_t char_number{};
         size_t char_offset{};
     };
-}// namespace cerb::lex
+}// namespace cerb::text
 
 #endif /* CERBERUS_LOCATION_IN_FILE_HPP */

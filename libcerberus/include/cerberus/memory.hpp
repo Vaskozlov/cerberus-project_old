@@ -142,8 +142,8 @@ namespace cerb
     {
 #if CERBLIB_AMD64
         if constexpr (
-                RawAccessible<T> && ClassValueFastCopiable<T> &&
-                CanBeStoredAsIntegral<GetValueType<T>>) {
+            RawAccessible<T> && ClassValueFastCopiable<T> &&
+            CanBeStoredAsIntegral<GetValueType<T>>) {
             if CERBLIB_RUNTIME {
                 return amd64::fill(std::data(dest), value, std::size(dest));
             }
@@ -196,7 +196,7 @@ namespace cerb
     CERBLIB_DECL auto find(T const *location, AutoCopyType<T> value, size_t limit) -> T const *
     {
         [[maybe_unused]] constexpr bool suitable_for_fast_search =
-                CanBeStoredAsIntegral<T> && std::is_trivial_v<T>;
+            CanBeStoredAsIntegral<T> && std::is_trivial_v<T>;
 
 #if CERBLIB_AMD64
         if constexpr (suitable_for_fast_search) {
@@ -213,8 +213,8 @@ namespace cerb
     {
 #if CERBLIB_AMD64
         [[maybe_unused]] constexpr bool suitable_for_fast_search =
-                RawAccessible<T> && CanBeStoredAsIntegral<GetValueType<T>> &&
-                std::is_trivial_v<GetValueType<T>>;
+            RawAccessible<T> && CanBeStoredAsIntegral<GetValueType<T>> &&
+            std::is_trivial_v<GetValueType<T>>;
 
         if constexpr (suitable_for_fast_search) {
             if CERBLIB_RUNTIME {

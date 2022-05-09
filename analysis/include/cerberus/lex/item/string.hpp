@@ -24,8 +24,7 @@ namespace cerb::lex::string
 
     private:
         constexpr auto
-            checkThatStringIsNotEmpty(text::GeneratorForText<CharT> const &generator) const
-            -> void
+            checkThatStringIsNotEmpty(text::GeneratorForText<CharT> const &generator) const -> void
         {
             if (string.empty()) {
                 throw StringItemError("Empty strings are not allowed!", generator);

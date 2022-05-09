@@ -6,7 +6,7 @@ CERBERUS_ENUM(TestEnum, cerb::u32, VALUE0 = 0b1, VALUE1 = 0b10, VALUE2 = 0b100);
 
 namespace cerb::debug
 {
-    constexpr auto testEnum(bool) -> bool
+    constexpr auto testEnum(bool /*unused*/) -> bool
     {
         TestEnum test(TestEnum::VALUE0);
 
@@ -25,7 +25,6 @@ namespace cerb::debug
     auto testEnum() -> int
     {
         CERBERUS_TEST(testEnum(true));
-
         return 0;
     }
 }// namespace cerb::debug

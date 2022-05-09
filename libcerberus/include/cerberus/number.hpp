@@ -100,7 +100,8 @@ namespace cerb
 
         constexpr size_t f32_exponent = 1ULL << F32ExponentBit;
         constexpr size_t f64_exponent = 1ULL << F64ExponentBit;
-        constexpr size_t float_exponent = sizeof(Float) == sizeof(u32) ? f32_exponent : f64_exponent;
+        constexpr size_t float_exponent =
+            sizeof(Float) == sizeof(u32) ? f32_exponent : f64_exponent;
 
         auto mask = asUInt(static_cast<Float>(1));
 

@@ -1,10 +1,10 @@
 #ifndef CERBERUS_BASIC_ITEM_HPP
 #define CERBERUS_BASIC_ITEM_HPP
 
-#include <cerberus/text/generator_for_text.hpp>
 #include <cerberus/lex/lexical_analysis_exception.hpp>
-#include <cerberus/text/string_to_codes.hpp>
 #include <cerberus/string_pool.hpp>
+#include <cerberus/text/generator_for_text.hpp>
+#include <cerberus/text/string_to_codes.hpp>
 
 #define CERBLIB_BASIC_ITEM_ACCESS(CharT)                                                           \
     using basic_item_t = BasicItem<CharT>;                                                         \

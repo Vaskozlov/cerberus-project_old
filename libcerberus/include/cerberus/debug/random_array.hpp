@@ -15,7 +15,7 @@ namespace cerb::debug
         static std::random_device random_device;
         static std::mt19937 engine(random_device());
         static std::uniform_int_distribution<value_type> distribution(
-                std::numeric_limits<Int>::min(), std::numeric_limits<Int>::max());
+            std::numeric_limits<Int>::min(), std::numeric_limits<Int>::max());
 
         std::unique_ptr<Int[]> data = std::make_unique<Int[]>(size);
 

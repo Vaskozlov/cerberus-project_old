@@ -7,10 +7,8 @@ namespace cerb::debug
 {
     CERBLIB_DECL auto testEqualStringViewComparisonWithStdStringView() -> bool
     {
-        using namespace string_view_literals;
-
         std::string_view standard_str_view = "Hello, World!";
-        cerb::string_view str_view = "Hello, World!"_sv;
+        cerb::string_view str_view = "Hello, World!";
 
         EXPECT_TRUE(str_view == standard_str_view);
         EXPECT_FALSE(str_view != standard_str_view);

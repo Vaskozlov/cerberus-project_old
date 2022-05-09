@@ -112,6 +112,6 @@ namespace cerb::text
     extern template class BracketFinder<char16_t>;
 #endif /* CERBERUS_HEADER_ONLY */
 
-}// namespace cerb::lex
+}// namespace cerb::text
 
 #endif /* CERBERUS_BRACKET_FINDER_HPP */
