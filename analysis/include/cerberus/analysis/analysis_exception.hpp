@@ -111,7 +111,7 @@ namespace cerb::analysis
             std::basic_string<CharT> result = fmt::format<CharT>(
                 "Analysis error occurred: {} File: {}, line: {}, char: {}\n{}\n"_sv,
                 exception_message, getFilename(), getLine(), getCharPosition(),
-                reducer.getResult());
+                reducer.getReducedString());
 
             addArrowToTheMessage(result, reducer.getErrorPositionAfterReducing());
 

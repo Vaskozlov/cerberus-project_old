@@ -83,6 +83,11 @@
             return (get() & other) == other;                                                       \
         }                                                                                          \
                                                                                                    \
+        CERBLIB_DECL auto isAnyOfSet(name flags) const -> bool                                     \
+        {                                                                                          \
+            return (get() & flags.get()) != 0;                                                     \
+        }                                                                                          \
+                                                                                                   \
         constexpr auto clearFlag(name other) -> void                                               \
         {                                                                                          \
             value = cast(get() & (~other.get()));                                                  \

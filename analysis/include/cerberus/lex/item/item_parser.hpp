@@ -20,12 +20,15 @@
 namespace cerb::lex
 {
     template<CharacterLiteral CharT>
-    struct ItemParser : public BasicItem<CharT>
+    struct ItemParser
+      : public BasicItem<CharT>
+      , private text::ScanApi<true, CharT>
     {
         CERBLIB_BASIC_ITEM_ACCESS(CharT);
-        using item_ptr = std::unique_ptr<BasicItem<CharT>>;
-
+        CERBLIB_SCAN_API_ACCESS(true, CharT);
         CERBERUS_ANALYSIS_EXCEPTION(DotItemParsingError, CharT, BasicLexicalAnalysisException);
+
+        using item_ptr = std::unique_ptr<BasicItem<CharT>>;
 
         CERBLIB_DECL auto id() const -> size_t
         {
@@ -41,22 +44,20 @@ namespace cerb::lex
             CERBLIB_BASIC_ITEM_ARGS,
             size_t id_of_item,
             BasicStringView<CharT> const &rule)
-          : CERBLIB_CONSTRUCT_BASIC_ITEM, rule_generator(rule), item_id(id_of_item)
+          : CERBLIB_CONSTRUCT_BASIC_ITEM, scan_api_t(rule_generator), rule_generator(rule),
+            item_id(id_of_item)
         {
-            parseRule();
+            scan_api_t::beginScanning(CharEnum<CharT>::EoF);
         }
 
     private:
-        constexpr auto parseRule() -> void
-        {
-            while (not isEoF(rule_generator.getCleanChar())) {
-                checkForAlreadyExistingNonterminal();
-                processChar(rule_generator.getCurrentChar());
-            }
-        }
+        constexpr auto start() -> void override
+        {}
 
-        constexpr auto processChar(CharT chr) -> void
+        constexpr auto processChar(CharT chr) -> void override
         {
+            checkItemIsNotNonterminal();
+
             switch (chr) {
             case cast('\''):
                 addNonTerminal();
@@ -67,7 +68,7 @@ namespace cerb::lex
                 break;
 
             case cast('('):
-                addItem();
+                addItemParser();
                 break;
 
             case cast('['):
@@ -100,8 +101,13 @@ namespace cerb::lex
 
             default:
                 throw DotItemParsingError(
-                    "Error in regex during the rule parsing!", rule_generator);
+                    "Error in regex during the rule parsing!", getGenerator());
             }
+        }
+
+        constexpr auto end() -> void override
+        {
+            checkItemNotEmpty();
         }
 
         constexpr auto setTag(ItemFlags new_tag) -> void
@@ -122,15 +128,16 @@ namespace cerb::lex
             createNewItem<string::StringItem<CharT>>(rule_generator);
         }
 
-        constexpr auto addItem() -> void
+        constexpr auto addItemParser() -> void
         {
             BasicStringView<CharT> text = rule_generator.getRestOfTheText();
-            size_t border = getBorder(rule_generator);
+            size_t border = getBorder();
 
             text = extractTextForNewItem(text, border);
-            BasicItem<CharT> *new_item = createNewItem<ItemParser<CharT>>(id(), text);
 
-            checkItemNonEmpty(asItemParser(new_item));
+            auto *new_item = createNewItem<ItemParser<CharT>>(id(), text);
+            new_item->checkItemIsNotNonterminal();
+
             skipItemBorder(border);
         }
 
@@ -148,16 +155,6 @@ namespace cerb::lex
             makeNonterminalGlobal(std::move(converted_str));
 
             flags |= ItemFlags::NONTERMINAL;
-        }
-
-        CERBLIB_DECL static auto asItemParser(BasicItem<CharT> *item) -> ItemParser<CharT> *
-        {
-            return dynamic_cast<ItemParser<CharT> *>(item);
-        }
-
-        CERBLIB_DECL static auto asStringItem(BasicItem<CharT> *item) -> string::StringItem<CharT> *
-        {
-            return dynamic_cast<string::StringItem<CharT> *>(item);
         }
 
         constexpr auto skipItemBorder(size_t border) -> void
@@ -178,13 +175,13 @@ namespace cerb::lex
             return { new_begin, new_length };
         }
 
-        CERBLIB_DECL static auto getBorder(text::GeneratorForText<CharT> const &gen) -> size_t
+        CERBLIB_DECL auto getBorder() const -> size_t
         {
-            return findBracket(cast('('), cast(')'), gen);
+            return findBracket(cast('('), cast(')'), getGenerator());
         }
 
         template<typename T, typename... Ts>
-        constexpr auto createNewItem(Ts &&...args) -> BasicItem<CharT> *
+        constexpr auto createNewItem(Ts &&...args) -> T *
         {
             static_assert(std::is_base_of_v<BasicItem<CharT>, T>);
 
@@ -192,8 +189,7 @@ namespace cerb::lex
             recent_item = new_item.get();
 
             items.emplace_back(std::move(new_item));
-
-            return recent_item;
+            return dynamic_cast<T *>(recent_item);
         }
 
         template<typename T, typename... Ts>
@@ -209,18 +205,19 @@ namespace cerb::lex
             analysis_globals.emplaceNonterminal(std::move(str), id());
         }
 
-        constexpr auto checkItemNonEmpty(ItemParser<CharT> const *item_to_check) const -> void
+        constexpr auto checkItemNotEmpty() const -> void
         {
-            if (item_to_check->items.empty()) {
-                throw DotItemParsingError("Empty items are not allowed!", rule_generator);
+            if (items.empty() && not flags.isSet(ItemFlags::NONTERMINAL)) {
+                throw DotItemParsingError("Empty items are not allowed!", getGenerator());
             }
         }
 
-        constexpr auto checkForAlreadyExistingNonterminal() const -> void
+        constexpr auto checkItemIsNotNonterminal() const -> void
         {
             if (flags.isSet(ItemFlags::NONTERMINAL)) {
                 throw DotItemParsingError(
-                    "Nonterminals can't coexist with other rules!", rule_generator);
+                    "Nonterminals can't coexist with other rules and can't be used in recursion!",
+                    getGenerator());
             }
         }
 
@@ -228,7 +225,7 @@ namespace cerb::lex
         {
             if (recent_item != nullptr) {
                 throw DotItemParsingError(
-                    "Non terminals can't coexist with other rules!", rule_generator);
+                    "Non terminals can't coexist with other rules!", getGenerator());
             }
         }
 
@@ -238,7 +235,7 @@ namespace cerb::lex
                 throw DotItemParsingError(
                     "Unable to apply operation, because current item hasn't"
                     " been created!",
-                    rule_generator);
+                    getGenerator());
             }
         }
 
@@ -247,8 +244,8 @@ namespace cerb::lex
             constexpr ItemFlags repetition_rules =
                 ItemFlags::PLUS | ItemFlags::STAR | ItemFlags::QUESTION;
 
-            if ((recent_item->flags & repetition_rules) != ItemFlags::NONE) {
-                throw DotItemParsingError("Unable to apply more than one rule!", rule_generator);
+            if (recent_item->flags.isAnyOfSet(repetition_rules)) {
+                throw DotItemParsingError("Unable to apply more than one rule!", getGenerator());
             }
         }
 

@@ -15,27 +15,25 @@ namespace cerb::text
         CERBERUS_ANALYSIS_EXCEPTION(
             StringToCodesTranslationError, CharT, BasicTextAnalysisException);
 
-        constexpr auto parseString() -> std::basic_string<CharT> &
+        constexpr auto parsedString() -> std::basic_string<CharT> &
         {
-            setupGenerator();
-            checkStringStart();
-
-            while (canContinueParsing(string_begin_char)) {
-                CharT chr = getChar();
-                processChar(chr);
-            }
-
             return parsed_string;
         }
 
-        StringToCodes() = default;
-
         constexpr StringToCodes(CharT string_opener, GeneratorForText<CharT> &text)
           : scan_api_t(text), string_begin_char(string_opener)
-        {}
+        {
+            scan_api_t::beginScanning(string_begin_char);
+        }
 
     private:
-        constexpr auto processChar(CharT chr) -> void
+        constexpr auto start() -> void override
+        {
+            setupGenerator();
+            checkStringStart();
+        }
+
+        constexpr auto processChar(CharT chr) -> void override
         {
             if (chr == lex::CharEnum<CharT>::Backlash) {
                 parsed_string.push_back(parseEscapeSequence(string_begin_char));
@@ -43,6 +41,9 @@ namespace cerb::text
                 parsed_string.push_back(chr);
             }
         }
+
+        constexpr auto end() -> void override
+        {}
 
         constexpr auto checkStringStart() const -> void
         {
@@ -67,7 +68,7 @@ namespace cerb::text
         -> std::basic_string<CharT>
     {
         StringToCodes<CharT> string_to_codes{ string_opener, text };
-        return std::move(string_to_codes.parseString());
+        return std::move(string_to_codes.parsedString());
     }
 
 #ifndef CERBERUS_HEADER_ONLY

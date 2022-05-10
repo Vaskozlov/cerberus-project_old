@@ -16,12 +16,12 @@ namespace cerb::fmt
         template<CharacterLiteral CharT>
         struct Converter
         {
-            CERBLIB_DECL auto moveResult() -> std::basic_string<CharT>
+            CERBLIB_DECL auto moveFormattedString() -> std::basic_string<CharT>
             {
                 return std::move(formatted_string);
             }
 
-            CERBLIB_DECL auto getResult() const -> std::basic_string<CharT> const &
+            CERBLIB_DECL auto getFormattedString() const -> std::basic_string<CharT> const &
             {
                 return formatted_string;
             }
@@ -189,7 +189,7 @@ namespace cerb::fmt
         using namespace private_;
 
         Converter<CharT> converter{ formatter, std::forward<Ts>(args)... };
-        return converter.moveResult();
+        return converter.moveFormattedString();
     }
 }// namespace cerb::fmt
 

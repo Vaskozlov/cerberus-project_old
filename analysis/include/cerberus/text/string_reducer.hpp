@@ -14,7 +14,7 @@ namespace cerb::text
             return base_index - left_border;
         }
 
-        CERBLIB_DECL auto getResult() const -> BasicStringView<CharT> const &
+        CERBLIB_DECL auto getReducedString() const -> BasicStringView<CharT> const &
         {
             return reduced_string;
         }

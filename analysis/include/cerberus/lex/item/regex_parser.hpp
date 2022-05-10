@@ -16,30 +16,24 @@ namespace cerb::lex::regex
         CERBERUS_ANALYSIS_EXCEPTION(RegexParsingError, CharT, BasicLexicalAnalysisException);
 
         constexpr static size_t number_of_chars = pow2<size_t>(bitsizeof(CharT));
+
+        using scan_api_t::cast;
         using bitmap_t = ConstBitmap<1, number_of_chars>;
 
         constexpr RegexParser(text::GeneratorForText<CharT> &regex, bitmap_t &bitmap_for_chars)
           : scan_api_t(regex), available_chars(bitmap_for_chars)
         {
-            parseRegex();
+            scan_api_t::beginScanning(']');
         }
 
     private:
-        constexpr auto parseRegex() -> void
+        constexpr auto start() -> void override
         {
             setupGenerator();
             checkRegexStart();
-
-            while (canContinueParsing(cast(']'))) {
-                CharT chr = getChar();
-                processChar(chr);
-            }
-
-            checkRangeClosing();
-            checkRangeNonEmpty();
         }
 
-        constexpr auto processChar(CharT chr) -> void
+        constexpr auto processChar(CharT chr) -> void override
         {
             checkDoubleRegexOpening(chr);
 
@@ -49,6 +43,12 @@ namespace cerb::lex::regex
                 chr = processEscapeSymbol(chr);
                 addCharToBitmap(chr);
             }
+        }
+
+        constexpr auto end() -> void override
+        {
+            checkRangeClosing();
+            checkRangeNonEmpty();
         }
 
         constexpr auto addCharToBitmap(CharT chr) -> void

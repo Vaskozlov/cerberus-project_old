@@ -27,7 +27,7 @@ namespace cerb::debug
     {
         GeneratorForText<char> text_generator{ "\"\"" };
         StringToCodes string_to_codes{ '\"', text_generator };
-        auto const &parsed_string = string_to_codes.parseString();
+        auto const &parsed_string = string_to_codes.parsedString();
 
         return parsed_string.empty();
     }
@@ -36,7 +36,7 @@ namespace cerb::debug
     {
         GeneratorForText<char> text_generator{ TestInput };
         StringToCodes string_to_codes{ '\"', text_generator };
-        auto const &processed_string = string_to_codes.parseString();
+        auto const &processed_string = string_to_codes.parsedString();
 
         return processed_string == ExpectedOutput;
     }
@@ -45,7 +45,7 @@ namespace cerb::debug
     {
         GeneratorForText<char16_t> text_generator{ TestInputU16 };
         StringToCodes string_to_codes{ u'\"', text_generator };
-        auto const &processed_string = string_to_codes.parseString();
+        auto const &processed_string = string_to_codes.parsedString();
 
         return processed_string == ExpectedOutputU16;
     }

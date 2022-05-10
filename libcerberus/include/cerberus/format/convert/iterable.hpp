@@ -11,12 +11,12 @@ namespace cerb::fmt
         template<CharacterLiteral CharT, Iterable T>
         struct IterableConverter
         {
-            CERBLIB_DECL auto moveResult() -> std::basic_string<CharT>
+            CERBLIB_DECL auto moveConvertedString() -> std::basic_string<CharT>
             {
                 return std::move(conversion_result);
             }
 
-            CERBLIB_DECL auto getResult() const -> std::basic_string<CharT> const &
+            CERBLIB_DECL auto getConvertedString() const -> std::basic_string<CharT> const &
             {
                 return conversion_result;
             }
@@ -88,7 +88,7 @@ namespace cerb::fmt
                 -> std::basic_string<CharT>
         {
             IterableConverter<CharT, T> converter{ object_begin, object_end, object_to_convert };
-            return converter.moveResult();
+            return converter.moveConvertedString();
         }
 
     }// namespace private_

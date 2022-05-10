@@ -6,7 +6,6 @@
 
 #define CERBLIB_SCAN_API_ACCESS(UseCleanChars, CharT)                                              \
     using scan_api_t = cerb::text::ScanApi<UseCleanChars, CharT>;                                  \
-    using scan_api_t::cast;                                                                        \
     using scan_api_t::getChar;                                                                     \
     using scan_api_t::getFutureChar;                                                               \
     using scan_api_t::nextChar;                                                                    \
@@ -67,11 +66,12 @@ namespace cerb::text
 
         constexpr auto canContinueParsing(CharT end_symbol) -> bool
         {
+            using namespace lex;
             CharT chr = nextChar();
 
-            if (lex::isEoF(chr)) {
+            if (logicalAnd(lex::isEoF(chr), end_symbol != CharEnum<CharT>::EoF)) {
                 throw ScanApiError(
-                    "Unable to close sequence, because of unexpected EoF!", text_generator);
+                    "Unable to continue, because of unexpected EoF!", text_generator);
             }
 
             return chr != end_symbol;
@@ -137,11 +137,33 @@ namespace cerb::text
             return parseUserDefinedEscapeSymbols(chr, special_symbols...);
         }
 
+        constexpr auto beginScanning(CharT end_symbol) -> void
+        {
+            start();
+
+            while (canContinueParsing(end_symbol)) {
+                processChar(getChar());
+            }
+
+            end();
+        }
+
+        constexpr virtual auto start() -> void = 0;
+        constexpr virtual auto processChar(CharT) -> void = 0;
+        constexpr virtual auto end() -> void = 0;
+
+        auto operator=(ScanApi const &) -> ScanApi & = default;
+        auto operator=(ScanApi &&) noexcept -> ScanApi & = default;
+
         ScanApi() = default;
+        ScanApi(ScanApi const &) = default;
+        ScanApi(ScanApi &&) noexcept = default;
 
         constexpr explicit ScanApi(GeneratorForText<CharT> &generator_for_text)
           : text_generator(generator_for_text)
         {}
+
+        virtual ~ScanApi() = default;
 
     private:
         template<CharacterLiteral... Ts>
@@ -165,7 +187,7 @@ namespace cerb::text
             CharT resulted_char = CharEnum<CharT>::EoF;
 
             for (CERBLIB_UNUSED(u32) : Range(length)) {
-                if (doesNotFitIntoNotation(getFutureChar(), notation)) {
+                if (isOutOfNotation(getFutureChar(), notation)) {
                     break;
                 }
 
@@ -176,7 +198,7 @@ namespace cerb::text
             return resulted_char;
         }
 
-        CERBLIB_DECL static auto doesNotFitIntoNotation(CharT chr, u32 notation) -> bool
+        CERBLIB_DECL static auto isOutOfNotation(CharT chr, u32 notation) -> bool
         {
             if (not hexadecimal_chars.contains(chr)) {
                 return true;
