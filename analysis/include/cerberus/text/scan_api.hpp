@@ -1,12 +1,11 @@
 #ifndef CERBERUS_SCAN_API_HPP
 #define CERBERUS_SCAN_API_HPP
 
-#include "cerberus/analysis/analysis_exception.hpp"
-#include <cerberus/lex/char.hpp>
-#include <cerberus/lex/generator_for_text.hpp>
+#include <cerberus/analysis/analysis_exception.hpp>
+#include <cerberus/text/generator_for_text.hpp>
 
 #define CERBLIB_SCAN_API_ACCESS(UseCleanChars, CharT)                                              \
-    using scan_api_t = cerb::scan::ScanApi<UseCleanChars, CharT>;                                  \
+    using scan_api_t = cerb::text::ScanApi<UseCleanChars, CharT>;                                  \
     using scan_api_t::cast;                                                                        \
     using scan_api_t::getChar;                                                                     \
     using scan_api_t::getFutureChar;                                                               \
@@ -18,20 +17,20 @@
     using scan_api_t::parseEscapeSequence;                                                         \
     using scan_api_t::setupGenerator
 
-namespace cerb::scan
+namespace cerb::text
 {
     template<bool UseCleanChars, CharacterLiteral CharT>
     struct ScanApi
     {
-        CERBERUS_ANALYSIS_EXCEPTION(ScanApiError, CharT, lex::BasicLexicalAnalysisException);
+        CERBERUS_ANALYSIS_EXCEPTION(ScanApiError, CharT, BasicTextAnalysisException);
 
-        template<std::integral T>
-        static constexpr auto cast(T value) -> CharT
+        template<std::integral Int>
+        CERBLIB_DECL static auto cast(Int value) -> CharT
         {
             return static_cast<CharT>(value);
         }
 
-        CERBLIB_DECL auto getGenerator() const -> lex::GeneratorForText<CharT> const &
+        CERBLIB_DECL auto getGenerator() const -> GeneratorForText<CharT> const &
         {
             return text_generator;
         }
@@ -140,7 +139,7 @@ namespace cerb::scan
 
         ScanApi() = default;
 
-        constexpr explicit ScanApi(lex::GeneratorForText<CharT> &generator_for_text)
+        constexpr explicit ScanApi(GeneratorForText<CharT> &generator_for_text)
           : text_generator(generator_for_text)
         {}
 
@@ -148,10 +147,12 @@ namespace cerb::scan
         template<CharacterLiteral... Ts>
         CERBLIB_DECL auto parseUserDefinedEscapeSymbols(CharT chr, Ts... special_symbols) -> CharT
         {
-            CharT result = cast(0);
+            using namespace lex;
+
+            CharT result = CharEnum<CharT>::EoF;
             ((result = safeEqual(chr, special_symbols) ? chr : result), ...);
 
-            if (result == cast(0)) {
+            if (result == CharEnum<CharT>::EoF) {
                 throw ScanApiError("Unable to match any escape sequence!", text_generator);
             }
 
@@ -160,7 +161,8 @@ namespace cerb::scan
 
         CERBLIB_DECL auto convertStringToChar(u32 notation, u32 length) -> CharT
         {
-            CharT resulted_char = lex::CharEnum<CharT>::EoF;
+            using namespace lex;
+            CharT resulted_char = CharEnum<CharT>::EoF;
 
             for (CERBLIB_UNUSED(u32) : Range(length)) {
                 if (doesNotFitIntoNotation(getFutureChar(), notation)) {
@@ -174,11 +176,6 @@ namespace cerb::scan
             return resulted_char;
         }
 
-        CERBLIB_DECL static auto convertSymbolToInt(CharT chr) -> CharT
-        {
-            return cast(hexadecimal_chars[chr]);
-        }
-
         CERBLIB_DECL static auto doesNotFitIntoNotation(CharT chr, u32 notation) -> bool
         {
             if (not hexadecimal_chars.contains(chr)) {
@@ -189,8 +186,13 @@ namespace cerb::scan
             return static_cast<i32>(code) >= static_cast<i32>(notation);
         }
 
+        CERBLIB_DECL static auto convertSymbolToInt(CharT chr) -> CharT
+        {
+            return cast(hexadecimal_chars[chr]);
+        }
+
         static constexpr auto hexadecimal_chars = lex::HexadecimalCharsToInt<CharT>;
-        lex::GeneratorForText<CharT> &text_generator;
+        GeneratorForText<CharT> &text_generator;
     };
 
 #ifndef CERBERUS_HEADER_ONLY
@@ -207,6 +209,6 @@ namespace cerb::scan
     extern template struct ScanApi<true, char32_t>;
 #endif /* CERBERUS_HEADER_ONLY */
 
-}// namespace cerb::scan
+}// namespace cerb::text
 
 #endif /* CERBERUS_SCAN_API_HPP */

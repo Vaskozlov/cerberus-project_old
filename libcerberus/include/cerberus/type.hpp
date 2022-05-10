@@ -86,7 +86,7 @@ namespace cerb
     concept ExceptionType = std::is_base_of_v<std::exception, T>;
 
     template<typename T>
-    concept CanBeStoredInIntegral = isOneOf(
+    concept CanBeStoredAsIntegral = isOneOf(
         sizeof(T),
         sizeof(uint8_t),
         sizeof(uint16_t),

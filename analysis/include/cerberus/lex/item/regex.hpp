@@ -12,14 +12,14 @@ namespace cerb::lex::regex
         CERBLIB_BASIC_ITEM_ACCESS(CharT);
         using bitmap_t = typename RegexParser<CharT>::bitmap_t;
 
-        constexpr RegexItem(CERBLIB_BASIC_ITEM_ARGS, GeneratorForText<CharT> &regex_rule)
+        constexpr RegexItem(CERBLIB_BASIC_ITEM_ARGS, text::GeneratorForText<CharT> &regex_rule)
           : CERBLIB_CONSTRUCT_BASIC_ITEM
         {
             parseRegex(regex_rule);
         }
 
     private:
-        constexpr auto parseRegex(GeneratorForText<CharT> &regex_rule) -> void
+        constexpr auto parseRegex(text::GeneratorForText<CharT> &regex_rule) -> void
         {
             RegexParser<CharT> regex_parser{ regex_rule, available_chars };
         }

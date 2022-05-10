@@ -9,22 +9,22 @@ namespace cerb::fmt
 {
     namespace private_
     {
-        template<CharacterLiteral CharT, std::integral T>
+        template<CharacterLiteral CharT, std::integral Int>
         struct IntConvert
         {
-            CERBLIB_DECL auto moveResult() -> std::basic_string<CharT>
+            CERBLIB_DECL auto moveConvertedNumber() -> std::basic_string<CharT>
             {
                 return std::move(converted_number);
             }
 
-            CERBLIB_DECL auto getResult() const -> std::basic_string<CharT> const &
+            CERBLIB_DECL auto getConvertedNumber() const -> std::basic_string<CharT> const &
             {
                 return converted_number;
             }
 
             IntConvert() = default;
 
-            constexpr explicit IntConvert(T number_to_convert) : number(number_to_convert)
+            constexpr explicit IntConvert(Int number_to_convert) : number(number_to_convert)
             {
                 convertNumber();
             }
@@ -32,22 +32,23 @@ namespace cerb::fmt
         private:
             constexpr auto convertNumber() -> void
             {
-                if constexpr (CharacterLiteral<T>) {
+                if constexpr (CharacterLiteral<Int>) {
                     converted_number = std::basic_string<CharT>{ cast(number) };
-                    return;
+                } else {
+                    addMinusIfNeed();
+                    processZeroNumber();
+                    fillBuffer();
+                    copyBufferToResult();
                 }
-
-                addMinusIfNeed();
-                processZeroNumber();
-                fillBuffer();
-                copyBufferToResult();
             }
 
             constexpr auto fillBuffer() -> void
             {
+                constexpr int decimal_notation = 10;
+
                 while (number != 0) {
-                    character_buffer[--buffer_index] = cast('0' + number % 10);
-                    number /= 10;
+                    character_buffer[--buffer_index] = cast('0' + number % decimal_notation);
+                    number /= decimal_notation;
                 }
             }
 
@@ -80,22 +81,22 @@ namespace cerb::fmt
                 return static_cast<CharT>(value);
             }
 
-            constexpr static auto digits_in_number = std::numeric_limits<T>::digits10 + 1;
+            constexpr static auto digits_in_number = std::numeric_limits<Int>::digits10 + 1;
 
             std::basic_string<CharT> converted_number{};
             std::array<CharT, digits_in_number> character_buffer{};
             size_t buffer_index = digits_in_number;
-            T number{};
+            Int number{};
         };
     }// namespace private_
 
-    template<CharacterLiteral CharT, std::integral T>
-    constexpr auto convert(T number) -> std::basic_string<CharT>
+    template<CharacterLiteral CharT, std::integral Int>
+    constexpr auto convert(Int number) -> std::basic_string<CharT>
     {
         using namespace private_;
 
-        IntConvert<CharT, T> converter{ number };
-        return converter.moveResult();
+        IntConvert<CharT, Int> converter{ number };
+        return converter.moveConvertedNumber();
     }
 }// namespace cerb::fmt
 

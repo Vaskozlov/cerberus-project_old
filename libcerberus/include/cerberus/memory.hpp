@@ -13,7 +13,7 @@ namespace cerb
         template<typename T>
         constexpr auto fill(T *dest, T value, size_t times) -> void
         {
-            static_assert(CanBeStoredInIntegral<T> && std::is_trivially_copy_constructible_v<T>);
+            static_assert(CanBeStoredAsIntegral<T> && std::is_trivially_copy_constructible_v<T>);
 
             if constexpr (sizeof(T) == sizeof(u8)) {
                 asm volatile("rep stosb" : "+D"(dest), "+c"(times) : "a"(value) : "memory");
@@ -46,7 +46,7 @@ namespace cerb
             }
         }
 
-        template<CanBeStoredInIntegral T>
+        template<CanBeStoredAsIntegral T>
         constexpr auto find(T const *location, T value, size_t limit) -> const T *
         {
             ++limit;
@@ -112,8 +112,7 @@ namespace cerb
     namespace private_
     {
         template<CharacterLiteral CharT, size_t Size>
-        // NOLINTNEXTLINE
-        CERBLIB_DECL auto strlenForArray(const CharT (&)[Size]) -> size_t
+        CERBLIB_DECL auto strlenForArray(const CharT (&/*unused*/)[Size]) -> size_t
         {
             return Size - 1;
         }
@@ -129,7 +128,7 @@ namespace cerb
     constexpr auto fill(T *dest, AutoCopyType<T> value, size_t times) -> void
     {
 #if CERBLIB_AMD64
-        if constexpr (std::is_trivially_copy_assignable_v<T> && CanBeStoredInIntegral<T>) {
+        if constexpr (std::is_trivially_copy_assignable_v<T> && CanBeStoredAsIntegral<T>) {
             if CERBLIB_RUNTIME {
                 return amd64::fill(dest, value, times);
             }
@@ -144,7 +143,7 @@ namespace cerb
 #if CERBLIB_AMD64
         if constexpr (
             RawAccessible<T> && ClassValueFastCopiable<T> &&
-            CanBeStoredInIntegral<GetValueType<T>>) {
+            CanBeStoredAsIntegral<GetValueType<T>>) {
             if CERBLIB_RUNTIME {
                 return amd64::fill(std::data(dest), value, std::size(dest));
             }
@@ -184,9 +183,8 @@ namespace cerb
                                                 std::is_trivially_copy_assignable_v<value_type>;
 
         if constexpr (suitable_for_fast_copy) {
-            auto const length = min<GetSizeType<T1>>(std::size(dest), std::size(src));
-
             if CERBLIB_RUNTIME {
+                auto const length = min<GetSizeType<T1>>(std::size(dest), std::size(src));
                 return amd64::copy(std::data(dest), std::size(src), length);
             }
         }
@@ -198,7 +196,7 @@ namespace cerb
     CERBLIB_DECL auto find(T const *location, AutoCopyType<T> value, size_t limit) -> T const *
     {
         [[maybe_unused]] constexpr bool suitable_for_fast_search =
-            CanBeStoredInIntegral<T> && std::is_trivial_v<T>;
+            CanBeStoredAsIntegral<T> && std::is_trivial_v<T>;
 
 #if CERBLIB_AMD64
         if constexpr (suitable_for_fast_search) {
@@ -207,18 +205,6 @@ namespace cerb
             }
         }
 #endif
-
-        if CERBLIB_COMPILE_TIME {
-            size_t counter = 0;
-
-            while (counter != limit && *location != value) {
-                ++location;
-                ++counter;
-            }
-
-            return location;
-        }
-
         return std::find(location, location + limit, value);
     }
 
@@ -227,7 +213,7 @@ namespace cerb
     {
 #if CERBLIB_AMD64
         [[maybe_unused]] constexpr bool suitable_for_fast_search =
-            RawAccessible<T> && CanBeStoredInIntegral<GetValueType<T>> &&
+            RawAccessible<T> && CanBeStoredAsIntegral<GetValueType<T>> &&
             std::is_trivial_v<GetValueType<T>>;
 
         if constexpr (suitable_for_fast_search) {
@@ -251,7 +237,7 @@ namespace cerb
 
 #if CERBLIB_AMD64
         constexpr bool can_be_fast_compared = RawAccessible<T1> && RawAccessible<T2> &&
-                                              CanBeStoredInIntegral<value_type> &&
+                                              CanBeStoredAsIntegral<value_type> &&
                                               std::is_trivial_v<value_type>;
 
         if constexpr (can_be_fast_compared) {
@@ -267,7 +253,7 @@ namespace cerb
     CERBLIB_DECL auto equal(T const *lhs, T const *rhs, size_t length) -> bool
     {
 #if CERBLIB_AMD64
-        constexpr bool can_be_fast_compared = CanBeStoredInIntegral<T> && std::is_trivial_v<T>;
+        constexpr bool can_be_fast_compared = CanBeStoredAsIntegral<T> && std::is_trivial_v<T>;
 
         if constexpr (can_be_fast_compared) {
             if CERBLIB_RUNTIME {

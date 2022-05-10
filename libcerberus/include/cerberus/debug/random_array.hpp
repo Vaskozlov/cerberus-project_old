@@ -7,20 +7,20 @@
 
 namespace cerb::debug
 {
-    template<std::integral T>
-    auto createRandomArrayOfInts(size_t size) -> std::unique_ptr<T[]>
+    template<std::integral Int>
+    auto createRandomArrayOfInts(size_t size) -> std::unique_ptr<Int[]>
     {
-        using value_type = std::conditional_t<std::is_unsigned_v<T>, size_t, ssize_t>;
+        using value_type = std::conditional_t<std::is_unsigned_v<Int>, size_t, ssize_t>;
 
         static std::random_device random_device;
         static std::mt19937 engine(random_device());
         static std::uniform_int_distribution<value_type> distribution(
-            std::numeric_limits<T>::min(), std::numeric_limits<T>::max());
+            std::numeric_limits<Int>::min(), std::numeric_limits<Int>::max());
 
-        std::unique_ptr<T[]> data = std::make_unique<T[]>(size);
+        std::unique_ptr<Int[]> data = std::make_unique<Int[]>(size);
 
         for (size_t i : Range(size)) {
-            data.get()[i] = static_cast<T>(distribution(engine));
+            data.get()[i] = static_cast<Int>(distribution(engine));
         }
 
         return data;

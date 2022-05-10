@@ -7,8 +7,10 @@ namespace cerb::debug
     using namespace regex;
     using namespace string;
 
-    AnalysisGlobals<char> Parameters{};
-    AnalysisGlobals<char16_t> ParametersUtf16{};
+    // NOLINTBEGIN
+    AnalysisGlobalsParameters<char> Parameters{};
+    AnalysisGlobalsParameters<char16_t> ParametersUtf16{};
+    // NOLINTEND
 
     auto dotItemErrorCaseEmptyRegex() -> void
     {
@@ -64,7 +66,7 @@ namespace cerb::debug
         EXPECT_TRUE(items.size() == 1);
 
         auto const &front_item = items.front();
-        auto string_item = dynamic_cast<StringItem<char> *>(front_item.get());
+        auto *string_item = dynamic_cast<StringItem<char> *>(front_item.get());
 
         EXPECT_TRUE(string_item != nullptr);
         EXPECT_TRUE(string_item->flags.isSet(ItemFlags::PLUS));
@@ -78,7 +80,7 @@ namespace cerb::debug
         EXPECT_TRUE(items.size() == 2);
 
         auto const &front_item = items.front();
-        auto string_item = dynamic_cast<StringItem<char> *>(front_item.get());
+        auto *string_item = dynamic_cast<StringItem<char> *>(front_item.get());
 
         EXPECT_TRUE(string_item != nullptr);
         EXPECT_TRUE(string_item->getString() == "for");
@@ -86,7 +88,7 @@ namespace cerb::debug
         EXPECT_TRUE(string_item->flags.isSet(ItemFlags::PREFIX));
 
         auto const &back_item = items.back();
-        auto regex_item = dynamic_cast<RegexItem<char> *>(back_item.get());
+        auto *regex_item = dynamic_cast<RegexItem<char> *>(back_item.get());
 
         EXPECT_TRUE(regex_item != nullptr);
         EXPECT_TRUE(regex_item->flags.isSet(ItemFlags::STAR));
@@ -101,13 +103,13 @@ namespace cerb::debug
         EXPECT_TRUE(items.size() == 2);
 
         auto const &front_item = items.front();
-        auto parsing_item = dynamic_cast<ItemParser<char> *>(front_item.get());
+        auto *parsing_item = dynamic_cast<ItemParser<char> *>(front_item.get());
 
         EXPECT_TRUE(parsing_item != nullptr);
         EXPECT_TRUE(parsing_item->flags.isSet(ItemFlags::PLUS));
 
         auto const &back_item = items.back();
-        auto regex_item = dynamic_cast<RegexItem<char> *>(back_item.get());
+        auto *regex_item = dynamic_cast<RegexItem<char> *>(back_item.get());
 
         EXPECT_TRUE(regex_item != nullptr);
         EXPECT_TRUE(regex_item->flags.isSet(ItemFlags::PLUS));

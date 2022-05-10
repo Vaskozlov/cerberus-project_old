@@ -1,14 +1,16 @@
 #include <cerberus/debug/debug.hpp>
-#include <cerberus/lex/generator_for_text.hpp>
 #include <cerberus/range.hpp>
+#include <cerberus/text/generator_for_text.hpp>
 
 namespace cerb::debug
 {
     using namespace lex;
+    using namespace text;
+    using namespace string_view_literals;
 
-    constexpr static std::string_view TestInput =
+    constexpr static string_view TestInput =
         "    \t\tHello, World! \nIt's a test "
-        "\t\t  string.";
+        "\t\t  string."_sv;
 
     auto testRawGeneratorForText() -> void
     {
@@ -26,40 +28,39 @@ namespace cerb::debug
 
     auto testCleanGeneratorForText() -> void
     {
-        constexpr static std::string_view expected_text = "Hello,World!It'sateststring.";
-        constexpr static std::array<std::string_view, expected_text.size()>
-            expected_tabs_and_spaces = {
-                "    \t\t",// H
-                "",        // e
-                "",        // l
-                "",        // l
-                "",        // o
-                "",        // ,
-                " ",       // W
-                "",        // o
-                "",        // r
-                "",        // l
-                "",        // d
-                "",        // !
-                "",        // I
-                "",        // t
-                "",        // '
-                "",        // s
-                " ",       // a
-                " ",       // t
-                "",        // e
-                "",        // s
-                "",        // t
-                " \t\t  ", // s
-                "",        // t
-                "",        // r
-                "",        // i
-                "",        // n
-                "",        // g
-                "",        // t.
-            };
+        constexpr static string_view expected_text = "Hello,World!It'sateststring.";
+        constexpr static std::array<string_view, expected_text.size()> expected_tabs_and_spaces = {
+            "    \t\t",// H
+            "",        // e
+            "",        // l
+            "",        // l
+            "",        // o
+            "",        // ,
+            " ",       // W
+            "",        // o
+            "",        // r
+            "",        // l
+            "",        // d
+            "",        // !
+            "",        // I
+            "",        // t
+            "",        // '
+            "",        // s
+            " ",       // a
+            " ",       // t
+            "",        // e
+            "",        // s
+            "",        // t
+            " \t\t  ", // s
+            "",        // t
+            "",        // r
+            "",        // i
+            "",        // n
+            "",        // g
+            "",        // t.
+        };
 
-        GeneratorForText<char> text_generator(TestInput, "None");
+        GeneratorForText<char> text_generator{ TestInput, "None" };
 
         EXPECT_TRUE(isEoF(text_generator.getCurrentChar()));
 

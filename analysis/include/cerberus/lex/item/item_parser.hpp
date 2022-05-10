@@ -1,9 +1,9 @@
 #ifndef CERBERUS_ITEM_PARSER_HPP
 #define CERBERUS_ITEM_PARSER_HPP
 
-#include <cerberus/lex/bracket_finder.hpp>
 #include <cerberus/lex/item/regex.hpp>
 #include <cerberus/lex/item/string.hpp>
+#include <cerberus/text/bracket_finder.hpp>
 
 #define CERBLIB_ITEM_PARSER_ACCESS(CharT)                                                          \
     using item_parser_t = cerb::lex::ItemParser<CharT>;                                            \
@@ -37,8 +37,6 @@ namespace cerb::lex
             return items;
         }
 
-        ItemParser() = default;
-
         constexpr ItemParser(
             CERBLIB_BASIC_ITEM_ARGS,
             size_t id_of_item,
@@ -52,7 +50,7 @@ namespace cerb::lex
         constexpr auto parseRule() -> void
         {
             while (not isEoF(rule_generator.getCleanChar())) {
-                checkForAlreadyExistsNonterminal();
+                checkForAlreadyExistingNonterminal();
                 processChar(rule_generator.getCurrentChar());
             }
         }
@@ -180,7 +178,7 @@ namespace cerb::lex
             return { new_begin, new_length };
         }
 
-        CERBLIB_DECL static auto getBorder(GeneratorForText<CharT> const &gen) -> size_t
+        CERBLIB_DECL static auto getBorder(text::GeneratorForText<CharT> const &gen) -> size_t
         {
             return findBracket(cast('('), cast(')'), gen);
         }
@@ -218,7 +216,7 @@ namespace cerb::lex
             }
         }
 
-        constexpr auto checkForAlreadyExistsNonterminal() const -> void
+        constexpr auto checkForAlreadyExistingNonterminal() const -> void
         {
             if (flags.isSet(ItemFlags::NONTERMINAL)) {
                 throw DotItemParsingError(
@@ -255,7 +253,7 @@ namespace cerb::lex
         }
 
     protected:
-        GeneratorForText<CharT> rule_generator{};
+        text::GeneratorForText<CharT> rule_generator{};
         std::vector<item_ptr> items{};
         BasicItem<CharT> *recent_item{};
         size_t item_id{};

@@ -1,9 +1,10 @@
 #include <cerberus/debug/debug.hpp>
-#include <cerberus/lex/bracket_finder.hpp>
+#include <cerberus/text/bracket_finder.hpp>
 
 namespace cerb::debug
 {
     using namespace lex;
+    using namespace text;
 
     static constexpr string_view TestInput = "(Hello, World())!";
     static constexpr string_view TestInputEmpty = "()";

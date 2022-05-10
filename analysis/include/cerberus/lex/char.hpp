@@ -1,11 +1,9 @@
 #ifndef CERBERUS_CHAR_HPP
 #define CERBERUS_CHAR_HPP
 
-#include <cctype>
 #include <cerberus/cerberus.hpp>
 #include <cerberus/enum.hpp>
 #include <cerberus/flat_map.hpp>
-#include <cerberus/type.hpp>
 
 #define CCHAR(x) static_cast<CharT>(x)
 

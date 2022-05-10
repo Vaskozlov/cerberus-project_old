@@ -1,11 +1,11 @@
 #ifndef CERBERUS_BRACKET_FINDER_HPP
 #define CERBERUS_BRACKET_FINDER_HPP
 
-#include <cerberus/lex/generator_for_text.hpp>
+#include <cerberus/text/generator_for_text.hpp>
 
-namespace cerb::lex
+namespace cerb::text
 {
-    CERBERUS_EXCEPTION(BracketFinderError, BasicLexicalAnalysisException);
+    CERBERUS_EXCEPTION(BracketFinderError, BasicTextAnalysisException);
 
     template<CharacterLiteral CharT>
     class BracketFinder
@@ -19,7 +19,7 @@ namespace cerb::lex
     public:
         CERBLIB_DECL auto getPosition() const -> ssize_t
         {
-            return getChar() == close_bracket ? static_cast<ssize_t>(text.getOffset()) : -1;
+            return getChar() == close_bracket ? static_cast<ssize_t>(text.getTextOffset()) : -1;
         }
 
         BracketFinder() = default;
@@ -40,7 +40,7 @@ namespace cerb::lex
                 processChar(chr);
             }
 
-            return text.getOffset() - 1;
+            return text.getTextOffset() - 1;
         }
 
     private:
@@ -82,7 +82,7 @@ namespace cerb::lex
 
         CERBLIB_DECL auto isCurrentCharEoF() const -> bool
         {
-            return isEoF(getChar());
+            return lex::isEoF(getChar());
         }
 
         constexpr auto isBeginBracket() const -> void
@@ -112,6 +112,6 @@ namespace cerb::lex
     extern template class BracketFinder<char16_t>;
 #endif /* CERBERUS_HEADER_ONLY */
 
-}// namespace cerb::lex
+}// namespace cerb::text
 
 #endif /* CERBERUS_BRACKET_FINDER_HPP */

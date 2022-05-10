@@ -62,18 +62,18 @@ namespace cerb
     }
 
     template<typename T, typename... Ts>
-    CERBLIB_DECL auto min(T arg, Ts &&...args) -> T
+    CERBLIB_DECL auto min(T arg, Ts... args) -> T
     {
         ((arg = args < arg ? args : arg), ...);
         return arg;
     }
 
-    template<std::floating_point T>
-    CERBLIB_DECL auto getExponent(T number) -> ssize_t
+    template<std::floating_point Float>
+    CERBLIB_DECL auto getExponent(Float number) -> ssize_t
     {
-        static_assert(IsAnyOfV<T, f32, f64>);
+        static_assert(IsAnyOfV<Float, f32, f64>);
 
-        constexpr bool is_32bit_size = sizeof(T) == sizeof(u32);
+        constexpr bool is_32bit_size = sizeof(Float) == sizeof(u32);
 
         constexpr ssize_t exponent_bit = is_32bit_size ? F32ExponentBit : F64ExponentBit;
         constexpr ssize_t zero_exponent = is_32bit_size ? F32ZeroExponent : F64ZeroExponent;
@@ -87,45 +87,46 @@ namespace cerb
         return exponent;
     }
 
-    template<std::unsigned_integral T, std::unsigned_integral PowerType>
-    CERBLIB_DECL auto pow2(PowerType power_of_2) -> T
+    template<std::unsigned_integral UInt, std::unsigned_integral PowerType>
+    CERBLIB_DECL auto pow2(PowerType power_of_2) -> UInt
     {
-        return static_cast<T>(1) << power_of_2;
+        return static_cast<UInt>(1) << power_of_2;
     }
 
-    template<std::floating_point T, std::unsigned_integral PowerType>
-    CERBLIB_DECL auto pow2(PowerType power_of_2) -> T
+    template<std::floating_point Float, std::unsigned_integral PowerType>
+    CERBLIB_DECL auto pow2(PowerType power_of_2) -> Float
     {
-        static_assert(IsAnyOfV<T, f32, f64>, "cerb::pow2 supports only floats and doubles.");
+        static_assert(IsAnyOfV<Float, f32, f64>, "cerb::pow2 supports only floats and doubles.");
 
         constexpr size_t f32_exponent = 1ULL << F32ExponentBit;
         constexpr size_t f64_exponent = 1ULL << F64ExponentBit;
-        constexpr size_t float_exponent = sizeof(T) == sizeof(u32) ? f32_exponent : f64_exponent;
+        constexpr size_t float_exponent =
+            sizeof(Float) == sizeof(u32) ? f32_exponent : f64_exponent;
 
-        auto mask = asUInt(static_cast<T>(1));
+        auto mask = asUInt(static_cast<Float>(1));
 
         mask += static_cast<decltype(mask)>(static_cast<size_t>(power_of_2) * float_exponent);
-        return std::bit_cast<T>(mask);
+        return std::bit_cast<Float>(mask);
     }
 
-    template<std::integral T>
-    CERBLIB_DECL auto abs(T value) -> T
+    template<std::integral Int>
+    CERBLIB_DECL auto abs(Int value) -> Int
     {
-        if constexpr (std::unsigned_integral<T>) {
+        if constexpr (std::unsigned_integral<Int>) {
             return value;
         }
-        return value < static_cast<T>(0) ? static_cast<T>(-value) : value;
+        return value < static_cast<Int>(0) ? static_cast<Int>(-value) : value;
     }
 
-    template<std::floating_point T>
-    CERBLIB_DECL auto abs(T value) -> T
+    template<std::floating_point Float>
+    CERBLIB_DECL auto abs(Float value) -> Float
     {
-        static_assert(CanBeStoredInIntegral<T>);
+        static_assert(CanBeStoredAsIntegral<Float>);
 
         auto mask = asInt(value);
         mask &= std::numeric_limits<decltype(mask)>::max();
 
-        return std::bit_cast<T>(mask);
+        return std::bit_cast<Float>(mask);
     }
 
     template<std::equality_comparable T>

@@ -1,21 +1,19 @@
 #ifndef CERBERUS_STRING_TO_CODES_HPP
 #define CERBERUS_STRING_TO_CODES_HPP
 
-#include <cerberus/exception.hpp>
-#include <cerberus/lex/char.hpp>
-#include <cerberus/lex/scan_api.hpp>
+#include <cerberus/text/scan_api.hpp>
 #include <string>
 
-namespace cerb::lex
+namespace cerb::text
 {
     template<CharacterLiteral CharT>
-    class StringToCodes : private scan::ScanApi<false, CharT>
+    class StringToCodes : private ScanApi<false, CharT>
     {
         CERBLIB_SCAN_API_ACCESS(false, CharT);
 
     public:
         CERBERUS_ANALYSIS_EXCEPTION(
-            StringToCodesTranslationError, CharT, BasicLexicalAnalysisException);
+            StringToCodesTranslationError, CharT, BasicTextAnalysisException);
 
         constexpr auto parseString() -> std::basic_string<CharT> &
         {
@@ -39,7 +37,7 @@ namespace cerb::lex
     private:
         constexpr auto processChar(CharT chr) -> void
         {
-            if (chr == CharEnum<CharT>::Backlash) {
+            if (chr == lex::CharEnum<CharT>::Backlash) {
                 parsed_string.push_back(parseEscapeSequence(string_begin_char));
             } else {
                 parsed_string.push_back(chr);
@@ -58,7 +56,7 @@ namespace cerb::lex
             return chr == string_begin_char;
         }
 
-        static constexpr auto hexadecimal_chars = HexadecimalCharsToInt<CharT>;
+        static constexpr auto hexadecimal_chars = lex::HexadecimalCharsToInt<CharT>;
 
         std::basic_string<CharT> parsed_string{};
         CharT string_begin_char{};
@@ -76,8 +74,10 @@ namespace cerb::lex
     extern template class StringToCodes<char>;
     extern template class StringToCodes<char8_t>;
     extern template class StringToCodes<char16_t>;
+    extern template class StringToCodes<char32_t>;
+    extern template class StringToCodes<wchar_t>;
 #endif /* CERBERUS_HEADER_ONLY */
 
-}// namespace cerb::lex
+}// namespace cerb::text
 
 #endif /* CERBERUS_STRING_TO_CODES_HPP */
