@@ -50,9 +50,21 @@ namespace cerb::lex
             scan_api_t::beginScanning(CharEnum<CharT>::EoF);
         }
 
+        constexpr ItemParser(
+            CERBLIB_BASIC_ITEM_ARGS,
+            size_t id_of_item,
+            text::GeneratorForText<CharT> const &gen)
+          : CERBLIB_CONSTRUCT_BASIC_ITEM, scan_api_t(rule_generator), rule_generator(gen),
+            item_id(id_of_item)
+        {
+            scan_api_t::beginScanning(CharEnum<CharT>::EoF);
+        }
+
     private:
-        constexpr auto start() -> void override
-        {}
+        constexpr auto start() -> text::ScanApiStatus override
+        {
+            return text::ScanApiStatus::DO_NOT_SKIP_CHAR;
+        }
 
         constexpr auto processChar(CharT chr) -> void override
         {
@@ -130,12 +142,13 @@ namespace cerb::lex
 
         constexpr auto addItemParser() -> void
         {
-            BasicStringView<CharT> text = rule_generator.getRestOfTheText();
+            constexpr size_t item_begin_length = 1;
+
             size_t border = getBorder();
+            text::GeneratorForText<CharT> forked_gen =
+                rule_generator.fork(item_begin_length, border);
 
-            text = extractTextForNewItem(text, border);
-
-            auto *new_item = createNewItem<ItemParser<CharT>>(id(), text);
+            auto *new_item = createNewItem<ItemParser<CharT>>(id(), forked_gen);
             new_item->checkItemIsNotNonterminal();
 
             skipItemBorder(border);
@@ -160,19 +173,6 @@ namespace cerb::lex
         constexpr auto skipItemBorder(size_t border) -> void
         {
             rule_generator.skip(border);
-        }
-
-        CERBLIB_DECL static auto
-            extractTextForNewItem(BasicStringView<CharT> const &text, size_t border)
-                -> BasicStringView<CharT>
-        {
-            constexpr size_t length_of_item_begin = 1;
-            constexpr size_t length_of_item_end = 1;
-
-            auto new_begin = text.begin() + length_of_item_begin;
-            auto new_length = border - length_of_item_end;
-
-            return { new_begin, new_length };
         }
 
         CERBLIB_DECL auto getBorder() const -> size_t

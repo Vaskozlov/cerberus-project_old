@@ -27,10 +27,10 @@ namespace cerb::lex::regex
         }
 
     private:
-        constexpr auto start() -> void override
+        constexpr auto start() -> text::ScanApiStatus override
         {
-            setupGenerator();
             checkRegexStart();
+            return text::ScanApiStatus::SKIP_CHAR;
         }
 
         constexpr auto processChar(CharT chr) -> void override
@@ -77,7 +77,8 @@ namespace cerb::lex::regex
         constexpr auto processEscapeSymbol(CharT chr) -> CharT
         {
             if (chr == cast('\\')) {
-                return parseEscapeSequence(chr, cast('-'), cast('['), cast(']'));
+                return parseEscapeSequence(
+                    { { '\\', '\\' }, { '-', '-' }, { '[', '[' }, { ']', ']' } });
             }
             return chr;
         }
@@ -93,14 +94,14 @@ namespace cerb::lex::regex
             return chr == cast('[');
         }
 
-        constexpr auto checkCharsOrder(CharT begin, CharT end) -> void
+        constexpr auto checkCharsOrder(CharT begin, CharT end) const -> void
         {
             if (begin > end) {
                 throw RegexParsingError("Chars in regex are in a wrong order!", getGenerator());
             }
         }
 
-        constexpr auto checkRegexStart() -> void
+        constexpr auto checkRegexStart() const -> void
         {
             if (not isBeginOfRegex(getChar())) {
                 throw RegexParsingError("Unable to parse a regular expression!", getGenerator());

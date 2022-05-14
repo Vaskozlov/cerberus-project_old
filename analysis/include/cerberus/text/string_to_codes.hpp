@@ -27,16 +27,17 @@ namespace cerb::text
         }
 
     private:
-        constexpr auto start() -> void override
+        constexpr auto start() -> text::ScanApiStatus override
         {
-            setupGenerator();
             checkStringStart();
+            return text::ScanApiStatus::SKIP_CHAR;
         }
 
         constexpr auto processChar(CharT chr) -> void override
         {
             if (chr == lex::CharEnum<CharT>::Backlash) {
-                parsed_string.push_back(parseEscapeSequence(string_begin_char));
+                parsed_string.push_back(
+                    parseEscapeSequence({ { string_begin_char, string_begin_char } }));
             } else {
                 parsed_string.push_back(chr);
             }

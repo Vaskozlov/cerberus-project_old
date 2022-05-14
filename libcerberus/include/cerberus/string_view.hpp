@@ -14,9 +14,9 @@ namespace cerb
     struct BasicStringView;
 
     template<typename T>
-    concept StringType = IsAnyOfV<
-        T, BasicStringView<GetValueType<T>>, std::basic_string<GetValueType<T>>,
-        std::basic_string_view<GetValueType<T>>>;
+    concept StringType = IsAnyOfV < T,
+            BasicStringView<GetValueType<T>>,
+    std::basic_string<GetValueType<T>>, std::basic_string_view < GetValueType < T >>> ;
 
     template<CharacterLiteral CharT>
     struct CERBLIB_TRIVIAL BasicStringView
@@ -158,7 +158,7 @@ namespace cerb
         {
             size_t maximum_checking_length = min<size_type>(length, std::size(other));
 
-            for (size_t i : Range(maximum_checking_length)) {
+            for (size_t i = 0; i != maximum_checking_length; ++i) {
                 if (at(i) != other.at(i)) {
                     return at(i) <=> other.at(i);
                 }
@@ -169,8 +169,7 @@ namespace cerb
 
         BasicStringView() = default;
 
-        template<typename T>
-        // NOLINTNEXTLINE
+        template<typename T>// NOLINTNEXTLINE
         constexpr BasicStringView(T const &str) : length(strlen(str)), string(str)
         {}
 
@@ -182,8 +181,7 @@ namespace cerb
           : length(ptrdiff(first, last)), string(first)
         {}
 
-        template<StringType T>
-        // NOLINTNEXTLINE
+        template<StringType T>// NOLINTNEXTLINE
         constexpr BasicStringView(T const &str) : length(std::size(str)), string(std::data(str))
         {}
 

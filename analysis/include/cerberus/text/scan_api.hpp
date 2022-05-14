@@ -18,6 +18,9 @@
 
 namespace cerb::text
 {
+    // NOLINTNEXTLINE
+    CERBERUS_ENUM(ScanApiStatus, u8, SKIP_CHAR = 1, DO_NOT_SKIP_CHAR = 0);
+
     template<bool UseCleanChars, CharacterLiteral CharT>
     struct ScanApi
     {
@@ -67,7 +70,7 @@ namespace cerb::text
         constexpr auto canContinueParsing(CharT end_symbol) -> bool
         {
             using namespace lex;
-            CharT chr = nextChar();
+            CharT chr = getChar();
 
             if (logicalAnd(lex::isEoF(chr), end_symbol != CharEnum<CharT>::EoF)) {
                 throw ScanApiError(
@@ -89,8 +92,9 @@ namespace cerb::text
             }
         }
 
-        template<CharacterLiteral... Ts>
-        constexpr auto parseEscapeSequence(Ts... special_symbols) -> CharT
+        constexpr auto parseEscapeSequence(
+            std::initializer_list<Pair<CharT, CharT, PairComparison::BY_FIRST_VALUE>> const
+                &special_symbols) -> CharT
         {
             CharT chr = getNextCharAndCheckForEoF();
             constexpr size_t octal_notation = 8;
@@ -134,21 +138,26 @@ namespace cerb::text
                 break;
             }
 
-            return parseUserDefinedEscapeSymbols(chr, special_symbols...);
+            return parseUserDefinedEscapeSymbols(chr, special_symbols);
         }
 
         constexpr auto beginScanning(CharT end_symbol) -> void
         {
-            start();
+            setupGenerator();
+
+            if (start() == ScanApiStatus::SKIP_CHAR) {
+                nextChar();
+            }
 
             while (canContinueParsing(end_symbol)) {
                 processChar(getChar());
+                nextChar();
             }
 
             end();
         }
 
-        constexpr virtual auto start() -> void = 0;
+        CERBLIB_DECL virtual auto start() -> ScanApiStatus = 0;
         constexpr virtual auto processChar(CharT) -> void = 0;
         constexpr virtual auto end() -> void = 0;
 
@@ -166,19 +175,18 @@ namespace cerb::text
         virtual ~ScanApi() = default;
 
     private:
-        template<CharacterLiteral... Ts>
-        CERBLIB_DECL auto parseUserDefinedEscapeSymbols(CharT chr, Ts... special_symbols) -> CharT
+        CERBLIB_DECL auto parseUserDefinedEscapeSymbols(
+            CharT chr,
+            std::initializer_list<Pair<CharT, CharT, PairComparison::BY_FIRST_VALUE>> const
+                &special_symbols) -> CharT
         {
-            using namespace lex;
+            auto location = std::find(special_symbols.begin(), special_symbols.end(), chr);
 
-            CharT result = CharEnum<CharT>::EoF;
-            ((result = safeEqual(chr, special_symbols) ? chr : result), ...);
-
-            if (result == CharEnum<CharT>::EoF) {
+            if (location == special_symbols.end()) {
                 throw ScanApiError("Unable to match any escape sequence!", text_generator);
             }
 
-            return result;
+            return location->second;
         }
 
         CERBLIB_DECL auto convertStringToChar(u32 notation, u32 length) -> CharT

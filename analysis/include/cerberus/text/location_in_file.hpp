@@ -3,6 +3,13 @@
 
 #include <cerberus/string_view.hpp>
 
+#define CERBLIB_LOCATION_IN_FILE_ACCESS(CharT)                                                     \
+    using location_t = cerb::text::LocationInFile<CharT>;                                          \
+    using location_t::line;                                                                        \
+    using location_t::offset;                                                                      \
+    using location_t::charPosition;                                                                \
+    using location_t::filename;
+
 namespace cerb::text
 {
     template<CharacterLiteral CharT = char>
