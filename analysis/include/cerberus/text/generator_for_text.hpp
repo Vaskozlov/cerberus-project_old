@@ -2,9 +2,9 @@
 #define CERBERUS_TEXT_GENERATOR_HPP
 
 #include <cerberus/lex/char.hpp>
+#include <cerberus/text/generator_modules/tabs_and_spaces_saver.hpp>
 #include <cerberus/text/location_in_file.hpp>
 #include <cerberus/text/text_exception.hpp>
-#include <fmt/format.h>
 #include <string>
 
 namespace cerb::text
@@ -14,11 +14,14 @@ namespace cerb::text
     template<CharacterLiteral CharT, CharacterLiteral FileNameT = char>
     class GeneratorForText : public LocationInFile<FileNameT>
     {
+        using tabs_and_spaces_saver_t = gen::TabsAndSpacesSaver<CharT, FileNameT>;
         using iterator = typename BasicStringView<CharT>::iterator;
+
+        friend tabs_and_spaces_saver_t;
 
         CERBLIB_DECL auto begin() const -> iterator
         {
-            return text.begin() + getTextOffset();
+            return text.begin() + charOffset();
         }
 
         CERBLIB_DECL auto end() const -> iterator
@@ -27,6 +30,8 @@ namespace cerb::text
         }
 
     public:
+        CERBLIB_LOCATION_IN_FILE_ACCESS(FileNameT);
+
         CERBLIB_DECL auto isInitialized() const -> bool
         {
             return initialized;
@@ -34,7 +39,7 @@ namespace cerb::text
 
         CERBLIB_DECL auto getTabsAndSpaces() const -> std::basic_string<CharT> const &
         {
-            return tabs_and_spaces;
+            return tabs_and_spaces.get();
         }
 
         CERBLIB_DECL auto getText() const -> BasicStringView<CharT> const &
@@ -49,7 +54,7 @@ namespace cerb::text
 
         CERBLIB_DECL auto getRestOfTheText() const -> BasicStringView<CharT>
         {
-            return { text.begin() + getTextOffset(), text.end() };
+            return { begin(), end() };
         }
 
         CERBLIB_DECL auto getCurrentChar(ssize_t offset = 0) const -> CharT
@@ -61,7 +66,7 @@ namespace cerb::text
             }
 
             auto real_offset = calculateRealOffset(offset);
-            return real_offset >= text.size() ? CharEnum<CharT>::EoF : text[real_offset];
+            return real_offset >= text.size() ? CharEnum<CharT>::EoF : at(real_offset);
         }
 
         constexpr auto getRawChar() -> CharT
@@ -83,6 +88,8 @@ namespace cerb::text
 
         constexpr auto getCleanChar() -> CharT
         {
+            using namespace lex;
+
             while (lex::isLayout(getRawChar())) {
                 // empty loop
             }
@@ -102,16 +109,19 @@ namespace cerb::text
             }
         }
 
-        constexpr auto fork(size_t from, size_t to) const -> GeneratorForText<CharT>
+        CERBLIB_DECL auto fork(size_t from, size_t to) const -> GeneratorForText<CharT>
         {
             checkForkingBorders(from, to);
 
             GeneratorForText<CharT> forked_generator = *this;
+            BasicStringView<CharT> &forked_text = forked_generator.text;
+
             forked_generator.skip(from);
 
-            BasicStringView<CharT> &forked_text = forked_generator.text;
-            forked_text = { forked_text.begin(), forked_generator.begin() + to - from };
+            auto forked_text_begin = forked_text.begin();
+            auto forked_text_end = forked_text_begin + to - from;
 
+            forked_text = { forked_text_begin, forked_text_end };
             return forked_generator;
         }
 
@@ -120,12 +130,17 @@ namespace cerb::text
         constexpr explicit GeneratorForText(
             BasicStringView<CharT> const &file_content,
             BasicStringView<FileNameT> const &name_of_file = {})
-          : location(name_of_file), text(file_content)
+          : location_t(name_of_file), text(file_content)
         {
             updateCurrentLine();
         }
 
     private:
+        CERBLIB_DECL auto at(size_t index) const -> CharT
+        {
+            return text[index];
+        }
+
         constexpr auto processFirstRawChar() -> void
         {
             initialized = true;
@@ -147,13 +162,13 @@ namespace cerb::text
 
         CERBLIB_DECL auto needToUpdateLine() const -> bool
         {
-            auto previous_offset = getTextOffset() - 1;
-            return text[previous_offset] == lex::CharEnum<CharT>::NewLine;
+            auto previous_offset = location_t::charOffset() - 1;
+            return at(previous_offset) == lex::CharEnum<CharT>::NewLine;
         }
 
         constexpr auto updateCurrentLine() -> void
         {
-            auto offset = getTextOffset();
+            auto offset = location_t::charOffset();
             size_t line_end = text.find(lex::CharEnum<CharT>::NewLine, offset);
             size_t line_length = line_end - offset;
 
@@ -162,9 +177,9 @@ namespace cerb::text
 
         constexpr auto updateLocationToTheNextChar() -> void
         {
-            auto future_offset = getTextOffset() + 1;
+            auto future_offset = location_t::charOffset() + 1;
 
-            if (text[future_offset] == lex::CharEnum<CharT>::NewLine) {
+            if (at(future_offset) == lex::CharEnum<CharT>::NewLine) {
                 processNewLine();
             } else {
                 processNewChar();
@@ -173,52 +188,30 @@ namespace cerb::text
 
         constexpr auto processNewLine() -> void
         {
-            location.newLine();
-            clearTabsAndSpaces();
+            location_t::newLine();
+            tabs_and_spaces.clear();
         }
 
         constexpr auto processNewChar() -> void
         {
             tryToClearTabsAndSpaces();
-            location.newChar();
+            location_t::newChar();
             tryToAddTabOrSpace();
         }
 
         constexpr auto tryToClearTabsAndSpaces() -> void
         {
-            if (needToClearTabsAndSpaces()) {
-                clearTabsAndSpaces();
-            }
-        }
-
-        constexpr auto clearTabsAndSpaces() -> void
-        {
-            tabs_and_spaces.clear();
+            tabs_and_spaces.tryToClearTabsAndSpaces(getCurrentChar());
         }
 
         constexpr auto tryToAddTabOrSpace() -> void
         {
-            using namespace lex;
-
-            auto offset = getTextOffset();
-            auto chr = text[offset];
-
-            if (isTabOrSpace(chr)) {
-                tabs_and_spaces.push_back(chr);
-            }
-        }
-
-        CERBLIB_DECL auto needToClearTabsAndSpaces() const -> bool
-        {
-            using namespace lex;
-            auto offset = getTextOffset();
-
-            return logicalAnd(not tabs_and_spaces.empty(), not isTabOrSpace(text[offset]));
+            tabs_and_spaces.tryToAddTabOrSpace(getCurrentChar());
         }
 
         CERBLIB_DECL auto calculateRealOffset(ssize_t offset) const -> size_t
         {
-            auto real_offset = static_cast<ssize_t>(getTextOffset()) + offset;
+            auto real_offset = static_cast<ssize_t>(charOffset()) + offset;
             checkOffset(real_offset);
 
             return static_cast<size_t>(real_offset);
@@ -226,33 +219,27 @@ namespace cerb::text
 
         CERBLIB_DECL auto isCurrentCharEoF() const -> bool
         {
-            return lex::isEoF(text[getTextOffset()]);
-        }
-
-        CERBLIB_DECL static auto isTabOrSpace(CharT chr) -> bool
-        {
-            using namespace lex;
-
-            return logicalOr(chr == CharEnum<CharT>::Tab, chr == CharEnum<CharT>::Space);
+            auto chr = at(charOffset());
+            return lex::isEoF(chr);
         }
 
         constexpr auto checkOffset(ssize_t offset) const -> void
         {
             if (offset < 0) {
-                throw TextGeneratorError("Unable to access char at given offset!");
+                throw TextGeneratorError("Unable to access char at given charOffset!");
             }
         }
 
         constexpr auto checkForkingBorders(size_t from, size_t to) const -> void
         {
-            if (logicalOr(
-                    from + getTextOffset() >= text.size(), to + getTextOffset() >= text.size(),
-                    to > from)) {
+            auto offset = charOffset();
+
+            if (logicalOr(from + offset >= text.size(), to + offset >= text.size(), from > to)) {
                 throw TextGeneratorError("Unable to fork generator with given borders");
             }
         }
 
-        std::basic_string<CharT> tabs_and_spaces{};
+        tabs_and_spaces_saver_t tabs_and_spaces{};
         BasicStringView<CharT> text{};
         BasicStringView<CharT> current_line{};
         bool initialized{ false };

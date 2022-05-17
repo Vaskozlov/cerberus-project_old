@@ -6,9 +6,9 @@
 #define CERBLIB_LOCATION_IN_FILE_ACCESS(CharT)                                                     \
     using location_t = cerb::text::LocationInFile<CharT>;                                          \
     using location_t::line;                                                                        \
-    using location_t::offset;                                                                      \
+    using location_t::charOffset;                                                                  \
     using location_t::charPosition;                                                                \
-    using location_t::filename;
+    using location_t::filename
 
 namespace cerb::text
 {
@@ -25,7 +25,7 @@ namespace cerb::text
             return char_number;
         }
 
-        CERBLIB_DECL auto offset() const -> size_t
+        CERBLIB_DECL auto charOffset() const -> size_t
         {
             return char_offset;
         }

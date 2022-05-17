@@ -22,7 +22,7 @@ namespace cerb::text
         StringReducer() = default;
 
         constexpr explicit StringReducer(GeneratorForText<CharT> const &generator)
-          : text_generator(generator), base_index(generator.getCharPosition() - 1)
+          : text_generator(generator), base_index(generator.charOffset() - 1)
         {
             reduceString();
         }

@@ -22,29 +22,24 @@ namespace cerb::analysis
     template<CharacterLiteral CharT, ExceptionType ExceptionT = BasicAnalysisException>
     struct AnalysisException : public ExceptionT
     {
-        CERBLIB_DECL auto getLocation() const -> text::LocationInFile<char> const &
-        {
-            return text_generator.getLocation();
-        }
-
         CERBLIB_DECL auto getOffset() const -> size_t
         {
-            return text_generator.getTextOffset();
+            return text_generator.charOffset();
         }
 
         CERBLIB_DECL auto getLine() const -> size_t
         {
-            return text_generator.getLine();
+            return text_generator.line();
         }
 
         CERBLIB_DECL auto getCharPosition() const -> size_t
         {
-            return text_generator.getCharPosition();
+            return text_generator.charPosition();
         }
 
         CERBLIB_DECL auto getFilename() const -> BasicStringView<char> const &
         {
-            return text_generator.getFilename();
+            return text_generator.filename();
         }
 
         CERBLIB_DECL auto getTabsAndSpaces() const -> std::basic_string<CharT> const &

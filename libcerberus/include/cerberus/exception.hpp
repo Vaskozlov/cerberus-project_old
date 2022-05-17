@@ -14,7 +14,7 @@
                                                                                                    \
         name() noexcept = default;                                                                 \
                                                                                                    \
-        explicit name(std::string_view t_message) : message(t_message)                             \
+        explicit name(std::string_view exception_message) : message(exception_message)             \
         {}                                                                                         \
                                                                                                    \
         [[nodiscard]] auto what() const noexcept -> char const * override                          \

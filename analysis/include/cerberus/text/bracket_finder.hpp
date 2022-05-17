@@ -19,7 +19,7 @@ namespace cerb::text
     public:
         CERBLIB_DECL auto getPosition() const -> ssize_t
         {
-            return getChar() == close_bracket ? static_cast<ssize_t>(text.getTextOffset()) : -1;
+            return getChar() == close_bracket ? static_cast<ssize_t>(text.charOffset()) : -1;
         }
 
         BracketFinder() = default;
@@ -40,7 +40,7 @@ namespace cerb::text
                 processChar(chr);
             }
 
-            return text.getTextOffset() - 1;
+            return text.charOffset() - 1;
         }
 
     private:
