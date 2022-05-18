@@ -14,8 +14,8 @@ namespace cerb::text
     template<CharacterLiteral CharT, CharacterLiteral FileNameT = char>
     class GeneratorForText : public LocationInFile<FileNameT>
     {
-        using tabs_and_spaces_saver_t = gen::TabsAndSpacesSaver<CharT, FileNameT>;
-        using iterator = typename BasicStringView<CharT>::iterator;
+        using tabs_and_spaces_saver_t = gen::TabsAndSpacesSaver<CharT>;
+        using iterator = GetIteratorType<BasicStringView<CharT>>;
 
         friend tabs_and_spaces_saver_t;
 
@@ -129,8 +129,8 @@ namespace cerb::text
 
         constexpr explicit GeneratorForText(
             BasicStringView<CharT> const &file_content,
-            BasicStringView<FileNameT> const &name_of_file = {})
-          : location_t(name_of_file), text(file_content)
+            BasicStringView<FileNameT> const &file_name = {})
+          : location_t(file_name), text(file_content)
         {
             updateCurrentLine();
         }
@@ -201,12 +201,12 @@ namespace cerb::text
 
         constexpr auto tryToClearTabsAndSpaces() -> void
         {
-            tabs_and_spaces.tryToClearTabsAndSpaces(getCurrentChar());
+            tabs_and_spaces.tryToClear(getCurrentChar());
         }
 
         constexpr auto tryToAddTabOrSpace() -> void
         {
-            tabs_and_spaces.tryToAddTabOrSpace(getCurrentChar());
+            tabs_and_spaces.tryToAdd(getCurrentChar());
         }
 
         CERBLIB_DECL auto calculateRealOffset(ssize_t offset) const -> size_t

@@ -1,17 +1,17 @@
 #ifndef CERBERUS_TABS_AND_SPACES_SAVER_HPP
 #define CERBERUS_TABS_AND_SPACES_SAVER_HPP
 
-#include <cerberus/type.hpp>
+#include <cerberus/lex/char.hpp>
 #include <string>
 
 namespace cerb::text::gen
 {
-    template<CharacterLiteral CharT, CharacterLiteral FileNameT>
+    template<CharacterLiteral CharT>
     struct TabsAndSpacesSaver
     {
         using char_enum = lex::CharEnum<CharT>;
 
-        constexpr auto get() const -> std::basic_string<CharT> const &
+        CERBLIB_DECL auto get() const -> std::basic_string<CharT> const &
         {
             return tabs_and_spaces;
         }
@@ -26,16 +26,16 @@ namespace cerb::text::gen
             return tabs_and_spaces.empty();
         }
 
-        constexpr auto tryToClearTabsAndSpaces(CharT chr) -> void
+        constexpr auto tryToClear(CharT chr) -> void
         {
             current_char = chr;
 
-            if (needToClearTabsAndSpaces()) {
+            if (needToClear()) {
                 clear();
             }
         }
 
-        constexpr auto tryToAddTabOrSpace(CharT chr) -> void
+        constexpr auto tryToAdd(CharT chr) -> void
         {
             using namespace lex;
             current_char = chr;
@@ -48,7 +48,7 @@ namespace cerb::text::gen
         TabsAndSpacesSaver() = default;
 
     private:
-        CERBLIB_DECL auto needToClearTabsAndSpaces() const -> bool
+        CERBLIB_DECL auto needToClear() const -> bool
         {
             using namespace lex;
 
@@ -66,6 +66,12 @@ namespace cerb::text::gen
         std::basic_string<CharT> tabs_and_spaces{};
         CharT current_char{};
     };
+
+    extern template struct TabsAndSpacesSaver<char>;
+    extern template struct TabsAndSpacesSaver<char8_t>;
+    extern template struct TabsAndSpacesSaver<char16_t>;
+    extern template struct TabsAndSpacesSaver<char32_t>;
+    extern template struct TabsAndSpacesSaver<wchar_t>;
 }// namespace cerb::text::gen
 
 #endif /* CERBERUS_TABS_AND_SPACES_SAVER_HPP */
