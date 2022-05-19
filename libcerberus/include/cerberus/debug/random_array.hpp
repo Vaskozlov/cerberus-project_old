@@ -4,11 +4,12 @@
 #include <cerberus/range.hpp>
 #include <memory>
 #include <random>
+#include <vector>
 
 namespace cerb::debug
 {
     template<std::integral Int>
-    auto createRandomArrayOfInts(size_t size) -> std::unique_ptr<Int[]>
+    auto createRandomArrayOfInts(size_t size) -> std::vector<Int>
     {
         using value_type = std::conditional_t<std::is_unsigned_v<Int>, size_t, ssize_t>;
 
@@ -17,13 +18,13 @@ namespace cerb::debug
         static std::uniform_int_distribution<value_type> distribution(
             std::numeric_limits<Int>::min(), std::numeric_limits<Int>::max());
 
-        std::unique_ptr<Int[]> data = std::make_unique<Int[]>(size);
+        std::vector<Int> result(size);
 
         for (size_t i : Range(size)) {
-            data.get()[i] = static_cast<Int>(distribution(engine));
+            result[i] = static_cast<Int>(distribution(engine));
         }
 
-        return data;
+        return result;
     }
 
     template<Pairable T>

@@ -17,7 +17,11 @@ namespace cerb::debug
         try {
             CERBLIB_UNUSED(auto) = DotItem<char>(Parameters, 0, "[]");
             CANT_BE_REACHED;
-        } catch (RegexParser<char>::RegexParsingError const &) {
+        } catch (RegexParser<char>::RegexParsingError const &error) {
+            EXPECT_TRUE(
+                error.getMessage() ==
+                "Analysis error occurred: There are no characters in regex! File: , line: 1, char: "
+                "2\n[]\n ^");
             MUST_BE_REACHED;
         }
     }
@@ -27,7 +31,11 @@ namespace cerb::debug
         try {
             CERBLIB_UNUSED(auto) = DotItem<char>(Parameters, 0, "\"\"");
             CANT_BE_REACHED;
-        } catch (StringItem<char>::StringItemError const &) {
+        } catch (StringItem<char>::StringItemError const &error) {
+            EXPECT_TRUE(
+                error.getMessage() ==
+                "Analysis error occurred: Empty strings are not allowed! File: , line: 1, char: 2\n"
+                "\"\"\n ^");
             MUST_BE_REACHED;
         }
     }
@@ -37,8 +45,11 @@ namespace cerb::debug
         try {
             CERBLIB_UNUSED(auto) = lex::DotItem<char>(Parameters, 0, "()");
             CANT_BE_REACHED;
-        } catch (BasicLexicalAnalysisException const &error) {
-            ::fmt::print("{}\n", error.what());
+        } catch (ItemParser<char>::DotItemParsingError const &error) {
+            EXPECT_TRUE(
+                error.getMessage() ==
+                "Analysis error occurred: Empty items are not allowed! File: , line: 1, char: 2\n"
+                "()\n ^");
             MUST_BE_REACHED;
         }
     }
@@ -66,7 +77,7 @@ namespace cerb::debug
         EXPECT_TRUE(items.size() == 1);
 
         auto const &front_item = items.front();
-        auto *string_item = dynamic_cast<StringItem<char> *>(front_item.get());
+        auto const *string_item = dynamic_cast<StringItem<char> *>(front_item.get());
 
         EXPECT_TRUE(string_item != nullptr);
         EXPECT_TRUE(string_item->flags.isSet(ItemFlags::PLUS));
@@ -80,7 +91,7 @@ namespace cerb::debug
         EXPECT_TRUE(items.size() == 2);
 
         auto const &front_item = items.front();
-        auto *string_item = dynamic_cast<StringItem<char> *>(front_item.get());
+        auto const *string_item = dynamic_cast<StringItem<char> *>(front_item.get());
 
         EXPECT_TRUE(string_item != nullptr);
         EXPECT_TRUE(string_item->getString() == "for");
@@ -88,7 +99,7 @@ namespace cerb::debug
         EXPECT_TRUE(string_item->flags.isSet(ItemFlags::PREFIX));
 
         auto const &back_item = items.back();
-        auto *regex_item = dynamic_cast<RegexItem<char> *>(back_item.get());
+        auto const *regex_item = dynamic_cast<RegexItem<char> *>(back_item.get());
 
         EXPECT_TRUE(regex_item != nullptr);
         EXPECT_TRUE(regex_item->flags.isSet(ItemFlags::STAR));
@@ -103,13 +114,13 @@ namespace cerb::debug
         EXPECT_TRUE(items.size() == 2);
 
         auto const &front_item = items.front();
-        auto *parsing_item = dynamic_cast<ItemParser<char> *>(front_item.get());
+        auto const *parsing_item = dynamic_cast<ItemParser<char> *>(front_item.get());
 
         EXPECT_TRUE(parsing_item != nullptr);
         EXPECT_TRUE(parsing_item->flags.isSet(ItemFlags::PLUS));
 
         auto const &back_item = items.back();
-        auto *regex_item = dynamic_cast<RegexItem<char> *>(back_item.get());
+        auto const *regex_item = dynamic_cast<RegexItem<char> *>(back_item.get());
 
         EXPECT_TRUE(regex_item != nullptr);
         EXPECT_TRUE(regex_item->flags.isSet(ItemFlags::PLUS));

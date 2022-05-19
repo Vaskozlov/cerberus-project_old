@@ -2,9 +2,9 @@
 
 namespace cerb::text
 {
-    template struct GeneratorForText<char>;
-    template struct GeneratorForText<char8_t>;
-    template struct GeneratorForText<char16_t>;
-    template struct GeneratorForText<char32_t>;
-    template struct GeneratorForText<wchar_t>;
+    template class GeneratorForText<char>;
+    template class GeneratorForText<char8_t>;
+    template class GeneratorForText<char16_t>;
+    template class GeneratorForText<char32_t>;
+    template class GeneratorForText<wchar_t>;
 }// namespace cerb::text

@@ -5,7 +5,6 @@
 #include <cerberus/debug/location.hpp>
 #include <cerberus/exception.hpp>
 #include <cerberus/pair.hpp>
-#include <fmt/color.h>
 #include <fmt/format.h>
 
 #define EXPECT_TRUE(value) debug::expectTrue(value, CERBLIB_LOCATION)

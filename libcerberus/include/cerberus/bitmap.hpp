@@ -53,14 +53,14 @@ namespace cerb
         }
 
         template<u16 BitValue, size_t Axis>
-        constexpr auto set(size_t index) -> decltype(auto)
+        constexpr auto set(size_t index) -> void
         {
             static_assert(Axis < AxisN);
-            return bit::set<BitValue, size_t>(storage[Axis].begin(), index);
+            bit::set<BitValue, size_t>(storage[Axis].begin(), index);
         }
 
         template<size_t Axis>
-        constexpr auto at(size_t index) const -> decltype(auto)
+        CERBLIB_DECL auto at(size_t index) const -> bool
         {
             static_assert(Axis < AxisN);
             return bit::at<size_t>(storage[Axis].begin(), index);
@@ -82,7 +82,7 @@ namespace cerb
 
             size_t index = 0;
 
-            for (; index < storage.size(); ++index) {
+            for (; index != storage.size(); ++index) {
                 auto suitable_bits = getSuitableBits<BitValues...>(index);
 
                 if (suitable_bits != 0) {

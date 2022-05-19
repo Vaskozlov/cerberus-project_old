@@ -14,7 +14,7 @@ namespace cerb::text
             return base_index - left_border;
         }
 
-        CERBLIB_DECL auto getResult() const -> BasicStringView<CharT> const &
+        CERBLIB_DECL auto getReducedString() const -> BasicStringView<CharT> const &
         {
             return reduced_string;
         }
@@ -22,7 +22,7 @@ namespace cerb::text
         StringReducer() = default;
 
         constexpr explicit StringReducer(GeneratorForText<CharT> const &generator)
-          : text_generator(generator), base_index(generator.getCharPosition() - 1)
+          : text_generator(generator), base_index(generator.charOffset() - 1)
         {
             reduceString();
         }

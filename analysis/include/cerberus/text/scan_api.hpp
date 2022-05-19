@@ -6,7 +6,6 @@
 
 #define CERBLIB_SCAN_API_ACCESS(UseCleanChars, CharT)                                              \
     using scan_api_t = cerb::text::ScanApi<UseCleanChars, CharT>;                                  \
-    using scan_api_t::cast;                                                                        \
     using scan_api_t::getChar;                                                                     \
     using scan_api_t::getFutureChar;                                                               \
     using scan_api_t::nextChar;                                                                    \
@@ -19,6 +18,9 @@
 
 namespace cerb::text
 {
+    // NOLINTNEXTLINE
+    CERBERUS_ENUM(ScanApiStatus, u8, SKIP_CHAR = 1, DO_NOT_SKIP_CHAR = 0);
+
     template<bool UseCleanChars, CharacterLiteral CharT>
     struct ScanApi
     {
@@ -45,6 +47,11 @@ namespace cerb::text
             return text_generator.getCurrentChar(1);
         }
 
+        constexpr auto skip(size_t times) -> void
+        {
+            text_generator.template skip<UseCleanChars>(times);
+        }
+
         constexpr auto nextChar() -> CharT
         {
             if constexpr (UseCleanChars) {
@@ -67,11 +74,12 @@ namespace cerb::text
 
         constexpr auto canContinueParsing(CharT end_symbol) -> bool
         {
-            CharT chr = nextChar();
+            using namespace lex;
+            CharT chr = getChar();
 
-            if (lex::isEoF(chr)) {
+            if (logicalAnd(lex::isEoF(chr), end_symbol != CharEnum<CharT>::EoF)) {
                 throw ScanApiError(
-                    "Unable to close sequence, because of unexpected EoF!", text_generator);
+                    "Unable to continue, because of unexpected EoF!", text_generator);
             }
 
             return chr != end_symbol;
@@ -89,8 +97,9 @@ namespace cerb::text
             }
         }
 
-        template<CharacterLiteral... Ts>
-        constexpr auto parseEscapeSequence(Ts... special_symbols) -> CharT
+        constexpr auto parseEscapeSequence(
+            std::initializer_list<Pair<CharT, CharT, PairComparison::BY_FIRST_VALUE>> const
+                &special_symbols) -> CharT
         {
             CharT chr = getNextCharAndCheckForEoF();
             constexpr size_t octal_notation = 8;
@@ -134,29 +143,55 @@ namespace cerb::text
                 break;
             }
 
-            return parseUserDefinedEscapeSymbols(chr, special_symbols...);
+            return parseUserDefinedEscapeSymbols(chr, special_symbols);
         }
 
+        constexpr auto beginScanning(CharT end_symbol) -> void
+        {
+            setupGenerator();
+
+            if (start() == ScanApiStatus::SKIP_CHAR) {
+                nextChar();
+            }
+
+            while (canContinueParsing(end_symbol)) {
+                processChar(getChar());
+                nextChar();
+            }
+
+            end();
+        }
+
+        CERBLIB_DECL virtual auto start() -> ScanApiStatus = 0;
+        constexpr virtual auto processChar(CharT) -> void = 0;
+        constexpr virtual auto end() -> void = 0;
+
+        auto operator=(ScanApi const &) -> ScanApi & = default;
+        auto operator=(ScanApi &&) noexcept -> ScanApi & = default;
+
         ScanApi() = default;
+        ScanApi(ScanApi const &) = default;
+        ScanApi(ScanApi &&) noexcept = default;
 
         constexpr explicit ScanApi(GeneratorForText<CharT> &generator_for_text)
           : text_generator(generator_for_text)
         {}
 
+        virtual ~ScanApi() = default;
+
     private:
-        template<CharacterLiteral... Ts>
-        CERBLIB_DECL auto parseUserDefinedEscapeSymbols(CharT chr, Ts... special_symbols) -> CharT
+        CERBLIB_DECL auto parseUserDefinedEscapeSymbols(
+            CharT chr,
+            std::initializer_list<Pair<CharT, CharT, PairComparison::BY_FIRST_VALUE>> const
+                &special_symbols) -> CharT
         {
-            using namespace lex;
+            auto location = std::find(special_symbols.begin(), special_symbols.end(), chr);
 
-            CharT result = CharEnum<CharT>::EoF;
-            ((result = safeEqual(chr, special_symbols) ? chr : result), ...);
-
-            if (result == CharEnum<CharT>::EoF) {
+            if (location == special_symbols.end()) {
                 throw ScanApiError("Unable to match any escape sequence!", text_generator);
             }
 
-            return result;
+            return location->second;
         }
 
         CERBLIB_DECL auto convertStringToChar(u32 notation, u32 length) -> CharT
@@ -165,7 +200,7 @@ namespace cerb::text
             CharT resulted_char = CharEnum<CharT>::EoF;
 
             for (CERBLIB_UNUSED(u32) : Range(length)) {
-                if (doesNotFitIntoNotation(getFutureChar(), notation)) {
+                if (isOutOfNotation(getFutureChar(), notation)) {
                     break;
                 }
 
@@ -176,7 +211,7 @@ namespace cerb::text
             return resulted_char;
         }
 
-        CERBLIB_DECL static auto doesNotFitIntoNotation(CharT chr, u32 notation) -> bool
+        CERBLIB_DECL static auto isOutOfNotation(CharT chr, u32 notation) -> bool
         {
             if (not hexadecimal_chars.contains(chr)) {
                 return true;

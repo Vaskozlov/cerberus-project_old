@@ -16,30 +16,24 @@ namespace cerb::lex::regex
         CERBERUS_ANALYSIS_EXCEPTION(RegexParsingError, CharT, BasicLexicalAnalysisException);
 
         constexpr static size_t number_of_chars = pow2<size_t>(bitsizeof(CharT));
+
+        using scan_api_t::cast;
         using bitmap_t = ConstBitmap<1, number_of_chars>;
 
         constexpr RegexParser(text::GeneratorForText<CharT> &regex, bitmap_t &bitmap_for_chars)
           : scan_api_t(regex), available_chars(bitmap_for_chars)
         {
-            parseRegex();
+            scan_api_t::beginScanning(']');
         }
 
     private:
-        constexpr auto parseRegex() -> void
+        constexpr auto start() -> text::ScanApiStatus override
         {
-            setupGenerator();
             checkRegexStart();
-
-            while (canContinueParsing(cast(']'))) {
-                CharT chr = getChar();
-                processChar(chr);
-            }
-
-            checkRangeClosing();
-            checkRangeNonEmpty();
+            return text::ScanApiStatus::SKIP_CHAR;
         }
 
-        constexpr auto processChar(CharT chr) -> void
+        constexpr auto processChar(CharT chr) -> void override
         {
             checkDoubleRegexOpening(chr);
 
@@ -49,6 +43,12 @@ namespace cerb::lex::regex
                 chr = processEscapeSymbol(chr);
                 addCharToBitmap(chr);
             }
+        }
+
+        constexpr auto end() -> void override
+        {
+            checkRangeClosing();
+            checkRangeNonEmpty();
         }
 
         constexpr auto addCharToBitmap(CharT chr) -> void
@@ -77,7 +77,8 @@ namespace cerb::lex::regex
         constexpr auto processEscapeSymbol(CharT chr) -> CharT
         {
             if (chr == cast('\\')) {
-                return parseEscapeSequence(chr, cast('-'), cast('['), cast(']'));
+                return parseEscapeSequence(
+                    { { '\\', '\\' }, { '-', '-' }, { '[', '[' }, { ']', ']' } });
             }
             return chr;
         }
@@ -93,14 +94,14 @@ namespace cerb::lex::regex
             return chr == cast('[');
         }
 
-        constexpr auto checkCharsOrder(CharT begin, CharT end) -> void
+        constexpr auto checkCharsOrder(CharT begin, CharT end) const -> void
         {
             if (begin > end) {
                 throw RegexParsingError("Chars in regex are in a wrong order!", getGenerator());
             }
         }
 
-        constexpr auto checkRegexStart() -> void
+        constexpr auto checkRegexStart() const -> void
         {
             if (not isBeginOfRegex(getChar())) {
                 throw RegexParsingError("Unable to parse a regular expression!", getGenerator());

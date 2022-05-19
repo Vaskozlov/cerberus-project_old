@@ -7,14 +7,16 @@ namespace cerb::debug
 {
     auto testPointerWrapper() -> int
     {
-        auto pointer = createRandomArrayOfInts<int>(100);
-        auto pointer_wrapper = RawPointerWrapper<int>(pointer.get(), 100);
+        constexpr size_t test_array_size = 100;
 
-        EXPECT_TRUE(pointer_wrapper.size() == 100);
+        auto pointer = createRandomArrayOfInts<int>(test_array_size);
+        auto pointer_wrapper = RawPointerWrapper<int>(pointer.data(), test_array_size);
+
+        EXPECT_TRUE(pointer_wrapper.size() == test_array_size);
 
         EXPECT_TRUE([&]() {
-            for (size_t i : Range(100U)) {
-                if (pointer.get()[i] != pointer_wrapper[i]) {
+            for (size_t i : Range(test_array_size)) {
+                if (pointer[i] != pointer_wrapper[i]) {
                     return false;
                 }
             }
@@ -22,7 +24,7 @@ namespace cerb::debug
         }());
 
         EXPECT_TRUE([&]() {
-            auto pointer_copy = pointer.get();
+            auto pointer_copy = pointer.data();
 
             for (int elem : pointer_wrapper) {
                 if (elem != *pointer_copy) {

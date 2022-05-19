@@ -22,29 +22,24 @@ namespace cerb::analysis
     template<CharacterLiteral CharT, ExceptionType ExceptionT = BasicAnalysisException>
     struct AnalysisException : public ExceptionT
     {
-        CERBLIB_DECL auto getLocation() const -> text::LocationInFile<char> const &
-        {
-            return text_generator.getLocation();
-        }
-
         CERBLIB_DECL auto getOffset() const -> size_t
         {
-            return text_generator.getTextOffset();
+            return text_generator.charOffset();
         }
 
         CERBLIB_DECL auto getLine() const -> size_t
         {
-            return text_generator.getLine();
+            return text_generator.line();
         }
 
         CERBLIB_DECL auto getCharPosition() const -> size_t
         {
-            return text_generator.getCharPosition();
+            return text_generator.charPosition();
         }
 
         CERBLIB_DECL auto getFilename() const -> BasicStringView<char> const &
         {
-            return text_generator.getFilename();
+            return text_generator.filename();
         }
 
         CERBLIB_DECL auto getTabsAndSpaces() const -> std::basic_string<CharT> const &
@@ -65,6 +60,11 @@ namespace cerb::analysis
         CERBLIB_DECL auto getRestOfTheText() const -> BasicStringView<CharT>
         {
             return text_generator.getRestOfTheText();
+        }
+
+        CERBLIB_DECL auto getMessage() const -> std::basic_string<CharT> const &
+        {
+            return message;
         }
 
         AnalysisException() noexcept = default;
@@ -93,7 +93,8 @@ namespace cerb::analysis
             if constexpr (not std::is_same_v<char, CharT>) {
                 static const std::string message = fmt::format<char>(
                     "Unable to show "
-                    "error message, because AnalysisException character type is {}"_sv,
+                    "error message, because AnalysisException character type is {}. Use "
+                    "AnalysisException::getMessage() instead"_sv,
                     typeid(CharT).name());
                 return message;
             } else {
@@ -111,7 +112,7 @@ namespace cerb::analysis
             std::basic_string<CharT> result = fmt::format<CharT>(
                 "Analysis error occurred: {} File: {}, line: {}, char: {}\n{}\n"_sv,
                 exception_message, getFilename(), getLine(), getCharPosition(),
-                reducer.getResult());
+                reducer.getReducedString());
 
             addArrowToTheMessage(result, reducer.getErrorPositionAfterReducing());
 
@@ -120,7 +121,7 @@ namespace cerb::analysis
 
         static auto addArrowToTheMessage(std::basic_string<CharT> &result, size_t offset) -> void
         {
-            result.resize(result.size() + offset, static_cast<CharT>(' '));
+            result.resize(result.size() + offset + 1, static_cast<CharT>(' '));
             result.push_back(static_cast<CharT>('^'));
         }
 
