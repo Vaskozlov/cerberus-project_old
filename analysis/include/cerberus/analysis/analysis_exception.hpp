@@ -62,6 +62,11 @@ namespace cerb::analysis
             return text_generator.getRestOfTheText();
         }
 
+        CERBLIB_DECL auto getMessage() const -> std::basic_string<CharT> const &
+        {
+            return message;
+        }
+
         AnalysisException() noexcept = default;
 
         explicit constexpr AnalysisException(
@@ -88,7 +93,8 @@ namespace cerb::analysis
             if constexpr (not std::is_same_v<char, CharT>) {
                 static const std::string message = fmt::format<char>(
                     "Unable to show "
-                    "error message, because AnalysisException character type is {}"_sv,
+                    "error message, because AnalysisException character type is {}. Use "
+                    "AnalysisException::getMessage() instead"_sv,
                     typeid(CharT).name());
                 return message;
             } else {
@@ -115,7 +121,7 @@ namespace cerb::analysis
 
         static auto addArrowToTheMessage(std::basic_string<CharT> &result, size_t offset) -> void
         {
-            result.resize(result.size() + offset, static_cast<CharT>(' '));
+            result.resize(result.size() + offset + 1, static_cast<CharT>(' '));
             result.push_back(static_cast<CharT>('^'));
         }
 

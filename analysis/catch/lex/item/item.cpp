@@ -18,7 +18,10 @@ namespace cerb::debug
             CERBLIB_UNUSED(auto) = DotItem<char>(Parameters, 0, "[]");
             CANT_BE_REACHED;
         } catch (RegexParser<char>::RegexParsingError const &error) {
-            ::fmt::print("{}\n", error.what());
+            EXPECT_TRUE(
+                error.getMessage() ==
+                "Analysis error occurred: There are no characters in regex! File: , line: 1, char: "
+                "2\n[]\n ^");
             MUST_BE_REACHED;
         }
     }
@@ -29,7 +32,10 @@ namespace cerb::debug
             CERBLIB_UNUSED(auto) = DotItem<char>(Parameters, 0, "\"\"");
             CANT_BE_REACHED;
         } catch (StringItem<char>::StringItemError const &error) {
-            ::fmt::print("{}\n", error.what());
+            EXPECT_TRUE(
+                error.getMessage() ==
+                "Analysis error occurred: Empty strings are not allowed! File: , line: 1, char: 2\n"
+                "\"\"\n ^");
             MUST_BE_REACHED;
         }
     }
@@ -39,8 +45,11 @@ namespace cerb::debug
         try {
             CERBLIB_UNUSED(auto) = lex::DotItem<char>(Parameters, 0, "()");
             CANT_BE_REACHED;
-        } catch (BasicLexicalAnalysisException const &error) {
-            ::fmt::print("{}\n", error.what());
+        } catch (ItemParser<char>::DotItemParsingError const &error) {
+            EXPECT_TRUE(
+                error.getMessage() ==
+                "Analysis error occurred: Empty items are not allowed! File: , line: 1, char: 2\n"
+                "()\n ^");
             MUST_BE_REACHED;
         }
     }

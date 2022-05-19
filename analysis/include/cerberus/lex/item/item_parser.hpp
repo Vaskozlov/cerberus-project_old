@@ -4,6 +4,7 @@
 #include <cerberus/lex/item/regex.hpp>
 #include <cerberus/lex/item/string.hpp>
 #include <cerberus/text/bracket_finder.hpp>
+#include <utility>
 
 #define CERBLIB_ITEM_PARSER_ACCESS(CharT)                                                          \
     using item_parser_t = cerb::lex::ItemParser<CharT>;                                            \
@@ -53,9 +54,10 @@ namespace cerb::lex
         constexpr ItemParser(
             CERBLIB_BASIC_ITEM_ARGS,
             size_t id_of_item,
-            text::GeneratorForText<CharT> const &gen)
-          : CERBLIB_CONSTRUCT_BASIC_ITEM, scan_api_t(rule_generator), rule_generator(gen),
-            item_id(id_of_item)
+            text::GeneratorForText<CharT>
+                gen)
+          : CERBLIB_CONSTRUCT_BASIC_ITEM, scan_api_t(rule_generator),
+            rule_generator(std::move(gen)), item_id(id_of_item)
         {
             scan_api_t::beginScanning(CharEnum<CharT>::EoF);
         }
@@ -172,7 +174,7 @@ namespace cerb::lex
 
         constexpr auto skipItemBorder(size_t border) -> void
         {
-            rule_generator.skip(border);
+            scan_api_t::skip(border);
         }
 
         CERBLIB_DECL auto getBorder() const -> size_t

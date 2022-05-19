@@ -47,6 +47,11 @@ namespace cerb::text
             return text_generator.getCurrentChar(1);
         }
 
+        constexpr auto skip(size_t times) -> void
+        {
+            text_generator.template skip<UseCleanChars>(times);
+        }
+
         constexpr auto nextChar() -> CharT
         {
             if constexpr (UseCleanChars) {

@@ -14,17 +14,18 @@ namespace cerb::text
     template<CharacterLiteral CharT, CharacterLiteral FileNameT = char>
     class GeneratorForText : public LocationInFile<FileNameT>
     {
-        using tabs_and_spaces_saver_t = gen::TabsAndSpacesSaver<CharT>;
+        using char_enum = lex::CharEnum<CharT>;
         using iterator = GetIteratorType<BasicStringView<CharT>>;
+        using tabs_and_spaces_saver_t = gen::TabsAndSpacesSaver<CharT>;
 
         friend tabs_and_spaces_saver_t;
 
-        CERBLIB_DECL auto begin() const -> iterator
+        CERBLIB_DECL auto currentTextBegin() const -> iterator
         {
             return text.begin() + charOffset();
         }
 
-        CERBLIB_DECL auto end() const -> iterator
+        CERBLIB_DECL auto currentTextEnd() const -> iterator
         {
             return text.end();
         }
@@ -54,27 +55,23 @@ namespace cerb::text
 
         CERBLIB_DECL auto getRestOfTheText() const -> BasicStringView<CharT>
         {
-            return { begin(), end() };
+            return { currentTextBegin(), currentTextEnd() };
         }
 
         CERBLIB_DECL auto getCurrentChar(ssize_t offset = 0) const -> CharT
         {
-            using namespace lex;
-
             if (not initialized) {
-                return CharEnum<CharT>::EoF;
+                return char_enum::EoF;
             }
 
             auto real_offset = calculateRealOffset(offset);
-            return real_offset >= text.size() ? CharEnum<CharT>::EoF : at(real_offset);
+            return real_offset >= text.size() ? char_enum::EoF : at(real_offset);
         }
 
         constexpr auto getRawChar() -> CharT
         {
-            using namespace lex;
-
             if (isCurrentCharEoF()) {
-                return CharEnum<CharT>::EoF;
+                return char_enum::EoF;
             }
 
             if (not initialized) {
@@ -88,8 +85,6 @@ namespace cerb::text
 
         constexpr auto getCleanChar() -> CharT
         {
-            using namespace lex;
-
             while (lex::isLayout(getRawChar())) {
                 // empty loop
             }
@@ -109,6 +104,7 @@ namespace cerb::text
             }
         }
 
+        template<bool SkipCleanChars = false>
         CERBLIB_DECL auto fork(size_t from, size_t to) const -> GeneratorForText<CharT>
         {
             checkForkingBorders(from, to);
@@ -119,9 +115,9 @@ namespace cerb::text
             forked_generator.skip(from);
 
             auto forked_text_begin = forked_text.begin();
-            auto forked_text_end = forked_text_begin + to - from;
+            auto forked_text_length = to - from;
 
-            forked_text = { forked_text_begin, forked_text_end };
+            forked_text = { forked_text_begin, forked_text_length };
             return forked_generator;
         }
 
@@ -163,23 +159,23 @@ namespace cerb::text
         CERBLIB_DECL auto needToUpdateLine() const -> bool
         {
             auto previous_offset = location_t::charOffset() - 1;
-            return at(previous_offset) == lex::CharEnum<CharT>::NewLine;
+            return at(previous_offset) == char_enum::NewLine;
         }
 
         constexpr auto updateCurrentLine() -> void
         {
             auto offset = location_t::charOffset();
-            size_t line_end = text.find(lex::CharEnum<CharT>::NewLine, offset);
+            size_t line_end = text.find(char_enum::NewLine, offset);
             size_t line_length = line_end - offset;
 
-            current_line = { begin(), line_length };
+            current_line = { currentTextBegin(), line_length };
         }
 
         constexpr auto updateLocationToTheNextChar() -> void
         {
             auto future_offset = location_t::charOffset() + 1;
 
-            if (at(future_offset) == lex::CharEnum<CharT>::NewLine) {
+            if (at(future_offset) == char_enum::NewLine) {
                 processNewLine();
             } else {
                 processNewChar();
@@ -223,7 +219,7 @@ namespace cerb::text
             return lex::isEoF(chr);
         }
 
-        constexpr auto checkOffset(ssize_t offset) const -> void
+        constexpr static auto checkOffset(ssize_t offset) -> void
         {
             if (offset < 0) {
                 throw TextGeneratorError("Unable to access char at given charOffset!");

@@ -37,7 +37,6 @@ namespace cerb::text::gen
 
         constexpr auto tryToAdd(CharT chr) -> void
         {
-            using namespace lex;
             current_char = chr;
 
             if (isTabOrSpace()) {
@@ -50,16 +49,12 @@ namespace cerb::text::gen
     private:
         CERBLIB_DECL auto needToClear() const -> bool
         {
-            using namespace lex;
-
             return logicalOr(
                 current_char == char_enum::NewLine, logicalAnd(not empty(), not isTabOrSpace()));
         }
 
         CERBLIB_DECL auto isTabOrSpace() const -> bool
         {
-            using namespace lex;
-
             return logicalOr(current_char == char_enum::Tab, current_char == char_enum::Space);
         }
 
