@@ -6,24 +6,27 @@ CERBERUS_ENUM(TestEnum, cerb::u32, VALUE0 = 0b1, VALUE1 = 0b10, VALUE2 = 0b100);
 
 namespace cerb::debug
 {
-    constexpr auto testEnumInitialization() -> bool
+    CERBERUS_TEST_FUNC(testEnumInitialization)
     {
         TestEnum test(TestEnum::VALUE0);
-        return test.get() == 0b1;
+        EXPECT_EQUAL(test.get(), 0b1);
+
+        return true;
     }
 
-    constexpr auto testEnumIsSet() -> bool
+    CERBERUS_TEST_FUNC(testEnumIsSet)
     {
         TestEnum test(TestEnum::VALUE0);
 
         EXPECT_TRUE(test.isSet(TestEnum::VALUE0));
+
         EXPECT_FALSE(test.isSet(TestEnum::VALUE1));
         EXPECT_FALSE(test.isSet(TestEnum::VALUE2));
 
         return true;
     }
 
-    constexpr auto testEnumOrOperator() -> bool
+    CERBERUS_TEST_FUNC(testEnumOrOperator)
     {
         TestEnum test(TestEnum::VALUE0);
 
@@ -38,7 +41,7 @@ namespace cerb::debug
         return true;
     }
 
-    constexpr auto testEnumAndOperator() -> bool
+    CERBERUS_TEST_FUNC(testEnumAndOperator)
     {
         TestEnum test(TestEnum::VALUE0 | TestEnum::VALUE1 | TestEnum::VALUE2);
 
@@ -53,7 +56,7 @@ namespace cerb::debug
         return true;
     }
 
-    constexpr auto testEnumAnySet() -> bool
+    CERBERUS_TEST_FUNC(testEnumAnySet)
     {
         TestEnum test(TestEnum::VALUE0 | TestEnum::VALUE1);
 

@@ -11,6 +11,7 @@ namespace cerb::fmt
     {
         std::basic_string<CharT> result{};
 
+        CERBLIB_UNROLL_N(2)
         for (; *ptr != static_cast<T>(0); ++ptr) {
             result.push_back(static_cast<T>(*ptr));
         }

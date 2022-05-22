@@ -149,13 +149,7 @@ namespace cerb
             }
         }
 #endif
-        if constexpr (IsAnyOfV<GetValueType<T>, u8, i8>) {
-            // stdlibc++ uses __builtin_memset for chars, so
-            // std::ranges::fill does not work at compile time
-            std::fill(dest.begin(), dest.end(), value);
-        } else {
-            std::ranges::fill(dest, value);
-        }
+        std::ranges::fill(dest, value);
     }
 
     template<typename T>
@@ -189,7 +183,8 @@ namespace cerb
             }
         }
 #endif
-        std::copy(src.begin(), src.end(), dest.begin());
+
+        std::ranges::copy(src, dest.begin());
     }
 
     template<typename T>
@@ -214,7 +209,7 @@ namespace cerb
 #if CERBLIB_AMD64
         [[maybe_unused]] constexpr bool suitable_for_fast_search =
             RawAccessible<T> && CanBeStoredAsIntegral<GetValueType<T>> &&
-            std::is_trivial_v<GetValueType<T>>;
+            std::is_trivial_v<GetValueType<T>> && std::is_pointer_v<GetIteratorType<T>>;
 
         if constexpr (suitable_for_fast_search) {
             if CERBLIB_RUNTIME {
@@ -223,6 +218,20 @@ namespace cerb
         }
 #endif
         return std::ranges::find(iterable_class, value_to_find);
+    }
+
+    template<Iterable T>
+    CERBLIB_DECL auto rfind(T &iterable_class, GetValueType<T> value_to_find) ->
+        typename T::reverse_iterator
+    {
+        return std::find(std::rbegin(iterable_class), std::rend(iterable_class), value_to_find);
+    }
+
+    template<Iterable T>
+    CERBLIB_DECL auto rfind(T const &iterable_class, GetValueType<T> value_to_find) ->
+        typename T::const_reverse_iterator
+    {
+        return std::find(std::crbegin(iterable_class), std::crend(iterable_class), value_to_find);
     }
 
     template<Iterable T1, Iterable T2>

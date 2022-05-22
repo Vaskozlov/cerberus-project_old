@@ -62,11 +62,13 @@ namespace cerb::text::gen
         CharT current_char{};
     };
 
+#ifndef CERBERUS_HEADER_ONLY
     extern template struct TabsAndSpacesSaver<char>;
     extern template struct TabsAndSpacesSaver<char8_t>;
     extern template struct TabsAndSpacesSaver<char16_t>;
     extern template struct TabsAndSpacesSaver<char32_t>;
     extern template struct TabsAndSpacesSaver<wchar_t>;
+#endif /* CERBERUS_HEADER_ONLY */
 }// namespace cerb::text::gen
 
 #endif /* CERBERUS_TABS_AND_SPACES_SAVER_HPP */

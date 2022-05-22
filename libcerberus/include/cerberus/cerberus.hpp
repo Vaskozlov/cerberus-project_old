@@ -232,12 +232,6 @@ namespace cerb
     {
         return (... | args);
     }
-
-    template<typename T>
-    constexpr auto cmov(bool condition, T const &on_true, T const &on_false) -> T
-    {
-        return condition ? on_true : on_false;
-    }
 }// namespace cerb
 
 #endif /* LIBCERBERUS_CERBERUS_HPP */

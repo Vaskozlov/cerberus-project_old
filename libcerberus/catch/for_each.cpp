@@ -2,13 +2,13 @@
 
 namespace cerb::debug
 {
-    constexpr auto testForEachOnInts() -> bool
+    CERBERUS_TEST_FUNC(testForEachOnInts)
     {
         int counter = 0;
 
         forEach(
             [&counter](int elem) {
-                EXPECT_TRUE(elem == counter * 10);
+                EXPECT_EQUAL(elem, counter * 10);
                 ++counter;
             },
             0,
@@ -18,8 +18,7 @@ namespace cerb::debug
             40,
             50);
 
-        EXPECT_TRUE(counter == 6);
-
+        EXPECT_EQUAL(counter, 6);
         return true;
     }
 

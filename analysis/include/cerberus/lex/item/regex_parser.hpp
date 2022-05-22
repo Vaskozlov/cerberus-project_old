@@ -66,6 +66,7 @@ namespace cerb::lex::regex
         {
             checkCharsOrder(begin, end);
 
+            CERBLIB_UNROLL_N(4)
             for (; begin <= end; ++begin) {
                 setChar(begin);
             }

@@ -14,9 +14,9 @@ namespace cerb
     struct BasicStringView;
 
     template<typename T>
-    concept StringType = IsAnyOfV<
-        T, BasicStringView<GetValueType<T>>, std::basic_string<GetValueType<T>>,
-        std::basic_string_view<GetValueType<T>>>;
+    concept StringType = IsAnyOfV < T,
+            BasicStringView<GetValueType<T>>,
+    std::basic_string<GetValueType<T>>, std::basic_string_view < GetValueType < T >>> ;
 
     template<CharacterLiteral CharT>
     struct CERBLIB_TRIVIAL BasicStringView
@@ -67,22 +67,22 @@ namespace cerb
 
         CERBLIB_DECL auto rbegin() const -> const_reverse_iterator
         {
-            return const_reverse_iterator(begin());
+            return const_reverse_iterator(end());
         }
 
         CERBLIB_DECL auto rend() const -> const_reverse_iterator
         {
-            return const_reverse_iterator(end());
+            return const_reverse_iterator(begin());
         }
 
         CERBLIB_DECL auto crbegin() const -> const_reverse_iterator
         {
-            return const_reverse_iterator(begin());
+            return const_reverse_iterator(end());
         }
 
         CERBLIB_DECL auto crend() const -> const_reverse_iterator
         {
-            return const_reverse_iterator(end());
+            return const_reverse_iterator(begin());
         }
 
         CERBLIB_DECL auto front() const -> CharT
@@ -113,6 +113,16 @@ namespace cerb
         CERBLIB_DECL auto find(CharT chr, size_t position) const -> size_t
         {
             return ptrdiff(begin(), cerb::find(string + position, chr, length - position));
+        }
+
+        CERBLIB_DECL auto rfind(CharT chr) const -> size_t
+        {
+            return ptrdiff(cerb::rfind(*this, chr), rend()) - 1;
+        }
+
+        CERBLIB_DECL auto rfind2(CharT chr) const
+        {
+            return cerb::rfind(*this, chr);
         }
 
         CERBLIB_DECL auto strView() const -> std::basic_string_view<CharT>
@@ -158,6 +168,7 @@ namespace cerb
         {
             size_t maximum_checking_length = min<size_type>(length, std::size(other));
 
+            CERBLIB_UNROLL_N(4)
             for (size_t i = 0; i != maximum_checking_length; ++i) {
                 if (at(i) != other.at(i)) {
                     return at(i) <=> other.at(i);

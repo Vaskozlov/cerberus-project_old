@@ -61,7 +61,10 @@ namespace cerb
         template<Iterable U>
         CERBLIB_DECL auto operator<=>(U const &other) -> decltype(auto)
         {
-            for (size_t i : Range(min<size_t>(size(), other.size()))) {
+            auto checking_length = min<size_t>(size(), other.size());
+
+            CERBLIB_UNROLL_N(4)
+            for (size_t i = 0; i != checking_length; ++i) {
                 if (*(pointer + i) != other[i]) {
                     return *(pointer + i) <=> other[i];
                 }

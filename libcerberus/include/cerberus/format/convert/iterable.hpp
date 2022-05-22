@@ -36,6 +36,7 @@ namespace cerb::fmt
             {
                 addBeginOfObject();
 
+                CERBLIB_UNROLL_N(2)
                 for (auto const &elem : converted_object) {
                     addElem(elem);
                 }

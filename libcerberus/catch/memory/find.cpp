@@ -4,6 +4,8 @@
 
 namespace cerb::debug
 {
+    constexpr std::array TestIntegrals = { -10, 0, 400, 14, 0, 123 };
+
     CERBLIB_DECL auto testFindOnStringView() -> bool
     {
         std::string_view str = "hello, world!";
@@ -40,16 +42,15 @@ namespace cerb::debug
 
     CERBLIB_DECL auto testFindOnArrayOfInts() -> bool
     {
-        std::array integrals = { -10, -20, 400, 14, 0, 123 };
-
-        EXPECT_TRUE(find(integrals, 123) == integrals.end() - 1);
+        EXPECT_TRUE(find(TestIntegrals, 123) == TestIntegrals.end() - 1);
         EXPECT_TRUE(
-            find(integrals.data(), 123, integrals.size()) ==
-            (integrals.data() + integrals.size() - 1));
+            find(TestIntegrals.data(), 123, TestIntegrals.size()) ==
+            (TestIntegrals.data() + TestIntegrals.size() - 1));
 
-        EXPECT_TRUE(find(integrals, 500) >= integrals.end());
+        EXPECT_TRUE(find(TestIntegrals, 500) >= TestIntegrals.end());
         EXPECT_TRUE(
-            find(integrals.data(), 500, integrals.size()) >= (integrals.data() + integrals.size()));
+            find(TestIntegrals.data(), 500, TestIntegrals.size()) >=
+            (TestIntegrals.data() + TestIntegrals.size()));
 
         return true;
     }
@@ -66,13 +67,39 @@ namespace cerb::debug
         return true;
     }
 
-    auto testStringOperations() -> int
+    CERBLIB_DECL auto testRfindOnStringView() -> bool
+    {
+        std::string_view str = "hello, world!";
+
+        return rfind(str, '\0') == str.rend();
+    }
+
+    CERBLIB_DECL auto testRfindOnArrayOfInts() -> bool
+    {
+        auto last_zero_index = TestIntegrals.rbegin() + 1;
+        auto index = rfind(TestIntegrals, 0);
+
+        return index == last_zero_index;
+    }
+
+    CERBLIB_DECL auto testRfindOnArrayOfIntsWithNoSuitableInts() -> bool
+    {
+        auto last_zero_index = TestIntegrals.rend();
+        auto index = rfind(TestIntegrals, -100);
+
+        return index == last_zero_index;
+    }
+
+    auto testFind() -> int
     {
         CERBERUS_TEST(testFindOnStringView());
         CERBERUS_TEST(testFindOnUtf16StringView());
         CERBERUS_TEST(testFindOnWstringView());
         CERBERUS_TEST(testFindOnArrayOfInts());
         CERBERUS_TEST(testFindOnArrayOfPairs());
+        CERBERUS_TEST(testRfindOnStringView());
+        CERBERUS_TEST(testRfindOnArrayOfInts());
+        CERBERUS_TEST(testRfindOnArrayOfIntsWithNoSuitableInts());
         return 0;
     }
 }// namespace cerb::debug

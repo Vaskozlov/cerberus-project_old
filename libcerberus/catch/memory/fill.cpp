@@ -62,7 +62,7 @@ namespace cerb::debug
 
     CERBLIB_DECL auto testFillOnPointerOfFloats() -> bool
     {
-        EXPECT_TRUE(testFillOnPointer<float>(45151.41551f));
+        EXPECT_TRUE(testFillOnPointer<float>(45151.41551F));
         EXPECT_TRUE(testFillOnPointer<double>(1451985155195.51851051521));
         return true;
     }
