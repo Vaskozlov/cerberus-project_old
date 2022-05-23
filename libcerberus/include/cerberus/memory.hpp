@@ -148,6 +148,14 @@ namespace cerb
                 return amd64::fill(std::data(dest), value, std::size(dest));
             }
         }
+#endif  
+
+#if defined(__GNUC__) && __GNUC__ <= 11
+        if constexpr (IsAnyOfV<GetValueType<T>, u8, i8>) {
+            // stdlibc++ uses __builtin_memset for chars, so
+            // std::ranges::fill does not work at compile time.
+            return std::fill(dest.begin(), dest.end(), value);
+        }
 #endif
         std::ranges::fill(dest, value);
     }
