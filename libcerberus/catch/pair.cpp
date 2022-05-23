@@ -3,6 +3,12 @@
 #include <cerberus/pair.hpp>
 #include <vector>
 
+#if __cpp_lib_constexpr_vector >= 201907L && !__clang__
+#    define CONSTEXPR_VECTOR constexpr
+#else
+#    define CONSTEXPR_VECTOR
+#endif
+
 namespace cerb::debug
 {
     CERBERUS_TEST_FUNC(testDefaultPair)
@@ -89,7 +95,7 @@ namespace cerb::debug
         return true;
     }
 
-    CERBERUS_TEST_FUNC(testPairOnStringAndVector)
+    CONSTEXPR_VECTOR auto testPairOnStringAndVector() -> bool
     {
         char const *str = "Hello, World! It's a long string!";
         std::initializer_list<int> const data = { 10, 20, 30, 40 };

@@ -120,7 +120,8 @@ namespace cerb
         template<CharacterLiteral CharT>
         CERBLIB_DECL auto strlenForPointer(CharT const *str) -> size_t
         {
-            return ptrdiff(str, find(str, static_cast<CharT>(0), std::numeric_limits<u32>::max()));
+            constexpr auto max_length = std::numeric_limits<u32>::max();
+            return ptrdiff(str, find(str, static_cast<CharT>(0), max_length));
         }
     }// namespace private_
 
@@ -148,7 +149,7 @@ namespace cerb
                 return amd64::fill(std::data(dest), value, std::size(dest));
             }
         }
-#endif  
+#endif
 
 #if defined(__GNUC__) && __GNUC__ <= 11
         if constexpr (IsAnyOfV<GetValueType<T>, u8, i8>) {
@@ -198,10 +199,10 @@ namespace cerb
     template<typename T>
     CERBLIB_DECL auto find(T const *location, AutoCopyType<T> value, size_t limit) -> T const *
     {
+#if CERBLIB_AMD64
         [[maybe_unused]] constexpr bool suitable_for_fast_search =
             CanBeStoredAsIntegral<T> && std::is_trivial_v<T>;
 
-#if CERBLIB_AMD64
         if constexpr (suitable_for_fast_search) {
             if CERBLIB_RUNTIME {
                 return amd64::find(location, value, limit);
@@ -282,7 +283,7 @@ namespace cerb
     }
 
     template<typename T>
-    CERBLIB_DECL auto ptrdiff(T const first, T const last) -> size_t
+    CERBLIB_DECL auto ptrdiff(T first, T last) -> size_t
     {
         return static_cast<size_t>(static_cast<ptrdiff_t>(last - first));
     }
