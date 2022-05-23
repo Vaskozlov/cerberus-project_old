@@ -6,6 +6,7 @@ namespace cerb::debug
     {
         int counter = 0;
 
+        // NOLINTBEGIN magic numbers
         forEach(
             [&counter](int elem) {
                 EXPECT_EQUAL(elem, counter * 10);
@@ -17,6 +18,7 @@ namespace cerb::debug
             30,
             40,
             50);
+        // NOLINTEND
 
         EXPECT_EQUAL(counter, 6);
         return true;

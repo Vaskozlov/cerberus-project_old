@@ -107,7 +107,8 @@ namespace cerb
 
         CERBLIB_DECL auto find(CharT chr) const -> size_t
         {
-            return ptrdiff(begin(), cerb::find(*this, chr));
+            auto index = ptrdiff(begin(), cerb::find(*this, chr));
+            return index < length ? index : npos;
         }
 
         CERBLIB_DECL auto find(CharT chr, size_t position) const -> size_t
@@ -195,6 +196,9 @@ namespace cerb
         template<StringType T>// NOLINTNEXTLINE
         constexpr BasicStringView(T const &str) : length(std::size(str)), string(std::data(str))
         {}
+
+        // NOLINTNEXTLINE
+        constexpr static size_t npos = std::numeric_limits<size_t>::max();
 
     private:
         size_type length{};

@@ -6,6 +6,7 @@ namespace cerb::debug
 {
     CERBERUS_TEST_FUNC(testFlatMapOfInts)
     {
+        // NOLINTBEGIN
         FlatMap<int, int, 4> flat_map{};
         flat_map.insert({ 10, 20 });
 
@@ -21,6 +22,7 @@ namespace cerb::debug
 
         flat_map.emplace(40, 50);
         EXPECT_EQUAL(flat_map.size(), 4);
+        // NOLINTEND
 
         return true;
     }
@@ -31,7 +33,7 @@ namespace cerb::debug
         flat_map.insert({ 0, 0 });
 
         try {
-            flat_map.emplace(50, 60);
+            flat_map.emplace(0, 0);
             CANT_BE_REACHED;
         } catch (std::out_of_range const &) {
             MUST_BE_REACHED;

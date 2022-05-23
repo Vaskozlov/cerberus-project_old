@@ -6,6 +6,7 @@
 #include <cerberus/exception.hpp>
 #include <cerberus/pair.hpp>
 #include <fmt/format.h>
+#include <vector>
 
 #define EXPECT_TRUE(value) debug::expectTrue(value, CERBLIB_LOCATION)
 #define EXPECT_FALSE(value) debug::expectFalse(value, CERBLIB_LOCATION)
@@ -21,6 +22,18 @@
     EXPECT_TRUE(value)
 
 #define CERBERUS_TEST_FUNC(name) CERBLIB_DECL auto name()->bool
+
+#if CERBLIB_CONSTEXPR_STD_VECTOR
+#    define DEBUG_CONSTEXPR_VECTOR constexpr
+#else
+#    define DEBUG_CONSTEXPR_VECTOR
+#endif
+
+#if CERBLIB_CONSTEXPR_STD_STRING
+#    define DEBUG_CONSTEXPR_STRING constexpr
+#else
+#    define DEBUG_CONSTEXPR_STRING
+#endif
 
 namespace cerb::debug
 {

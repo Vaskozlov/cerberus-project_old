@@ -12,7 +12,7 @@ namespace cerb::debug
         auto pointer = createRandomArrayOfInts<int>(test_array_size);
         auto pointer_wrapper = RawPointerWrapper<int>(pointer.data(), test_array_size);
 
-        EXPECT_TRUE(pointer_wrapper.size() == test_array_size);
+        EXPECT_EQUAL(pointer_wrapper.size(), test_array_size);
 
         EXPECT_TRUE([&]() {
             for (size_t i : Range(test_array_size)) {
