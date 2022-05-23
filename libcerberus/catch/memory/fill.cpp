@@ -4,7 +4,11 @@
 
 namespace cerb::debug
 {
-    template<typename T, size_t N = 512>
+    static constexpr size_t TestLength = 512;
+    static constexpr float TestFloatValue = 45151.41551F;
+    static constexpr double TestDoubleValue = 1451985155195.51851051521;
+
+    template<typename T, size_t N = TestLength>
     CERBLIB_DECL auto testFillOnArray(T const &value) -> bool
     {
         auto same_to_value = [&value](T const &elem) { return safeEqual(elem, value); };
@@ -15,7 +19,7 @@ namespace cerb::debug
         return std::ranges::all_of(data, same_to_value);
     }
 
-    template<typename T, size_t N = 512>
+    template<typename T, size_t N = TestLength>
     CERBLIB_DECL auto testFillOnPointer(T const &value) -> bool
     {
         auto same_to_value = [&value](T const &elem) { return safeEqual(elem, value); };
@@ -26,7 +30,7 @@ namespace cerb::debug
         return std::ranges::all_of(data, same_to_value);
     }
 
-    CERBLIB_DECL auto testFillOnArrayOfInts() -> bool
+    CERBERUS_TEST_FUNC(testFillOnArrayOfInts)
     {
         EXPECT_TRUE(testFillOnArray<u8>(0xAC));
         EXPECT_TRUE(testFillOnArray<u16>(0xABCD));
@@ -39,15 +43,15 @@ namespace cerb::debug
         return true;
     }
 
-    CERBLIB_DECL auto testFillOnArrayOfFloats() -> bool
+    CERBERUS_TEST_FUNC(testFillOnArrayOfFloats)
     {
-        EXPECT_TRUE(testFillOnArray<float>(45151.41551f));
-        EXPECT_TRUE(testFillOnArray<double>(1451985155195.51851051521));
+        EXPECT_TRUE(testFillOnArray<float>(TestFloatValue));
+        EXPECT_TRUE(testFillOnArray<double>(TestDoubleValue));
         return true;
     }
 
 
-    CERBLIB_DECL auto testFillOnPointerOfInts() -> bool
+    CERBERUS_TEST_FUNC(testFillOnPointerOfInts)
     {
         EXPECT_TRUE(testFillOnPointer<u8>(0xAC));
         EXPECT_TRUE(testFillOnPointer<u16>(0xABCD));
@@ -60,21 +64,21 @@ namespace cerb::debug
         return true;
     }
 
-    CERBLIB_DECL auto testFillOnPointerOfFloats() -> bool
+    CERBERUS_TEST_FUNC(testFillOnPointerOfFloats)
     {
-        EXPECT_TRUE(testFillOnPointer<float>(45151.41551f));
-        EXPECT_TRUE(testFillOnPointer<double>(1451985155195.51851051521));
+        EXPECT_TRUE(testFillOnPointer<float>(TestFloatValue));
+        EXPECT_TRUE(testFillOnPointer<double>(TestDoubleValue));
         return true;
     }
 
-    auto testFillOnArrayOfStrings() -> bool
+    DEBUG_CONSTEXPR_STRING auto testFillOnArrayOfStrings() -> bool
     {
         std::string const long_string = "Hello, world! It's a long string!";
         EXPECT_TRUE(testFillOnArray<std::string>(long_string));
         return true;
     }
 
-    auto testFillOnPointerOfStrings() -> bool
+    DEBUG_CONSTEXPR_STRING auto testFillOnPointerOfStrings() -> bool
     {
         std::string const long_string = "Hello, world! It's a long string!";
         EXPECT_TRUE(testFillOnPointer<std::string>(long_string));
@@ -88,8 +92,13 @@ namespace cerb::debug
         CERBERUS_TEST(testFillOnPointerOfInts());
         CERBERUS_TEST(testFillOnPointerOfFloats());
 
+#if CERBLIB_CONSTEXPR_STD_STRING
+        CERBERUS_TEST(testFillOnArrayOfStrings());
+        CERBERUS_TEST(testFillOnPointerOfStrings());
+#else
         EXPECT_TRUE(testFillOnArrayOfStrings());
         EXPECT_TRUE(testFillOnPointerOfStrings());
+#endif
 
         return 0;
     }

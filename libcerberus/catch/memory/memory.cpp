@@ -4,14 +4,14 @@ namespace cerb::debug
     auto testEqual() -> int;
     auto testCopy() -> int;
     auto testPointerWrapper() -> int;
-    auto testStringOperations() -> int;
+    auto testFind() -> int;
 
     auto memoryTest() -> int
     {
         testFill();
         testCopy();
         testEqual();
-        testStringOperations();
+        testFind();
         testPointerWrapper();
         return 0;
     }

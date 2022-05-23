@@ -7,31 +7,32 @@ namespace cerb::debug
     using namespace text;
 
     static constexpr string_view TestInput = "(Hello, World())!";
-    static constexpr string_view TestInputEmpty = "()";
-
     static constexpr u16string_view TestInputU16 = u"(Hello, World())!";
-    static constexpr u16string_view TestInputEmptyU16 = u"()";
 
-    static constexpr string_view TestErrorInput = "((Hello, World())!";
+    static constexpr string_view EmptyTestInput = "()";
+    static constexpr u16string_view EmptyTestInputU16 = u"()";
 
-    static constexpr u16string_view TestErrorInputU16 = u"((Hello, World())!";
+    static constexpr string_view ErroneousTestInput = "((Hello, World())!";
+    static constexpr u16string_view ErroneousTestInputU16 = u"((Hello, World())!";
 
     auto testBracketFinderOnBasicString() -> bool
     {
-        return findBracket('(', ')', GeneratorForText(TestInput)) == 15 and
-               findBracket('(', ')', GeneratorForText(TestInputEmpty)) == 1;
+        constexpr auto last_bracket = 15;// TestInput.rfind(')') - 1;
+
+        return findBracket('(', ')', GeneratorForText(TestInput)) == last_bracket and
+               findBracket('(', ')', GeneratorForText(EmptyTestInput)) == 1;
     }
 
     auto testBracketFinderOnU16String() -> bool
     {
         return findBracket(u'(', u')', GeneratorForText(TestInputU16)) == 15 and
-               findBracket(u'(', u')', GeneratorForText(TestInputEmptyU16)) == 1;
+               findBracket(u'(', u')', GeneratorForText(EmptyTestInputU16)) == 1;
     }
 
     auto testBracketFinderOnErrorCase() -> bool
     {
         try {
-            CERBLIB_UNUSED(auto) = findBracket('(', ')', GeneratorForText(TestErrorInput));
+            CERBLIB_UNUSED(auto) = findBracket('(', ')', GeneratorForText(ErroneousTestInput));
             CANT_BE_REACHED;
         } catch (BracketFinderError const &) {
             MUST_BE_REACHED;
@@ -43,7 +44,7 @@ namespace cerb::debug
     auto testBracketFinderOnErrorCaseU16() -> bool
     {
         try {
-            CERBLIB_UNUSED(auto) = findBracket(u'(', u')', GeneratorForText(TestErrorInputU16));
+            CERBLIB_UNUSED(auto) = findBracket(u'(', u')', GeneratorForText(ErroneousTestInputU16));
             CANT_BE_REACHED;
         } catch (BracketFinderError const &) {
             MUST_BE_REACHED;

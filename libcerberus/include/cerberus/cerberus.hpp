@@ -46,19 +46,35 @@
 
 #ifndef CERBLIB_AMD64
 #    ifdef __x86_64__
-#        define CERBLIB_AMD64 1
+#        define CERBLIB_AMD64 true
 #    else
-#        define CERBLIB_AMD64 0
+#        define CERBLIB_AMD64 false
 #    endif
 #endif /* CERBLIB_AMD64 */
 
 #ifndef CERBLIB_64BIT
 #    if INTPTR_MAX == INT32_MAX
-#        define CERBLIB_64BIT 0
+#        define CERBLIB_64BIT false
 #    else
-#        define CERBLIB_64BIT 1
+#        define CERBLIB_64BIT true
 #    endif
 #endif /* CERBLIB_64BIT */
+
+#ifndef CERBLIB_CONSTEXPR_STD_VECTOR
+#    if __cpp_lib_constexpr_vector >= 201907L && !defined(__clang__)
+#        define CERBLIB_CONSTEXPR_STD_VECTOR true
+#    else
+#        define CERBLIB_CONSTEXPR_STD_VECTOR false
+#    endif
+#endif /*CERBLIB_CONSTEXPR_STD_VECTOR */
+
+#ifndef CERBLIB_CONSTEXPR_STD_STRING
+#    if __cpp_lib_constexpr_string >= 201907L && (!__clang__ || __clang_major__ >= 15)
+#        define CERBLIB_CONSTEXPR_STD_STRING true
+#    else
+#        define CERBLIB_CONSTEXPR_STD_STRING false
+#    endif
+#endif /* CERBLIB_CONSTEXPR_STD_STRING*/
 
 #ifndef CERBLIB_INLINE
 #    if defined(_MSC_VER)
@@ -231,12 +247,6 @@ namespace cerb
     CERBLIB_DECL auto logicalOr(Ts... args) -> bool
     {
         return (... | args);
-    }
-
-    template<typename T>
-    constexpr auto cmov(bool condition, T const &on_true, T const &on_false) -> T
-    {
-        return condition ? on_true : on_false;
     }
 }// namespace cerb
 

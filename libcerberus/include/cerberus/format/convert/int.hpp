@@ -54,6 +54,7 @@ namespace cerb::fmt
 
             constexpr auto copyBufferToResult() -> void
             {
+                CERBLIB_UNROLL_N(2)
                 for (; buffer_index != digits_in_number; ++buffer_index) {
                     converted_number.push_back(character_buffer[buffer_index]);
                 }

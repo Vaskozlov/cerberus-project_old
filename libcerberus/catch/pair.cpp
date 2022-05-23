@@ -5,16 +5,17 @@
 
 namespace cerb::debug
 {
-    constexpr auto testDefaultPair() -> bool
+    CERBERUS_TEST_FUNC(testDefaultPair)
     {
         auto pair = cerb::makePair(10, 10);
 
-        EXPECT_TRUE(logicalAnd(pair.first == 10, pair.second == 10));
-        EXPECT_TRUE(pair == std::make_pair(10, 10));
+        EXPECT_EQUAL(pair.first, 10);
+        EXPECT_EQUAL(pair.second, 10);
+        EXPECT_EQUAL(pair, std::make_pair(10, 10));
 
         auto const pair_2 = pair;
 
-        EXPECT_TRUE(pair == pair_2);
+        EXPECT_EQUAL(pair, pair_2);
 
         pair.first += 10;
         pair.second -= 5;
@@ -30,12 +31,13 @@ namespace cerb::debug
         return true;
     }
 
-    constexpr auto testFirstValuePair() -> bool
+    CERBERUS_TEST_FUNC(testFirstValuePair)
     {
         auto pair = makePair<PairComparison::BY_FIRST_VALUE>(10, 10);
 
-        EXPECT_TRUE(logicalAnd(pair.first == 10, pair.second == 10));
-        EXPECT_TRUE(pair == std::make_pair(10, 10));
+        EXPECT_EQUAL(pair.first, 10);
+        EXPECT_EQUAL(pair.second, 10);
+        EXPECT_EQUAL(pair, std::make_pair(10, 10));
 
         auto c_pair_2 = pair;
 
@@ -44,8 +46,11 @@ namespace cerb::debug
         pair.first -= 10;
         pair.second += 5;
 
-        EXPECT_FALSE(pair == c_pair_2);
-        EXPECT_TRUE(logicalAnd(pair.first == 0, pair.second == 15));
+        EXPECT_NOT_EQUAL(pair, c_pair_2);
+
+        EXPECT_EQUAL(pair.first, 0);
+        EXPECT_EQUAL(pair.second, 15);
+
         EXPECT_FALSE(pair > c_pair_2);
         EXPECT_TRUE(pair < c_pair_2);
         EXPECT_FALSE(pair >= c_pair_2);
@@ -55,22 +60,26 @@ namespace cerb::debug
         return true;
     }
 
-    constexpr auto testSecondValuePair() -> bool
+    CERBERUS_TEST_FUNC(testSecondValuePair)
     {
         auto pair = makePair<PairComparison::BY_SECOND_VALUE>(10, 10);
 
-        EXPECT_TRUE(logicalAnd(pair.first == 10, pair.second == 10));
-        EXPECT_TRUE(pair == std::make_pair(10, 10));
+        EXPECT_EQUAL(pair.first, 10);
+        EXPECT_EQUAL(pair.second, 10);
+        EXPECT_EQUAL(pair, std::make_pair(10, 10));
 
         auto pair_2 = pair;
 
-        EXPECT_TRUE(pair == pair_2);
+        EXPECT_EQUAL(pair, pair_2);
 
         pair.first += 10;
         pair.second -= 50;
 
-        EXPECT_FALSE(pair == pair_2);
-        EXPECT_TRUE(logicalAnd(pair.first == 20, pair.second == -40));
+        EXPECT_NOT_EQUAL(pair, pair_2);
+
+        EXPECT_EQUAL(pair.first, 20);
+        EXPECT_EQUAL(pair.second, -40);
+
         EXPECT_FALSE(pair > pair_2);
         EXPECT_TRUE(pair < pair_2);
         EXPECT_FALSE(pair >= pair_2);
@@ -80,18 +89,24 @@ namespace cerb::debug
         return true;
     }
 
-    auto testPairOnStringAndVector() -> void
+    DEBUG_CONSTEXPR_VECTOR auto testPairOnStringAndVector() -> bool
     {
         char const *str = "Hello, World! It's a long string!";
         std::initializer_list<int> const data = { 10, 20, 30, 40 };
         Pair<std::string, std::vector<int>> pair = { str, data };
 
-        EXPECT_TRUE(logicalAnd(pair.first == str, pair.second == std::vector<int>(data)));
+        EXPECT_EQUAL(pair.first, str);
+        EXPECT_EQUAL(pair.second, std::vector<int>(data));
 
         auto pair_2 = std::move(pair);
 
-        EXPECT_TRUE(logicalAnd(pair_2.first == str, pair_2.second == std::vector<int>(data)));
-        EXPECT_TRUE(logicalAnd(pair.first.empty(), pair.second.empty()));// NOLINT
+        EXPECT_EQUAL(pair_2.first, str);
+        EXPECT_EQUAL(pair_2.second, std::vector<int>(data));
+
+        EXPECT_TRUE(pair.first.empty()); // NOLINT
+        EXPECT_TRUE(pair.second.empty());// NOLINT
+
+        return true;
     }
 
     auto testPair() -> int
@@ -100,7 +115,11 @@ namespace cerb::debug
         CERBERUS_TEST(testFirstValuePair());
         CERBERUS_TEST(testSecondValuePair());
 
-        testPairOnStringAndVector();
+#if CERBLIB_CONSTEXPR_STD_VECTOR
+        CERBERUS_TEST(testPairOnStringAndVector());
+#else
+        EXPECT_TRUE(testPairOnStringAndVector());
+#endif
 
         return 0;
     }

@@ -18,14 +18,12 @@ namespace cerb::text
         using iterator = GetIteratorType<BasicStringView<CharT>>;
         using tabs_and_spaces_saver_t = gen::TabsAndSpacesSaver<CharT>;
 
-        friend tabs_and_spaces_saver_t;
-
-        CERBLIB_DECL auto currentTextBegin() const -> iterator
+        CERBLIB_DECL auto currentBegin() const -> iterator
         {
             return text.begin() + charOffset();
         }
 
-        CERBLIB_DECL auto currentTextEnd() const -> iterator
+        CERBLIB_DECL auto currentEnd() const -> iterator
         {
             return text.end();
         }
@@ -55,7 +53,7 @@ namespace cerb::text
 
         CERBLIB_DECL auto getRestOfTheText() const -> BasicStringView<CharT>
         {
-            return { currentTextBegin(), currentTextEnd() };
+            return { currentBegin(), currentEnd() };
         }
 
         CERBLIB_DECL auto getCurrentChar(ssize_t offset = 0) const -> CharT
@@ -168,7 +166,7 @@ namespace cerb::text
             size_t line_end = text.find(char_enum::NewLine, offset);
             size_t line_length = line_end - offset;
 
-            current_line = { currentTextBegin(), line_length };
+            current_line = { currentBegin(), line_length };
         }
 
         constexpr auto updateLocationToTheNextChar() -> void
