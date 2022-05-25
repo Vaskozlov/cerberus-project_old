@@ -8,6 +8,9 @@
 // NOLINTNEXTLINE
 namespace std
 {
+    template<typename T, size_t N>
+    struct array;
+
     template<typename Key, typename Compare, typename Alloc>
     struct set;
 
@@ -20,6 +23,14 @@ namespace std
 
 namespace cerb::fmt
 {
+    template<CharacterLiteral CharT, typename T, size_t N>
+    constexpr auto convert(std::array<T, N> const &iterable_obj) -> std::basic_string<CharT>
+    {
+        using namespace private_;
+
+        return convertIterable<CharT, std::array<T, N>>('[', ']', iterable_obj);
+    }
+
     template<CharacterLiteral CharT, typename T, typename Alloc>
     constexpr auto convert(std::vector<T, Alloc> const &iterable_obj) -> std::basic_string<CharT>
     {

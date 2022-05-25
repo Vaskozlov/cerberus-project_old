@@ -3,30 +3,32 @@
 
 namespace cerb::debug
 {
-    constexpr auto testAbsOnInts() -> bool
+    CERBERUS_TEST_FUNC(testAbsOnInts)
     {
-        EXPECT_TRUE(abs(0) == 0);
-        EXPECT_TRUE(abs(10) == 10);
+        EXPECT_EQUAL(abs(0), 0);
+        EXPECT_EQUAL(abs(10), 10);
 
-        EXPECT_TRUE(abs(-10) == 10);
-        EXPECT_TRUE(abs(-10) == 10U);
+        EXPECT_EQUAL(abs(-10), 10);
+        EXPECT_EQUAL(abs(-10), 10U);
 
         return true;
     }
 
-    constexpr auto testAbsOnFloats() -> bool
+    CERBERUS_TEST_FUNC(testAbsOnFloats)
     {
-        EXPECT_TRUE(safeEqual<f32>(abs(0.0f), 0.0f));
-        EXPECT_TRUE(safeEqual<f32>(abs(10.0f), 10.0f));
+        // NOLINTBEGIN
+        EXPECT_EQUAL(abs(0.0F), 0.0F);
+        EXPECT_EQUAL(abs(10.0F), 10.0);
 
-        EXPECT_TRUE(safeEqual<f32>(abs(-0.0f), 0.0f));
-        EXPECT_TRUE(safeEqual<f32>(abs(-10.0f), 10.0f));
+        EXPECT_EQUAL(abs(-0.0F), 0.0F);
+        EXPECT_EQUAL(abs(-10.0F), 10.0);
 
-        EXPECT_TRUE(safeEqual<f32>(abs(0.0f), 0.0f));
-        EXPECT_TRUE(safeEqual<f32>(abs(10.0f), 10.0f));
+        EXPECT_EQUAL(abs(0.0F), 0.0F);
+        EXPECT_EQUAL(abs(10.0F), 10.0);
 
-        EXPECT_TRUE(safeEqual<f64>(abs(-0.0), 0.0));
-        EXPECT_TRUE(safeEqual<f64>(abs(-10.0), 10.0));
+        EXPECT_EQUAL(abs(-0.0), 0.0);
+        EXPECT_EQUAL(abs(-10.0), 10.0);
+        // NOLINTEND
 
         return true;
     }

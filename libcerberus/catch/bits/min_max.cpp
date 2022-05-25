@@ -3,17 +3,19 @@
 
 namespace cerb::debug
 {
-    constexpr auto testMinMaxOnInts() -> bool
+    CERBERUS_TEST_FUNC(testMinMaxOnInts)
     {
-        EXPECT_TRUE(min(10, -41, 0, 14515) == -41);
-        EXPECT_TRUE(max(10, -41, 0, 14515) == 14515);
+        EXPECT_EQUAL(min(10, -41, 0, 14515), -41);
+        EXPECT_EQUAL(max(10, -41, 0, 14515), 14515);
         return true;
     }
 
-    constexpr auto testMinMaxOnFloats() -> bool
+    CERBERUS_TEST_FUNC(testMinMaxOnFloats)
     {
-        EXPECT_TRUE(safeEqual(min(10.1551, -41.51961, 14515.51616, -5151.5161), -5151.5161));
-        EXPECT_TRUE(safeEqual(max(10.1551, -41.51961, 14515.51616, -5151.5161), 14515.51616));
+        // NOLINTBEGIN
+        EXPECT_EQUAL(min(10.1551, -41.51961, 14515.51616, -5151.5161), -5151.5161);
+        EXPECT_EQUAL(max(10.1551, -41.51961, 14515.51616, -5151.5161), 14515.51616);
+        // NOLINTEND
         return true;
     }
 

@@ -29,7 +29,7 @@ namespace cerb::text
           : text(gen), open_bracket(opening_bracket), close_bracket(closing_bracket)
         {}
 
-        constexpr auto findBracketPosition() -> size_t
+        CERBLIB_DECL auto findBracketPosition() -> size_t
         {
             initialize();
             isBeginBracket();

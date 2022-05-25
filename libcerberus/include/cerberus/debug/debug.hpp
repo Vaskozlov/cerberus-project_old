@@ -21,8 +21,6 @@
     static_assert(value);                                                                          \
     EXPECT_TRUE(value)
 
-#define CERBERUS_TEST_FUNC(name) CERBLIB_DECL auto name()->bool
-
 #if CERBLIB_CONSTEXPR_STD_VECTOR
 #    define DEBUG_CONSTEXPR_VECTOR constexpr
 #else
@@ -33,6 +31,34 @@
 #    define DEBUG_CONSTEXPR_STRING constexpr
 #else
 #    define DEBUG_CONSTEXPR_STRING
+#endif
+
+#define CERBERUS_TEST_FUNC(name) CERBLIB_DECL auto name()->bool
+#define CERBERUS_TEST_FUNC_STD_STRING(name) DEBUG_CONSTEXPR_STRING auto name()->bool
+#define CERBERUS_TEST_FUNC_STD_VECTOR(name) DEBUG_CONSTEXPR_VECTOR auto name()->bool
+
+#if CERBLIB_CONSTEXPR_STD_VECTOR && CERBLIB_CONSTEXPR_STD_STRING
+#    define CERBERUS_TEST_FUNC_STD_VECTOR_AND_STRING(name) constexpr auto name()->bool
+#else
+#    define CERBERUS_TEST_FUNC_STD_VECTOR_AND_STRING(name) auto name()->bool
+#endif
+
+#if CERBLIB_CONSTEXPR_STD_STRING
+#    define CERBERUS_TEST_STD_STRING(value) CERBERUS_TEST(value)
+#else
+#    define CERBERUS_TEST_STD_STRING(value) EXPECT_TRUE(value)
+#endif
+
+#if CERBLIB_CONSTEXPR_STD_VECTOR
+#    define CERBERUS_TEST_STD_VECTOR(value) CERBERUS_TEST(value)
+#else
+#    define CERBERUS_TEST_STD_VECTOR(value) EXPECT_TRUE(value)
+#endif
+
+#if CERBLIB_CONSTEXPR_STD_VECTOR && CERBLIB_CONSTEXPR_STD_STRING
+#    define CERBERUS_TEST_STD_VECTOR_AND_STRING(value) CERBERUS_TEST(value)
+#else
+#    define CERBERUS_TEST_STD_VECTOR_AND_STRING(value) EXPECT_TRUE(value)
 #endif
 
 namespace cerb::debug
@@ -100,7 +126,7 @@ namespace cerb::debug
     template<typename T1, typename T2>
     constexpr auto expectEqual(T1 const &lhs, T2 const &rhs, Location const &loc) -> void
     {
-        if (lhs != static_cast<T1>(rhs)) {
+        if (safeNotEqual(lhs, static_cast<T1>(rhs))) {
             if CERBLIB_COMPILE_TIME {
                 throw CompileTimeError("Cerberus test failure, because object are not equal!");
             }
@@ -112,7 +138,7 @@ namespace cerb::debug
     template<typename T1, typename T2>
     constexpr auto expectNotEqual(T1 const &lhs, T2 const &rhs, Location const &loc) -> void
     {
-        if (lhs == static_cast<T1>(rhs)) {
+        if (safeEqual(lhs, static_cast<T1>(rhs))) {
             if CERBLIB_COMPILE_TIME {
                 throw CompileTimeError("Cerberus test failure, because object are not equal!");
             }

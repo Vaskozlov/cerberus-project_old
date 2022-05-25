@@ -4,7 +4,7 @@
 
 namespace cerb::debug
 {
-    CERBLIB_DECL auto testEqualOnArrayOfInts() -> bool
+    CERBERUS_TEST_FUNC(testEqualOnArrayOfInts)
     {
         std::array first_array = { 10, 20, 30, 40, 50 };
         std::array second_array = { 10, 20, 30, 40, 51 };
@@ -15,13 +15,11 @@ namespace cerb::debug
         return true;
     }
 
-    CERBLIB_DECL auto testEqualOnString() -> bool
+    CERBERUS_TEST_FUNC(testEqualOnString)
     {
-        using namespace std::string_view_literals;
-
-        auto first_string = "Hello, World?"sv;
-        auto second_string = "Hello, World!"sv;
-        auto copy_of_first_string = "Hello, World?"sv;
+        std::string_view first_string = "Hello, World?";
+        std::string_view second_string = "Hello, World!";
+        std::string_view copy_of_first_string = "Hello, World?";
 
         EXPECT_FALSE(equal(first_string, second_string));
         EXPECT_TRUE(equal(first_string, copy_of_first_string));

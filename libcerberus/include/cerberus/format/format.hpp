@@ -38,6 +38,12 @@ namespace cerb::fmt
             }
 
         private:
+            template<std::integral T>
+            CERBLIB_DECL static auto cast(T value) -> CharT
+            {
+                return static_cast<CharT>(value);
+            }
+
             constexpr auto formatString() -> void
             {
                 while (canContinueFormatting()) {
@@ -156,12 +162,6 @@ namespace cerb::fmt
             CERBLIB_DECL auto canAccessChar(size_t offset = 0) const -> bool
             {
                 return logicalAnd(initialized, current_char_index + offset < formatter.size());
-            }
-
-            template<std::integral T>
-            static constexpr auto cast(T value) -> CharT
-            {
-                return static_cast<CharT>(value);
             }
 
             constexpr auto checkForOpenFmt() const -> void

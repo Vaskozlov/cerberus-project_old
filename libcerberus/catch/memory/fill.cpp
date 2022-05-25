@@ -71,14 +71,14 @@ namespace cerb::debug
         return true;
     }
 
-    DEBUG_CONSTEXPR_STRING auto testFillOnArrayOfStrings() -> bool
+    CERBERUS_TEST_FUNC_STD_STRING(testFillOnArrayOfStrings)
     {
         std::string const long_string = "Hello, world! It's a long string!";
         EXPECT_TRUE(testFillOnArray<std::string>(long_string));
         return true;
     }
 
-    DEBUG_CONSTEXPR_STRING auto testFillOnPointerOfStrings() -> bool
+    CERBERUS_TEST_FUNC_STD_STRING(testFillOnPointerOfStrings)
     {
         std::string const long_string = "Hello, world! It's a long string!";
         EXPECT_TRUE(testFillOnPointer<std::string>(long_string));
@@ -92,13 +92,8 @@ namespace cerb::debug
         CERBERUS_TEST(testFillOnPointerOfInts());
         CERBERUS_TEST(testFillOnPointerOfFloats());
 
-#if CERBLIB_CONSTEXPR_STD_STRING
-        CERBERUS_TEST(testFillOnArrayOfStrings());
-        CERBERUS_TEST(testFillOnPointerOfStrings());
-#else
-        EXPECT_TRUE(testFillOnArrayOfStrings());
-        EXPECT_TRUE(testFillOnPointerOfStrings());
-#endif
+        CERBERUS_TEST_STD_STRING(testFillOnArrayOfStrings());
+        CERBERUS_TEST_STD_STRING(testFillOnPointerOfStrings());
 
         return 0;
     }

@@ -34,7 +34,7 @@ namespace cerb::debug
 
     auto testStringToCodesOnBasicString() -> bool
     {
-        GeneratorForText<char> text_generator{ TestInput };
+        GeneratorForText text_generator{ TestInput };
         StringToCodes string_to_codes{ '\"', text_generator };
         auto const &processed_string = string_to_codes.parsedString();
 
@@ -43,7 +43,7 @@ namespace cerb::debug
 
     auto testStringToCodesOnUtf16String() -> bool
     {
-        GeneratorForText<char16_t> text_generator{ TestInputU16 };
+        GeneratorForText text_generator{ TestInputU16 };
         StringToCodes string_to_codes{ u'\"', text_generator };
         auto const &processed_string = string_to_codes.parsedString();
 
