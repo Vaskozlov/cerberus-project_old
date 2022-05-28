@@ -61,7 +61,8 @@
 #endif /* CERBLIB_64BIT */
 
 #ifndef CERBLIB_CONSTEXPR_STD_VECTOR_AVAILABLE
-#    if __cpp_lib_constexpr_vector >= 201907L && !defined(__clang__)
+#    if __cpp_lib_constexpr_vector >= 201907L && !defined(__clang__) &&                            \
+        (!defined(__gcc__) || __GNUC__ >= 12)
 #        define CERBLIB_CONSTEXPR_STD_VECTOR_AVAILABLE true
 #    else
 #        define CERBLIB_CONSTEXPR_STD_VECTOR_AVAILABLE false
@@ -69,7 +70,8 @@
 #endif /*CERBLIB_CONSTEXPR_STD_VECTOR_AVAILABLE */
 
 #ifndef CERBLIB_CONSTEXPR_STD_STRING_AVAILABLE
-#    if __cpp_lib_constexpr_string >= 201907L && (!__clang__ || __clang_major__ >= 15)
+#    if __cpp_lib_constexpr_string >= 201907L && (!__clang__ || __clang_major__ >= 15) &&          \
+        (!defined(__gcc__) || __GNUC__ >= 12)
 #        define CERBLIB_CONSTEXPR_STD_STRING_AVAILABLE true
 #    else
 #        define CERBLIB_CONSTEXPR_STD_STRING_AVAILABLE false
