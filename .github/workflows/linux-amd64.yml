@@ -8,26 +8,16 @@ jobs:
       matrix:
         config:
           - name: Linux GCC
-            os: ubuntu-latest
-            cc: gcc
-            cxx: g++
-            version: 11
-            dependencies: ninja-build libfmt-dev gcc-11 g++-11
+            os: [ self-hosted, linux, X64 ]
     name: CMake (${{ matrix.config.name }})
     runs-on: ${{ matrix.config.os }}
     steps:
       - name: Checkout
         uses: actions/checkout@v2
-      - name: Install dependencies (Linux)
-        if: ${{ matrix.config.os == 'ubuntu-latest' }}
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y ${{ matrix.config.dependencies }}
-          sudo update-alternatives --install /usr/bin/gcc gcc /usr/bin/${{ matrix.config.cc }}-${{ matrix.config.version }} 200 --slave /usr/bin/g++ g++ /usr/bin/${{ matrix.config.cxx }}-${{ matrix.config.version }}
       - name: Build
         run: |
           cmake -G Ninja -B build -DCMAKE_BUILD_TYPE=Release -DCERBERUS_STRICT_COMPILATION=ON -DUSE_LIBCPP=OFF
-          cmake --build build -- -j3
+          cmake --build build -- -j1
       - name: Test
         run: |
           cd build

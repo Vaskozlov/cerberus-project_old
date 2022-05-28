@@ -8,9 +8,9 @@ jobs:
       matrix:
         config:
           - name: Linux GCC
-            os: ubuntu-raspberry_pi_4
+            os: [ self-hosted, linux, ARM64 ]
     name: CMake (${{ matrix.config.name }})
-    runs-on: self-hosted
+    runs-on: ${{ matrix.config.os }}
     steps:
       - name: Checkout
         uses: actions/checkout@v2
