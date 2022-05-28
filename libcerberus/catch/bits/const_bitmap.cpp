@@ -68,6 +68,7 @@ namespace cerb::debug
 
     CERBLIB_DECL auto testBitMapFind() -> bool
     {
+        // NOLINTBEGIN
         ConstBitmap<3, 512> bitmap;
 
         bitmap.set<1, 0>(100);
@@ -83,6 +84,7 @@ namespace cerb::debug
 
         ASSERT_TRUE(safeEqual(
             bitmap.find<ValueOfBit::ONE, ValueOfBit::ONE, ValueOfBit::ONE>(), bitmap.npos));
+        // NOLINTEND
 
         return true;
     }
