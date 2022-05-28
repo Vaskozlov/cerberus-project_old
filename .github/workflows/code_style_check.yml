@@ -1,6 +1,10 @@
 name: Code style check
 
-on: [ pull_request ]
+on:
+  pull_request:
+    branches: [ main ]
+    paths: [ '**.c', '**.cpp', '**.h', '**.hpp' ]
+
 jobs:
   check:
     name: Code style check
