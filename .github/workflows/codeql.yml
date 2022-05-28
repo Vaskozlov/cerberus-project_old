@@ -43,7 +43,9 @@ jobs:
       - name: Install dependencies (Linux)
         run: |
           sudo apt-get -y update
-          sudo apt-get -y install libfmt-dev
+          sudo apt-get -y install libfmt-dev gcc-11 g++11
+          sudo update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-11 110
+          sudo update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-11 110
 
       # Initializes the CodeQL tools for scanning.
       - name: Initialize CodeQL
@@ -60,8 +62,11 @@ jobs:
 
       # Autobuild attempts to build any compiled languages  (C/C++, C#, or Java).
       # If this step fails, then you should remove it and run the build manually (see below)
-      - name: Autobuild
-        uses: github/codeql-action/autobuild@v2
+
+      - name: Build
+        run: |
+          cmake -G Ninja -B build -DCMAKE_BUILD_TYPE=Release -DCERBERUS_STRICT_COMPILATION=ON -DUSE_LIBCPP=OFF
+          cmake --build build -- -j4
 
       # ℹ️ Command-line programs to run using the OS shell.
       # 📚 See https://docs.github.com/en/actions/using-workflows/workflow-syntax-for-github-actions#jobsjob_idstepsrun
