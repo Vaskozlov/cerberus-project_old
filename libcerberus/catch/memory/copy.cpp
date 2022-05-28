@@ -23,24 +23,24 @@ namespace cerb::debug
 
     CERBLIB_DECL auto testCopyOnArray() -> bool
     {
-        EXPECT_TRUE(testCopyFromIterableToArray<RandomBytes.size()>(RandomBytes));
-        EXPECT_TRUE(testCopyFromIterableToArray<RandomWords.size()>(RandomWords));
-        EXPECT_TRUE(testCopyFromIterableToArray<RandomDWords.size()>(RandomDWords));
+        ASSERT_TRUE(testCopyFromIterableToArray<RandomBytes.size()>(RandomBytes));
+        ASSERT_TRUE(testCopyFromIterableToArray<RandomWords.size()>(RandomWords));
+        ASSERT_TRUE(testCopyFromIterableToArray<RandomDWords.size()>(RandomDWords));
 
 #if CERBLIB_64BIT
-        EXPECT_TRUE(testCopyFromIterableToArray<RandomQWords.size()>(RandomQWords));
+        ASSERT_TRUE(testCopyFromIterableToArray<RandomQWords.size()>(RandomQWords));
 #endif
         return true;
     }
 
     CERBLIB_DECL auto testCopyOnPointer() -> bool
     {
-        EXPECT_TRUE(testCopyFromIterableToPointer<RandomBytes.size()>(RandomBytes.data()));
-        EXPECT_TRUE(testCopyFromIterableToPointer<RandomWords.size()>(RandomWords.data()));
-        EXPECT_TRUE(testCopyFromIterableToPointer<RandomDWords.size()>(RandomDWords.data()));
+        ASSERT_TRUE(testCopyFromIterableToPointer<RandomBytes.size()>(RandomBytes.data()));
+        ASSERT_TRUE(testCopyFromIterableToPointer<RandomWords.size()>(RandomWords.data()));
+        ASSERT_TRUE(testCopyFromIterableToPointer<RandomDWords.size()>(RandomDWords.data()));
 
 #if CERBLIB_64BIT
-        EXPECT_TRUE(testCopyFromIterableToPointer<RandomQWords.size()>(RandomQWords.data()));
+        ASSERT_TRUE(testCopyFromIterableToPointer<RandomQWords.size()>(RandomQWords.data()));
 #endif
         return true;
     }

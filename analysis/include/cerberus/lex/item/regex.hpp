@@ -10,7 +10,6 @@ namespace cerb::lex::regex
     struct RegexItem : public BasicItem<CharT>
     {
         CERBLIB_BASIC_ITEM_ACCESS(CharT);
-        using bitmap_t = typename RegexParser<CharT>::bitmap_t;
 
         constexpr RegexItem(CERBLIB_BASIC_ITEM_ARGS, text::GeneratorForText<CharT> &regex_rule)
           : CERBLIB_CONSTRUCT_BASIC_ITEM
@@ -24,7 +23,7 @@ namespace cerb::lex::regex
             RegexParser<CharT> regex_parser{ regex_rule, available_chars };
         }
 
-        bitmap_t available_chars{};
+        Bitmap available_chars{};
     };
 
 #ifndef CERBERUS_HEADER_ONLY

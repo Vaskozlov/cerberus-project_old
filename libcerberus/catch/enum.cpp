@@ -9,7 +9,7 @@ namespace cerb::debug
     CERBERUS_TEST_FUNC(testEnumInitialization)
     {
         TestEnum test(TestEnum::VALUE0);
-        EXPECT_EQUAL(test.get(), 0b1);
+        ASSERT_EQUAL(test.get(), 0b1);
 
         return true;
     }
@@ -18,10 +18,10 @@ namespace cerb::debug
     {
         TestEnum test(TestEnum::VALUE0);
 
-        EXPECT_TRUE(test.isSet(TestEnum::VALUE0));
+        ASSERT_TRUE(test.isSet(TestEnum::VALUE0));
 
-        EXPECT_FALSE(test.isSet(TestEnum::VALUE1));
-        EXPECT_FALSE(test.isSet(TestEnum::VALUE2));
+        ASSERT_FALSE(test.isSet(TestEnum::VALUE1));
+        ASSERT_FALSE(test.isSet(TestEnum::VALUE2));
 
         return true;
     }
@@ -31,10 +31,10 @@ namespace cerb::debug
         TestEnum test(TestEnum::VALUE0);
 
         test |= TestEnum::VALUE1;
-        EXPECT_TRUE(test.isSet(TestEnum::VALUE0) && test.isSet(TestEnum::VALUE1));
+        ASSERT_TRUE(test.isSet(TestEnum::VALUE0) && test.isSet(TestEnum::VALUE1));
 
         test = test | TestEnum::VALUE2;
-        EXPECT_TRUE(
+        ASSERT_TRUE(
             test.isSet(TestEnum::VALUE0) && test.isSet(TestEnum::VALUE1) &&
             test.isSet(TestEnum::VALUE2));
 
@@ -46,12 +46,12 @@ namespace cerb::debug
         TestEnum test(TestEnum::VALUE0 | TestEnum::VALUE1 | TestEnum::VALUE2);
 
         test &= TestEnum::VALUE0 | TestEnum::VALUE1;
-        EXPECT_TRUE(test.isSet(TestEnum::VALUE0) && test.isSet(TestEnum::VALUE1));
-        EXPECT_FALSE(test.isSet(TestEnum::VALUE2));
+        ASSERT_TRUE(test.isSet(TestEnum::VALUE0) && test.isSet(TestEnum::VALUE1));
+        ASSERT_FALSE(test.isSet(TestEnum::VALUE2));
 
         test = test & TestEnum::VALUE0;
-        EXPECT_TRUE(test.isSet(TestEnum::VALUE0));
-        EXPECT_FALSE(test.isSet(TestEnum::VALUE2) || test.isSet(TestEnum::VALUE1));
+        ASSERT_TRUE(test.isSet(TestEnum::VALUE0));
+        ASSERT_FALSE(test.isSet(TestEnum::VALUE2) || test.isSet(TestEnum::VALUE1));
 
         return true;
     }
@@ -60,11 +60,11 @@ namespace cerb::debug
     {
         TestEnum test(TestEnum::VALUE0 | TestEnum::VALUE1);
 
-        EXPECT_TRUE(test.isAnyOfSet(TestEnum::VALUE0 | TestEnum::VALUE2));
-        EXPECT_TRUE(test.isAnyOfSet(TestEnum::VALUE0 | TestEnum::VALUE1));
-        EXPECT_TRUE(test.isAnyOfSet(TestEnum::VALUE1 | TestEnum::VALUE2));
+        ASSERT_TRUE(test.isAnyOfSet(TestEnum::VALUE0 | TestEnum::VALUE2));
+        ASSERT_TRUE(test.isAnyOfSet(TestEnum::VALUE0 | TestEnum::VALUE1));
+        ASSERT_TRUE(test.isAnyOfSet(TestEnum::VALUE1 | TestEnum::VALUE2));
 
-        EXPECT_FALSE(test.isAnyOfSet(TestEnum::VALUE2));
+        ASSERT_FALSE(test.isAnyOfSet(TestEnum::VALUE2));
 
         return true;
     }

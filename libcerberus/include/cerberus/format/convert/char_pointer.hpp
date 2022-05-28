@@ -7,7 +7,7 @@
 namespace cerb::fmt
 {
     template<CharacterLiteral CharT, CharacterLiteral T>
-    constexpr auto convert(T const *ptr) -> std::basic_string<CharT>
+    CERBLIB_DECL auto convert(T const *ptr) -> std::basic_string<CharT>
     {
         std::basic_string<CharT> result{};
 

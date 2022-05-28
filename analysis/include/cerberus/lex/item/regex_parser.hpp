@@ -15,12 +15,9 @@ namespace cerb::lex::regex
         CERBLIB_SCAN_API_ACCESS(false, CharT);
         CERBERUS_ANALYSIS_EXCEPTION(RegexParsingError, CharT, BasicLexicalAnalysisException);
 
-        constexpr static size_t number_of_chars = pow2<size_t>(bitsizeof(CharT));
-
         using scan_api_t::cast;
-        using bitmap_t = ConstBitmap<1, number_of_chars>;
 
-        constexpr RegexParser(text::GeneratorForText<CharT> &regex, bitmap_t &bitmap_for_chars)
+        constexpr RegexParser(text::GeneratorForText<CharT> &regex, Bitmap &bitmap_for_chars)
           : scan_api_t(regex), available_chars(bitmap_for_chars)
         {
             scan_api_t::beginScanning(']');
@@ -65,11 +62,7 @@ namespace cerb::lex::regex
         constexpr auto fillRangeOfChars(CharT begin, CharT end) -> void
         {
             checkCharsOrder(begin, end);
-
-            CERBLIB_UNROLL_N(4)
-            for (; begin <= end; ++begin) {
-                setChar(begin);
-            }
+            available_chars.multiSet<1>(asUInt(begin), asUInt(end) + 1);
 
             is_range_of_chars = false;
             previous_char = CharEnum<CharT>::EoF;
@@ -87,7 +80,7 @@ namespace cerb::lex::regex
         constexpr auto setChar(CharT chr) -> void
         {
             is_filled = true;
-            available_chars.template set<1, 0>(asUInt(chr));
+            available_chars.set<1>(asUInt(chr));
         }
 
         CERBLIB_DECL static auto isBeginOfRegex(CharT chr) -> bool
@@ -133,7 +126,7 @@ namespace cerb::lex::regex
             }
         }
 
-        bitmap_t &available_chars;
+        Bitmap &available_chars;
         CharT previous_char{};
         bool is_filled{ false };
         bool is_range_of_chars{ false };

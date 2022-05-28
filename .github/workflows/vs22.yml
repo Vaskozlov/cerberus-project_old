@@ -1,6 +1,10 @@
 name: VS2022
 
-on: [ pull_request ]
+on:
+  pull_request:
+    branches: [ main ]
+    paths: [ '**.c', '**.cpp', '**.h', '**.hpp' ]
+
 jobs:
   build:
     strategy:

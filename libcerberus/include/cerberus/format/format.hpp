@@ -38,10 +38,17 @@ namespace cerb::fmt
             }
 
         private:
+            template<std::integral Int>
+            CERBLIB_DECL static auto cast(Int value) -> CharT
+            {
+                return static_cast<CharT>(value);
+            }
+
             constexpr auto formatString() -> void
             {
                 while (canContinueFormatting()) {
-                    appendChar(getChar());
+                    CharT chr = getChar();
+                    processChar(chr);
                 }
             }
 
@@ -88,7 +95,7 @@ namespace cerb::fmt
             {
                 CharT chr = getFutureChar();
 
-                if (chr == cast('}')) {
+                if (logicalAnd(not fmt_open, chr == cast('}'))) {
                     appendChar(chr);
                     nextChar();
                 } else {
@@ -103,6 +110,13 @@ namespace cerb::fmt
                 if (need_to_print_value) {
                     convertValue(value);
                     formatString(std::forward<Ts>(args)...);
+                }
+            }
+
+            constexpr auto checkThatValueDoesNotNeedToBePrinted() const -> void
+            {
+                if (need_to_print_value) {
+                    throw FmtConverterError("Too many arguments have been past to formatting");
                 }
             }
 
@@ -156,12 +170,6 @@ namespace cerb::fmt
             CERBLIB_DECL auto canAccessChar(size_t offset = 0) const -> bool
             {
                 return logicalAnd(initialized, current_char_index + offset < formatter.size());
-            }
-
-            template<std::integral T>
-            static constexpr auto cast(T value) -> CharT
-            {
-                return static_cast<CharT>(value);
             }
 
             constexpr auto checkForOpenFmt() const -> void

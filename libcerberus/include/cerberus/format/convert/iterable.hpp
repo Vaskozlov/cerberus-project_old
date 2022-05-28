@@ -71,8 +71,8 @@ namespace cerb::fmt
                 }
             }
 
-            template<std::integral U>
-            static constexpr auto cast(U value) -> CharT
+            template<std::integral Int>
+            CERBLIB_DECL static auto cast(Int value) -> CharT
             {
                 return static_cast<CharT>(value);
             }

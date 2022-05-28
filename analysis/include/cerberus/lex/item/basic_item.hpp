@@ -12,7 +12,7 @@
     using basic_item_t::cast;                                                                      \
     using basic_item_t::flags
 
-#define CERBLIB_BASIC_ITEM_ARGS cerb::lex::AnalysisGlobalsParameters<CharT> &analysis_parameters
+#define CERBLIB_BASIC_ITEM_ARGS cerb::lex::AnalysisGlobals<CharT> &analysis_parameters
 #define CERBLIB_CONSTRUCT_BASIC_ITEM basic_item_t(analysis_parameters)
 
 namespace cerb::lex
@@ -22,7 +22,7 @@ namespace cerb::lex
         PREFIX = 0b10'000, REVERSE = 0b100'000, NONTERMINAL = 0b10'000'000);
 
     template<CharacterLiteral CharT>
-    struct AnalysisGlobalsParameters
+    struct AnalysisGlobals
     {
         constexpr auto emplaceNonterminal(std::basic_string<CharT> &&str, size_t id)
             -> decltype(auto)
@@ -36,7 +36,7 @@ namespace cerb::lex
             return nonterminals.emplace(str, id);
         }
 
-        AnalysisGlobalsParameters() = default;
+        AnalysisGlobals() = default;
 
         StringPool<CharT, size_t, true> nonterminals{};
     };
@@ -54,7 +54,7 @@ namespace cerb::lex
         BasicItem(BasicItem const &) = default;
         BasicItem(BasicItem &&) noexcept = default;
 
-        constexpr explicit BasicItem(AnalysisGlobalsParameters<CharT> &analysis_parameters)
+        constexpr explicit BasicItem(AnalysisGlobals<CharT> &analysis_parameters)
           : analysis_globals(analysis_parameters)
         {}
 
@@ -63,14 +63,14 @@ namespace cerb::lex
         auto operator=(BasicItem const &) -> BasicItem & = default;
         auto operator=(BasicItem &&) noexcept -> BasicItem & = default;
 
-        AnalysisGlobalsParameters<CharT> &analysis_globals;
+        AnalysisGlobals<CharT> &analysis_globals;
         ItemFlags flags{ ItemFlags::NONE };
     };
 
 #ifndef CERBERUS_HEADER_ONLY
-    extern template struct AnalysisGlobalsParameters<char>;
-    extern template struct AnalysisGlobalsParameters<char8_t>;
-    extern template struct AnalysisGlobalsParameters<char16_t>;
+    extern template struct AnalysisGlobals<char>;
+    extern template struct AnalysisGlobals<char8_t>;
+    extern template struct AnalysisGlobals<char16_t>;
 
     extern template struct BasicItem<char>;
     extern template struct BasicItem<char8_t>;

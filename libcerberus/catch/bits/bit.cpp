@@ -7,6 +7,7 @@ namespace cerb::debug
     auto testLog2() -> int;
     auto testMinMax() -> int;
     auto testBitmap() -> int;
+    auto testConstBitmap() -> int;
     auto testBitScan() -> int;
     auto testByteMask() -> void;
 
@@ -16,6 +17,8 @@ namespace cerb::debug
         testPow2();
         testLog2();
         testMinMax();
+        testBitmap();
+        testConstBitmap();
         testByteMask();
         testBitScan();
         return 0;

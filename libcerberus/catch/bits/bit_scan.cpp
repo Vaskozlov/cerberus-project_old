@@ -3,17 +3,17 @@
 
 namespace cerb::debug
 {
-    CERBLIB_DECL auto testBitScanForward() -> bool
+    CERBERUS_TEST_FUNC(testBitScanForward)
     {
-        EXPECT_TRUE(bit::scanForward<1>(0b1000U) == 3);
-        EXPECT_TRUE(bit::scanForward<1>(0b1001U) == 0);
+        ASSERT_EQUAL(bit::scanForward<1>(0b1000U), 3);
+        ASSERT_EQUAL(bit::scanForward<1>(0b1001U), 0);
         return true;
     }
 
-    CERBLIB_DECL auto testBitScanReverse() -> bool
+    CERBERUS_TEST_FUNC(testBitScanReverse)
     {
-        EXPECT_TRUE(bit::scanReverse<1>(0b1000U) == 3);
-        EXPECT_TRUE(bit::scanReverse<1>(0b1001U) == 3);
+        ASSERT_EQUAL(bit::scanReverse<1>(0b1000U), 3);
+        ASSERT_EQUAL(bit::scanReverse<1>(0b1001U), 3);
         return true;
     }
 

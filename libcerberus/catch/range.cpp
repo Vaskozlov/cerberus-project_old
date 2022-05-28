@@ -11,10 +11,10 @@ namespace cerb::debug
 
         for (uint i : Range(10U)) {
             control_sum += i;
-            EXPECT_EQUAL(i, expected_values[i]);
+            ASSERT_EQUAL(i, expected_values[i]);
         }
 
-        EXPECT_EQUAL(control_sum, 45);
+        ASSERT_EQUAL(control_sum, 45);
         return true;
     }
 
@@ -25,10 +25,10 @@ namespace cerb::debug
 
         for (uint i : Range(10U, 20U)) {
             control_sum += i;
-            EXPECT_EQUAL(i, expected_values[i - 10U]);
+            ASSERT_EQUAL(i, expected_values[i - 10U]);
         }
 
-        EXPECT_EQUAL(control_sum, 145);
+        ASSERT_EQUAL(control_sum, 145);
         return true;
     }
 
@@ -39,10 +39,10 @@ namespace cerb::debug
 
         for (uint i : Range(10U, 23U, 5U)) {
             control_sum += i;
-            EXPECT_EQUAL(i, expected_values[i - 10U]);
+            ASSERT_EQUAL(i, expected_values[i - 10U]);
         }
 
-        EXPECT_EQUAL(control_sum, 45);
+        ASSERT_EQUAL(control_sum, 45);
         return true;
     }
 
@@ -53,10 +53,10 @@ namespace cerb::debug
 
         for (int i : Range(20, 10, -1)) {
             control_sum += i;
-            EXPECT_EQUAL(i, expected_values[asUInt(i - 11)]);
+            ASSERT_EQUAL(i, expected_values[asUInt(i - 11)]);
         }
 
-        EXPECT_EQUAL(control_sum, 155);
+        ASSERT_EQUAL(control_sum, 155);
         return true;
     }
 
@@ -67,10 +67,10 @@ namespace cerb::debug
 
         for (int i : Range(20, 13, -5)) {
             control_sum += i;
-            EXPECT_EQUAL(i, expected_values[asUInt(i - 11)]);
+            ASSERT_EQUAL(i, expected_values[asUInt(i - 11)]);
         }
 
-        EXPECT_EQUAL(control_sum, 35);
+        ASSERT_EQUAL(control_sum, 35);
         return true;
     }
 

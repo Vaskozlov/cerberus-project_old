@@ -15,17 +15,19 @@ namespace cerb::debug
     static constexpr string_view ErroneousTestInput = "((Hello, World())!";
     static constexpr u16string_view ErroneousTestInputU16 = u"((Hello, World())!";
 
-    auto testBracketFinderOnBasicString() -> bool
+    CERBERUS_TEST_FUNC_WITH_CONSTEXPR_STRING(testBracketFinderOnBasicString)
     {
-        constexpr auto last_bracket = 15;// TestInput.rfind(')') - 1;
+        constexpr auto last_bracket = TestInput.rfind(')');
 
         return findBracket('(', ')', GeneratorForText(TestInput)) == last_bracket and
                findBracket('(', ')', GeneratorForText(EmptyTestInput)) == 1;
     }
 
-    auto testBracketFinderOnU16String() -> bool
+    CERBERUS_TEST_FUNC_WITH_CONSTEXPR_STRING(testBracketFinderOnU16String)
     {
-        return findBracket(u'(', u')', GeneratorForText(TestInputU16)) == 15 and
+        constexpr auto last_bracket = TestInputU16.rfind(u')');
+
+        return findBracket(u'(', u')', GeneratorForText(TestInputU16)) == last_bracket and
                findBracket(u'(', u')', GeneratorForText(EmptyTestInputU16)) == 1;
     }
 
@@ -34,9 +36,7 @@ namespace cerb::debug
         try {
             CERBLIB_UNUSED(auto) = findBracket('(', ')', GeneratorForText(ErroneousTestInput));
             CANT_BE_REACHED;
-        } catch (BracketFinderError const &) {
-            MUST_BE_REACHED;
-        }
+        } catch (BracketFinderError const &) {}
 
         return true;
     }
@@ -46,20 +46,18 @@ namespace cerb::debug
         try {
             CERBLIB_UNUSED(auto) = findBracket(u'(', u')', GeneratorForText(ErroneousTestInputU16));
             CANT_BE_REACHED;
-        } catch (BracketFinderError const &) {
-            MUST_BE_REACHED;
-        }
+        } catch (BracketFinderError const &) {}
 
         return true;
     }
 
     auto testBracketFinder() -> int
     {
-        EXPECT_TRUE(testBracketFinderOnBasicString());
-        EXPECT_TRUE(testBracketFinderOnU16String());
+        CERBERUS_TEST_STD_STRING(testBracketFinderOnBasicString());
+        CERBERUS_TEST_STD_STRING(testBracketFinderOnU16String());
 
-        EXPECT_TRUE(testBracketFinderOnErrorCase());
-        EXPECT_TRUE(testBracketFinderOnErrorCaseU16());
+        ASSERT_TRUE(testBracketFinderOnErrorCase());
+        ASSERT_TRUE(testBracketFinderOnErrorCaseU16());
         return 0;
     }
 }// namespace cerb::debug

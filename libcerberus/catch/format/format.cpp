@@ -1,69 +1,105 @@
 #include <cerberus/debug/debug.hpp>
 #include <cerberus/format/format.hpp>
-#include <fmt/format.h>
-#include <set>
-#include <vector>
 
 namespace cerb::debug
 {
-    using namespace string_view_literals;
+    constexpr static string_view TestCharStringView = "Hello, World!";
+    constexpr static u16string_view TestChar16StringView = u"Hello, World!";
+    constexpr static std::array<int, 4> TestArrayOfInts = { 10, 20, 30, 40 };
 
-    constexpr static string_view TestCharStringView = "Hello, World!"_sv;
-    constexpr static u16string_view TestChar16StringView = u"Hello, World!"_sv;
-    const static std::set<int> TestSetOfInts = { 10, 20, 30, 40 };
-    const static std::vector<int> TestVectorOfInts = { 10, 20, 30, 40 };
-
-    auto testFmtOnBasicChar() -> void
+    CERBERUS_TEST_FUNC_WITH_CONSTEXPR_STRING(testFormattingBasicChar)
     {
-        EXPECT_TRUE(fmt::format<char>("Hello, World!"_sv) == "Hello, World!");
-
-        EXPECT_TRUE(fmt::format<char>("Hello, World! {}!"_sv, 10) == "Hello, World! 10!");
-
-        EXPECT_TRUE(
-            fmt::format<char>("Hello, World! {}!"_sv, TestSetOfInts) ==
-            "Hello, World! {10, 20, 30, 40}!");
-
-        EXPECT_TRUE(
-            fmt::format<char>("Hello, World! {}!"_sv, TestVectorOfInts) ==
-            "Hello, World! [10, 20, 30, 40]!");
-
-        EXPECT_TRUE(
-            fmt::format<char>(
-                "Hello, World! {} {} {} {}"_sv, 10, TestSetOfInts, TestVectorOfInts,
-                TestCharStringView) ==
-            "Hello, World! 10 {10, 20, 30, 40} [10, 20, 30, 40] Hello, World!");
+        ASSERT_EQUAL(fmt::format<char>("Hello, World!"), "Hello, World!");
+        return true;
     }
 
-    auto testFmtOnUtf16Char() -> void
+    CERBERUS_TEST_FUNC_WITH_CONSTEXPR_STRING(testFormattingOnIntBasicChar)
     {
-        EXPECT_TRUE(fmt::format<char16_t>("Hello, World!"_sv) == u"Hello, World!");
+        ASSERT_EQUAL(fmt::format<char>("{}", 10), "10");
+        return true;
+    }
 
-        EXPECT_TRUE(fmt::format<char16_t>("Hello, World! {}!"_sv, 10) == u"Hello, World! 10!");
+    CERBERUS_TEST_FUNC_WITH_CONSTEXPR_STRING(testFormattingOnPairBasicChar)
+    {
+        ASSERT_EQUAL(fmt::format<char>("{}", Pair{ 0, 10 }), "{0, 10}");
+        return true;
+    }
 
-        EXPECT_TRUE(
-            fmt::format<char16_t>("Hello, World! {}!"_sv, TestChar16StringView) ==
-            u"Hello, "
-            "World! Hello, World!!");
+    CERBERUS_TEST_FUNC_WITH_CONSTEXPR_STRING(testFormattingOnArrayBasicChar)
+    {
+        ASSERT_EQUAL(fmt::format<char>("{}", TestArrayOfInts), "[10, 20, 30, 40]");
+        return true;
+    }
 
-        EXPECT_TRUE(
-            fmt::format<char16_t>("Hello, World! {}!"_sv, TestSetOfInts) ==
-            u"Hello, World! {10, 20, 30, 40}!");
+    CERBERUS_TEST_FUNC_WITH_CONSTEXPR_STRING(testFormattingOnStringBasicChar)
+    {
+        ASSERT_EQUAL(fmt::format<char>("{}", TestCharStringView), "Hello, World!");
+        return true;
+    }
 
-        EXPECT_TRUE(
-            fmt::format<char16_t>("Hello, World! {}!"_sv, TestVectorOfInts) ==
-            u"Hello, World! [10, 20, 30, 40]!");
+    CERBERUS_TEST_FUNC_WITH_CONSTEXPR_STRING(testFormattingMultiArgumentsBasicChar)
+    {
+        ASSERT_EQUAL(
+            fmt::format<char>("Hello, World! {} {} {}", 10, TestArrayOfInts, TestCharStringView),
+            "Hello, World! 10 [10, 20, 30, 40] Hello, World!");
+        return true;
+    }
 
-        EXPECT_TRUE(
+    CERBERUS_TEST_FUNC_WITH_CONSTEXPR_STRING(testFormattingUtf16Char)
+    {
+        ASSERT_EQUAL(fmt::format<char16_t>("Hello, World!"), u"Hello, World!");
+        return true;
+    }
+
+    CERBERUS_TEST_FUNC_WITH_CONSTEXPR_STRING(testFormattingOnIntUtf16Char)
+    {
+        ASSERT_EQUAL(fmt::format<char16_t>("{}", 10), u"10");
+        return true;
+    }
+
+    CERBERUS_TEST_FUNC_WITH_CONSTEXPR_STRING(testFormattingOnPairUtf16Char)
+    {
+        ASSERT_EQUAL(fmt::format<char16_t>("{}", Pair{ 0, 10 }), u"{0, 10}");
+        return true;
+    }
+
+    CERBERUS_TEST_FUNC_WITH_CONSTEXPR_STRING(testFormattingOnArrayUtf16Char)
+    {
+        ASSERT_EQUAL(fmt::format<char16_t>("{}", TestArrayOfInts), u"[10, 20, 30, 40]");
+        return true;
+    }
+
+    CERBERUS_TEST_FUNC_WITH_CONSTEXPR_STRING(testFormattingOnStringUtf16Char)
+    {
+        ASSERT_EQUAL(fmt::format<char16_t>("{}", TestCharStringView), u"Hello, World!");
+        return true;
+    }
+
+    CERBERUS_TEST_FUNC_WITH_CONSTEXPR_STRING(testFormattingMultiArgumentsUtf16Char)
+    {
+        ASSERT_EQUAL(
             fmt::format<char16_t>(
-                "Hello, World! {} {} {} {}"_sv, 10, TestSetOfInts, TestVectorOfInts,
-                TestCharStringView) ==
-            u"Hello, World! 10 {10, 20, 30, 40} [10, 20, 30, 40] Hello, World!");
+                "Hello, World! {} {} {}", 10, TestArrayOfInts, TestChar16StringView),
+            u"Hello, World! 10 [10, 20, 30, 40] Hello, World!");
+        return true;
     }
 
     auto testFmt() -> int
     {
-        testFmtOnBasicChar();
-        testFmtOnUtf16Char();
+        CERBERUS_TEST_STD_STRING(testFormattingBasicChar());
+        CERBERUS_TEST_STD_STRING(testFormattingOnIntBasicChar());
+        CERBERUS_TEST_STD_STRING(testFormattingOnPairBasicChar());
+        CERBERUS_TEST_STD_STRING(testFormattingOnArrayBasicChar());
+        CERBERUS_TEST_STD_STRING(testFormattingOnStringBasicChar());
+        CERBERUS_TEST_STD_STRING(testFormattingMultiArgumentsBasicChar());
+
+        CERBERUS_TEST_STD_STRING(testFormattingUtf16Char());
+        CERBERUS_TEST_STD_STRING(testFormattingOnIntUtf16Char());
+        CERBERUS_TEST_STD_STRING(testFormattingOnPairUtf16Char());
+        CERBERUS_TEST_STD_STRING(testFormattingOnArrayUtf16Char());
+        CERBERUS_TEST_STD_STRING(testFormattingOnStringUtf16Char());
+        CERBERUS_TEST_STD_STRING(testFormattingMultiArgumentsUtf16Char());
+
         return 0;
     }
 }// namespace cerb::debug

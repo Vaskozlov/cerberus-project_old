@@ -10,8 +10,8 @@ namespace cerb::text
     template<CharacterLiteral CharT>
     class BracketFinder
     {
-        template<std::integral T>
-        CERBLIB_DECL static auto cast(T value) -> CharT
+        template<std::integral Int>
+        CERBLIB_DECL static auto cast(Int value) -> CharT
         {
             return value;
         }
@@ -29,7 +29,7 @@ namespace cerb::text
           : text(gen), open_bracket(opening_bracket), close_bracket(closing_bracket)
         {}
 
-        constexpr auto findBracketPosition() -> size_t
+        CERBLIB_DECL auto findBracketPosition() -> size_t
         {
             initialize();
             isBeginBracket();

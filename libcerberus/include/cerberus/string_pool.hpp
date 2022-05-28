@@ -1,7 +1,7 @@
 #ifndef CERBERUS_STRING_POOL_HPP
 #define CERBERUS_STRING_POOL_HPP
 
-#include <cerberus/bitmap.hpp>
+#include <cerberus/const_bitmap.hpp>
 #include <cerberus/number.hpp>
 #include <cerberus/string_view.hpp>
 #include <map>
@@ -21,16 +21,18 @@ namespace cerb
 
         using node_type = typename tokens_storage_t::node_type;
         using value_type = typename tokens_storage_t::value_type;
+        using tokens_storage_iterator = typename tokens_storage_t::iterator;
         using string_storage_const_iterator = typename strings_storage_t::const_iterator;
+        using tokens_storage_insert_return_type = typename tokens_storage_t::insert_return_type;
 
-        constexpr auto insert(str_t const &string) -> decltype(auto)
+        constexpr auto insert(str_t const &string) -> std::pair<tokens_storage_iterator, bool>
         {
             addStringToBitmap(string);
             return tokens_by_strings.insert(string);
         }
 
         template<typename... Ts>
-        constexpr auto emplace(Ts &&...args) -> decltype(auto)
+        constexpr auto emplace(Ts &&...args) -> std::pair<tokens_storage_iterator, bool>
         {
             auto inserted_item =
                 tokens_by_strings.template emplace<Ts...>(std::forward<Ts>(args)...);
@@ -38,16 +40,10 @@ namespace cerb
             return inserted_item;
         }
 
-        constexpr auto insert(node_type &&node) -> decltype(auto)
+        constexpr auto insert(node_type &&node) -> tokens_storage_insert_return_type
         {
             addStringToBitmap(node.key());
             return tokens_by_strings.insert(std::move(node));
-        }
-
-        constexpr auto insert(node_type const &node) -> decltype(auto)
-        {
-            addStringToBitmap(node.key());
-            return tokens_by_strings.insert(node);
         }
 
         CERBLIB_DECL auto operator[](str_t const &string) const -> TokenType
