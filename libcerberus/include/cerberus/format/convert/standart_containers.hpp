@@ -19,12 +19,43 @@ namespace std
 
     template<typename T, typename Alloc>
     struct deque;
+
+    template<typename T1, typename T2>
+    struct pair;
 }// namespace std
+
+namespace cerb
+{
+    enum struct PairComparison : u16;
+
+    template<typename T1, typename T2, PairComparison>
+    class Pair;
+}// namespace cerb
 
 namespace cerb::fmt
 {
+    template<typename CharT, typename... Ts>
+    CERBLIB_DECL auto format(BasicStringView<char> const &formatter, Ts &&...args)
+        -> std::basic_string<CharT>;
+
+    template<CharacterLiteral CharT, typename T1, typename T2>
+    CERBLIB_DECL auto convert(std::pair<T1, T2> const &pair) -> std::basic_string<CharT>
+    {
+        using namespace private_;
+
+        return format<CharT>("{{{}, {}}}", pair.first, pair.second);
+    }
+
+    template<CharacterLiteral CharT, typename T1, typename T2, PairComparison Rule>
+    CERBLIB_DECL auto convert(Pair<T1, T2, Rule> const &pair) -> std::basic_string<CharT>
+    {
+        using namespace private_;
+
+        return format<CharT>("{{{}, {}}}", pair.first, pair.second);
+    }
+
     template<CharacterLiteral CharT, typename T, size_t N>
-    constexpr auto convert(std::array<T, N> const &iterable_obj) -> std::basic_string<CharT>
+    CERBLIB_DECL auto convert(std::array<T, N> const &iterable_obj) -> std::basic_string<CharT>
     {
         using namespace private_;
 
@@ -32,7 +63,7 @@ namespace cerb::fmt
     }
 
     template<CharacterLiteral CharT, typename T, typename Alloc>
-    constexpr auto convert(std::vector<T, Alloc> const &iterable_obj) -> std::basic_string<CharT>
+    CERBLIB_DECL auto convert(std::vector<T, Alloc> const &iterable_obj) -> std::basic_string<CharT>
     {
         using namespace private_;
 
@@ -40,7 +71,7 @@ namespace cerb::fmt
     }
 
     template<CharacterLiteral CharT, typename T, typename Alloc>
-    constexpr auto convert(std::deque<T, Alloc> const &iterable_obj) -> std::basic_string<CharT>
+    CERBLIB_DECL auto convert(std::deque<T, Alloc> const &iterable_obj) -> std::basic_string<CharT>
     {
         using namespace private_;
 
@@ -48,7 +79,7 @@ namespace cerb::fmt
     }
 
     template<CharacterLiteral CharT, typename Key, typename Compare, typename Alloc>
-    constexpr auto convert(std::set<Key, Compare, Alloc> const &iterable_obj)
+    CERBLIB_DECL auto convert(std::set<Key, Compare, Alloc> const &iterable_obj)
         -> std::basic_string<CharT>
     {
         using namespace private_;

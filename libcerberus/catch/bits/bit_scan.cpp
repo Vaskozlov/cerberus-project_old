@@ -5,15 +5,15 @@ namespace cerb::debug
 {
     CERBERUS_TEST_FUNC(testBitScanForward)
     {
-        EXPECT_EQUAL(bit::scanForward<1>(0b1000U), 3);
-        EXPECT_EQUAL(bit::scanForward<1>(0b1001U), 0);
+        ASSERT_EQUAL(bit::scanForward<1>(0b1000U), 3);
+        ASSERT_EQUAL(bit::scanForward<1>(0b1001U), 0);
         return true;
     }
 
     CERBERUS_TEST_FUNC(testBitScanReverse)
     {
-        EXPECT_EQUAL(bit::scanReverse<1>(0b1000U), 3);
-        EXPECT_EQUAL(bit::scanReverse<1>(0b1001U), 3);
+        ASSERT_EQUAL(bit::scanReverse<1>(0b1000U), 3);
+        ASSERT_EQUAL(bit::scanReverse<1>(0b1001U), 3);
         return true;
     }
 

@@ -20,8 +20,9 @@ namespace cerb::bit
         auto array_index = index / bitsizeof(ValueType);
         auto bit_index = index % bitsizeof(ValueType);
         auto target_bit = static_cast<ValueType>(1) << bit_index;
+        iterator += array_index;
 
-        return (*(iterator + array_index) & target_bit) == target_bit;
+        return (*iterator & target_bit) == target_bit;
     }
 
     template<std::integral Int>
@@ -38,13 +39,14 @@ namespace cerb::bit
     {
         static_assert(isOneOf(BitValue, 0, 1), "Bit of value can be represented as 0 or 1");
 
-        auto array_index = index / bitsizeof(ValueType);
-        auto bit_index = index % bitsizeof(ValueType);
+        auto array_index = static_cast<ptrdiff_t>(index / bitsizeof(ValueType));
+        size_t bit_index = index % bitsizeof(ValueType);
+        iterator += array_index;
 
         if constexpr (BitValue == 0) {
-            *(iterator + array_index) &= ~(pow2<ValueType>(bit_index));
+            *iterator &= ~(pow2<ValueType>(bit_index));
         } else {
-            *(iterator + array_index) |= pow2<ValueType>(bit_index);
+            *iterator |= pow2<ValueType>(bit_index);
         }
     }
 

@@ -156,6 +156,7 @@ namespace cerb::bit
         if constexpr (BitValue == 0) {
             value = ~value;
         }
+
         if (value == 0) {
             return bitsizeof(size_t);
         }

@@ -12,22 +12,22 @@ namespace cerb::debug
         "    \t\tHello, World! \nIt's a test "
         "\t\t  string."_sv;
 
-    CERBERUS_TEST_FUNC_STD_STRING(testRawGeneratorForText)
+    CERBERUS_TEST_FUNC_WITH_CONSTEXPR_STRING(testRawGeneratorForText)
     {
         GeneratorForText<char> text_generator(TestInput, "None");
 
         for (size_t i : Range(TestInput.size())) {
-            EXPECT_EQUAL(text_generator.getRawChar(), TestInput[i]);
+            ASSERT_EQUAL(text_generator.getRawChar(), TestInput[i]);
         }
 
-        EXPECT_EQUAL(text_generator.getRawChar(), '\0');
-        EXPECT_EQUAL(text_generator.getRawChar(), '\0');
-        EXPECT_EQUAL(text_generator.getCurrentChar(1), '\0');
+        ASSERT_EQUAL(text_generator.getRawChar(), '\0');
+        ASSERT_EQUAL(text_generator.getRawChar(), '\0');
+        ASSERT_EQUAL(text_generator.getCurrentChar(1), '\0');
 
         return true;
     }
 
-    CERBERUS_TEST_FUNC_STD_STRING(testCleanGeneratorForText)
+    CERBERUS_TEST_FUNC_WITH_CONSTEXPR_STRING(testCleanGeneratorForText)
     {
         constexpr string_view expected_text = "Hello,World!It'sateststring.";
         constexpr std::array<std::string_view, expected_text.size()> expected_tabs_and_spaces = {
@@ -63,17 +63,17 @@ namespace cerb::debug
 
         GeneratorForText<char> text_generator{ TestInput, "None" };
 
-        EXPECT_EQUAL(text_generator.getCurrentChar(), '\0');
+        ASSERT_EQUAL(text_generator.getCurrentChar(), '\0');
 
         for (size_t i : Range(expected_text.size())) {
             char chr = text_generator.getCleanChar();
-            EXPECT_EQUAL(chr, expected_text[i]);
-            EXPECT_EQUAL(text_generator.getTabsAndSpaces(), expected_tabs_and_spaces[i]);
+            ASSERT_EQUAL(chr, expected_text[i]);
+            ASSERT_EQUAL(text_generator.getTabsAndSpaces(), expected_tabs_and_spaces[i]);
         }
 
-        EXPECT_EQUAL(text_generator.getCleanChar(), '\0');
-        EXPECT_EQUAL(text_generator.getCleanChar(), '\0');
-        EXPECT_EQUAL(text_generator.getCurrentChar(1), '\0');
+        ASSERT_EQUAL(text_generator.getCleanChar(), '\0');
+        ASSERT_EQUAL(text_generator.getCleanChar(), '\0');
+        ASSERT_EQUAL(text_generator.getCurrentChar(1), '\0');
 
         return true;
     }

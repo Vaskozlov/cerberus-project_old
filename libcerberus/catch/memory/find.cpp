@@ -10,7 +10,7 @@ namespace cerb::debug
     {
         std::string_view str = "hello, world!";
 
-        EXPECT_EQUAL(find(str, '\0'), str.end());
+        ASSERT_EQUAL(find(str, '\0'), str.end());
 
         return true;
     }
@@ -19,8 +19,8 @@ namespace cerb::debug
     {
         std::u16string_view str = u"hello, world!";
 
-        EXPECT_EQUAL(find(str.data(), u'\0', str.size()), (str.data() + str.size()));
-        EXPECT_EQUAL(find(str, u'\0'), str.end());
+        ASSERT_EQUAL(find(str.data(), u'\0', str.size()), (str.data() + str.size()));
+        ASSERT_EQUAL(find(str, u'\0'), str.end());
 
         return true;
     }
@@ -29,21 +29,21 @@ namespace cerb::debug
     {
         std::wstring_view str = L"hello, world!";
 
-        EXPECT_EQUAL(find(str.data(), L'\0', str.size()), str.data() + str.size());
-        EXPECT_EQUAL(find(str, L'\0'), str.end());
+        ASSERT_EQUAL(find(str.data(), L'\0', str.size()), str.data() + str.size());
+        ASSERT_EQUAL(find(str, L'\0'), str.end());
 
         return true;
     }
 
     CERBERUS_TEST_FUNC(testFindOnArrayOfInts)
     {
-        EXPECT_EQUAL(find(TestIntegrals, 123), TestIntegrals.end() - 1);
-        EXPECT_EQUAL(
+        ASSERT_EQUAL(find(TestIntegrals, 123), TestIntegrals.end() - 1);
+        ASSERT_EQUAL(
             find(TestIntegrals.data(), 123, TestIntegrals.size()),
             TestIntegrals.data() + TestIntegrals.size() - 1);
 
-        EXPECT_EQUAL(find(TestIntegrals, 500), TestIntegrals.end());
-        EXPECT_EQUAL(
+        ASSERT_EQUAL(find(TestIntegrals, 500), TestIntegrals.end());
+        ASSERT_EQUAL(
             find(TestIntegrals.data(), 500, TestIntegrals.size()),
             TestIntegrals.data() + TestIntegrals.size());
 
@@ -57,9 +57,9 @@ namespace cerb::debug
             { { -10, 10 }, { -20, 30 }, { 400, 400 }, { 14, 0 }, { 1, 0 }, { 123, 123 } }
         };
 
-        EXPECT_EQUAL(find(pairs, { 123, 123 }), pairs.end() - 1);
-        EXPECT_EQUAL(find(pairs, { -10, 10 }), pairs.begin());
-        EXPECT_EQUAL(find(pairs, { 0, 0 }), pairs.end());
+        ASSERT_EQUAL(find(pairs, { 123, 123 }), pairs.end() - 1);
+        ASSERT_EQUAL(find(pairs, { -10, 10 }), pairs.begin());
+        ASSERT_EQUAL(find(pairs, { 0, 0 }), pairs.end());
         // NOLINTEND
 
         return true;

@@ -10,13 +10,13 @@ namespace cerb::debug
         std::string_view standard_str_view = "Hello, World!";
         cerb::string_view str_view = "Hello, World!";
 
-        EXPECT_TRUE(str_view == standard_str_view);
-        EXPECT_TRUE(str_view >= standard_str_view);
-        EXPECT_TRUE(str_view <= standard_str_view);
+        ASSERT_TRUE(str_view == standard_str_view);
+        ASSERT_TRUE(str_view >= standard_str_view);
+        ASSERT_TRUE(str_view <= standard_str_view);
 
-        EXPECT_FALSE(str_view != standard_str_view);
-        EXPECT_FALSE(str_view > standard_str_view);
-        EXPECT_FALSE(str_view < standard_str_view);
+        ASSERT_FALSE(str_view != standard_str_view);
+        ASSERT_FALSE(str_view > standard_str_view);
+        ASSERT_FALSE(str_view < standard_str_view);
 
         return true;
     }
@@ -26,10 +26,10 @@ namespace cerb::debug
         std::string_view standard_str_view = "Hello, World!";
         cerb::string_view str_view = "Hello, World!";
 
-        EXPECT_TRUE(str_view == standard_str_view);
+        ASSERT_TRUE(str_view == standard_str_view);
 
         for (size_t i = 0; i != str_view.size(); ++i) {
-            EXPECT_EQUAL(str_view.at(i), standard_str_view.at(i));
+            ASSERT_EQUAL(str_view.at(i), standard_str_view.at(i));
         }
 
         return true;
@@ -41,7 +41,7 @@ namespace cerb::debug
         std::string_view standard_str_view = "Hello, World!";
         cerb::string_view str_view = "Hello, World!";
 
-        EXPECT_EQUAL(str_view.strView(), standard_str_view);
+        ASSERT_EQUAL(str_view.strView(), standard_str_view);
 
         return true;
     }
@@ -51,7 +51,7 @@ namespace cerb::debug
         std::string_view standard_str_view = "Hello, World!";
         cerb::string_view str_view = "Hello, World!";
 
-        EXPECT_TRUE(std::ranges::equal(standard_str_view, str_view));
+        ASSERT_TRUE(std::ranges::equal(standard_str_view, str_view));
 
         return true;
     }
@@ -61,8 +61,8 @@ namespace cerb::debug
         std::string_view standard_str_view = "It's a \"Hello, World!\" program";
         cerb::string_view str_view = "It's not a \"Hello, World!\" program";
 
-        EXPECT_TRUE(str_view.back() == standard_str_view.back());
-        EXPECT_TRUE(str_view.front() == standard_str_view.front());
+        ASSERT_TRUE(str_view.back() == standard_str_view.back());
+        ASSERT_TRUE(str_view.front() == standard_str_view.front());
 
         return true;
     }
@@ -72,13 +72,13 @@ namespace cerb::debug
         std::string_view standard_str_view = "It's a \"Hello, World!\" program";
         cerb::string_view str_view = "It's not a \"Hello, World!\" program";
 
-        EXPECT_FALSE(str_view == standard_str_view);
-        EXPECT_FALSE(str_view <= standard_str_view);
-        EXPECT_FALSE(str_view < standard_str_view);
+        ASSERT_FALSE(str_view == standard_str_view);
+        ASSERT_FALSE(str_view <= standard_str_view);
+        ASSERT_FALSE(str_view < standard_str_view);
 
-        EXPECT_TRUE(str_view != standard_str_view);
-        EXPECT_TRUE(str_view >= standard_str_view);
-        EXPECT_TRUE(str_view > standard_str_view);
+        ASSERT_TRUE(str_view != standard_str_view);
+        ASSERT_TRUE(str_view >= standard_str_view);
+        ASSERT_TRUE(str_view > standard_str_view);
 
         return true;
     }
@@ -87,11 +87,11 @@ namespace cerb::debug
     {
         cerb::string_view str = "Hello, World!?";
 
-        EXPECT_TRUE(str.containsAt(0, "Hello"));
-        EXPECT_TRUE(str.containsAt(7, "World!"));
+        ASSERT_TRUE(str.containsAt(0, "Hello"));
+        ASSERT_TRUE(str.containsAt(7, "World!"));
 
-        EXPECT_FALSE(str.containsAt(7, "World!!"));
-        EXPECT_FALSE(str.containsAt(0, "World!"));
+        ASSERT_FALSE(str.containsAt(7, "World!!"));
+        ASSERT_FALSE(str.containsAt(0, "World!"));
 
         return true;
     }
@@ -101,12 +101,12 @@ namespace cerb::debug
         std::string_view standard_str_view = "It's a \"Hello, World!\" program";
         cerb::string_view str_view = "It's a \"Hello, World!\" program";
 
-        EXPECT_EQUAL(str_view.find('I'), standard_str_view.find('I'));
-        EXPECT_EQUAL(str_view.find('m'), standard_str_view.find('m'));
-        EXPECT_EQUAL(str_view.find('\''), standard_str_view.find('\''));
+        ASSERT_EQUAL(str_view.find('I'), standard_str_view.find('I'));
+        ASSERT_EQUAL(str_view.find('m'), standard_str_view.find('m'));
+        ASSERT_EQUAL(str_view.find('\''), standard_str_view.find('\''));
 
-        EXPECT_EQUAL(str_view.find('!'), standard_str_view.find('!'));
-        EXPECT_EQUAL(str_view.find('\0'), standard_str_view.find('\0'));
+        ASSERT_EQUAL(str_view.find('!'), standard_str_view.find('!'));
+        ASSERT_EQUAL(str_view.find('\0'), standard_str_view.find('\0'));
 
         return true;
     }
@@ -116,11 +116,11 @@ namespace cerb::debug
         std::string_view std_str = "Hello, World!?";
         cerb::string_view str = "Hello, World!?";
 
-        EXPECT_EQUAL(str.rfind('?'), std_str.rfind('?'));
-        EXPECT_EQUAL(str.rfind('!'), std_str.rfind('!'));
-        EXPECT_EQUAL(str.rfind('H'), std_str.rfind('H'));
-        EXPECT_EQUAL(str.rfind('\0'), std_str.rfind('\0'));
-        EXPECT_EQUAL(str.rfind('\1'), std_str.rfind('\1'));
+        ASSERT_EQUAL(str.rfind('?'), std_str.rfind('?'));
+        ASSERT_EQUAL(str.rfind('!'), std_str.rfind('!'));
+        ASSERT_EQUAL(str.rfind('H'), std_str.rfind('H'));
+        ASSERT_EQUAL(str.rfind('\0'), std_str.rfind('\0'));
+        ASSERT_EQUAL(str.rfind('\1'), std_str.rfind('\1'));
 
         return true;
     }

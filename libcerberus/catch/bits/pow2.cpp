@@ -5,20 +5,20 @@ namespace cerb::debug
 {
     CERBERUS_TEST_FUNC(testPow2OnInt)
     {
-        EXPECT_EQUAL(pow2<u32>(0U), 1U);
-        EXPECT_EQUAL(pow2<u32>(2U), 4U);
-        EXPECT_EQUAL(pow2<u32>(10U), 1024U);
-        EXPECT_EQUAL(pow2<u64>(54ULL), (1ULL << 54ULL));
+        ASSERT_EQUAL(pow2<u32>(0U), 1U);
+        ASSERT_EQUAL(pow2<u32>(2U), 4U);
+        ASSERT_EQUAL(pow2<u32>(10U), 1024U);
+        ASSERT_EQUAL(pow2<u64>(54ULL), (1ULL << 54ULL));
         return true;
     }
 
     CERBERUS_TEST_FUNC(testPow2OnF32)
     {
         // NOLINTBEGIN
-        EXPECT_EQUAL(pow2<f32>(0U), 1.0F);
-        EXPECT_EQUAL(pow2<f32>(2U), 4.0F);
-        EXPECT_EQUAL(pow2<f32>(10U), 1024.0F);
-        EXPECT_EQUAL(pow2<f32>(54ULL), 18014398509481984ULL);
+        ASSERT_EQUAL(pow2<f32>(0U), 1.0F);
+        ASSERT_EQUAL(pow2<f32>(2U), 4.0F);
+        ASSERT_EQUAL(pow2<f32>(10U), 1024.0F);
+        ASSERT_EQUAL(pow2<f32>(54ULL), 18014398509481984ULL);
         // NOLINTEND
         return true;
     }
@@ -26,10 +26,10 @@ namespace cerb::debug
     CERBERUS_TEST_FUNC(testPow2OnF64)
     {
         // NOLINTBEGIN
-        EXPECT_EQUAL(pow2<f64>(0U), 1.0);
-        EXPECT_EQUAL(pow2<f64>(2U), 4.0);
-        EXPECT_EQUAL(pow2<f64>(10U), 1024.0);
-        EXPECT_EQUAL(pow2<f64>(54ULL), 18014398509481984ULL);
+        ASSERT_EQUAL(pow2<f64>(0U), 1.0);
+        ASSERT_EQUAL(pow2<f64>(2U), 4.0);
+        ASSERT_EQUAL(pow2<f64>(10U), 1024.0);
+        ASSERT_EQUAL(pow2<f64>(54ULL), 18014398509481984ULL);
         // NOLINTEND
         return true;
     }

@@ -8,57 +8,57 @@
 #include <fmt/format.h>
 #include <vector>
 
-#define EXPECT_TRUE(value) debug::expectTrue(value, CERBLIB_LOCATION)
-#define EXPECT_FALSE(value) debug::expectFalse(value, CERBLIB_LOCATION)
+#define ASSERT_TRUE(value) debug::expectTrue(value, CERBLIB_LOCATION)
+#define ASSERT_FALSE(value) debug::expectFalse(value, CERBLIB_LOCATION)
 
-#define EXPECT_EQUAL(lhs, rhs) debug::expectEqual(lhs, rhs, CERBLIB_LOCATION)
-#define EXPECT_NOT_EQUAL(lhs, rhs) debug::expectNotEqual(lhs, rhs, CERBLIB_LOCATION)
+#define ASSERT_EQUAL(lhs, rhs) debug::expectEqual(lhs, rhs, CERBLIB_LOCATION)
+#define ASSERT_NOT_EQUAL(lhs, rhs) debug::expectNotEqual(lhs, rhs, CERBLIB_LOCATION)
 
-#define CANT_BE_REACHED EXPECT_TRUE(false)
-#define MUST_BE_REACHED EXPECT_TRUE(true)
+#define CANT_BE_REACHED ASSERT_TRUE(false)
+#define MUST_BE_REACHED ASSERT_TRUE(true)
 
 #define CERBERUS_TEST(value)                                                                       \
     static_assert(value);                                                                          \
-    EXPECT_TRUE(value)
+    ASSERT_TRUE(value)
 
-#if CERBLIB_CONSTEXPR_STD_VECTOR
-#    define DEBUG_CONSTEXPR_VECTOR constexpr
+#if CERBLIB_CONSTEXPR_STD_VECTOR_AVAILABLE
+#    define CERBLIB_VECTOR_CONSTEXPR constexpr
 #else
-#    define DEBUG_CONSTEXPR_VECTOR
+#    define CERBLIB_VECTOR_CONSTEXPR
 #endif
 
-#if CERBLIB_CONSTEXPR_STD_STRING
-#    define DEBUG_CONSTEXPR_STRING constexpr
+#if CERBLIB_CONSTEXPR_STD_STRING_AVAILABLE
+#    define CERBLIB_STRING_CONSTEXPR constexpr
 #else
-#    define DEBUG_CONSTEXPR_STRING
+#    define CERBLIB_STRING_CONSTEXPR
 #endif
 
 #define CERBERUS_TEST_FUNC(name) CERBLIB_DECL auto name()->bool
-#define CERBERUS_TEST_FUNC_STD_STRING(name) DEBUG_CONSTEXPR_STRING auto name()->bool
-#define CERBERUS_TEST_FUNC_STD_VECTOR(name) DEBUG_CONSTEXPR_VECTOR auto name()->bool
+#define CERBERUS_TEST_FUNC_WITH_CONSTEXPR_STRING(name) CERBLIB_STRING_CONSTEXPR auto name()->bool
+#define CERBERUS_TEST_FUNC_WITH_CONSTEXPR_VECTOR(name) CERBLIB_VECTOR_CONSTEXPR auto name()->bool
 
-#if CERBLIB_CONSTEXPR_STD_VECTOR && CERBLIB_CONSTEXPR_STD_STRING
-#    define CERBERUS_TEST_FUNC_STD_VECTOR_AND_STRING(name) constexpr auto name()->bool
+#if CERBLIB_CONSTEXPR_STD_VECTOR_AVAILABLE && CERBLIB_CONSTEXPR_STD_STRING_AVAILABLE
+#    define CERBERUS_TEST_FUNC_WITH_CONSTEXPR_VECTOR_AND_STRING(name) constexpr auto name()->bool
 #else
-#    define CERBERUS_TEST_FUNC_STD_VECTOR_AND_STRING(name) auto name()->bool
+#    define CERBERUS_TEST_FUNC_WITH_CONSTEXPR_VECTOR_AND_STRING(name) auto name()->bool
 #endif
 
-#if CERBLIB_CONSTEXPR_STD_STRING
+#if CERBLIB_CONSTEXPR_STD_STRING_AVAILABLE
 #    define CERBERUS_TEST_STD_STRING(value) CERBERUS_TEST(value)
 #else
-#    define CERBERUS_TEST_STD_STRING(value) EXPECT_TRUE(value)
+#    define CERBERUS_TEST_STD_STRING(value) ASSERT_TRUE(value)
 #endif
 
-#if CERBLIB_CONSTEXPR_STD_VECTOR
-#    define CERBERUS_TEST_STD_VECTOR(value) CERBERUS_TEST(value)
+#if CERBLIB_CONSTEXPR_STD_VECTOR_AVAILABLE
+#    define CERBERUS_TEST_FOR_CONSTEXPR_VECTOR(value) CERBERUS_TEST(value)
 #else
-#    define CERBERUS_TEST_STD_VECTOR(value) EXPECT_TRUE(value)
+#    define CERBERUS_TEST_FOR_CONSTEXPR_VECTOR(value) ASSERT_TRUE(value)
 #endif
 
-#if CERBLIB_CONSTEXPR_STD_VECTOR && CERBLIB_CONSTEXPR_STD_STRING
-#    define CERBERUS_TEST_STD_VECTOR_AND_STRING(value) CERBERUS_TEST(value)
+#if CERBLIB_CONSTEXPR_STD_VECTOR_AVAILABLE && CERBLIB_CONSTEXPR_STD_STRING_AVAILABLE
+#    define CERBERUS_TEST_FOR_CONSTEXPR_STRING(value) CERBERUS_TEST(value)
 #else
-#    define CERBERUS_TEST_STD_VECTOR_AND_STRING(value) EXPECT_TRUE(value)
+#    define CERBERUS_TEST_FOR_CONSTEXPR_STRING(value) ASSERT_TRUE(value)
 #endif
 
 namespace cerb::debug

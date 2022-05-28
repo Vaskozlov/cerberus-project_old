@@ -29,15 +29,15 @@ namespace cerb::debug
     CERBERUS_TEST_FUNC(testChar2Hex)
     {
         for (u16 i : Range<u16>(10)) {
-            EXPECT_TRUE(HexadecimalCharsToInt<char>[static_cast<char>('0' + i)] == i);
+            ASSERT_TRUE(HexadecimalCharsToInt<char>[static_cast<char>('0' + i)] == i);
         }
 
         for (u16 i : Range<u16>(6)) {
-            EXPECT_TRUE(HexadecimalCharsToInt<char>[static_cast<char>('a' + i)] == (i + 10));
+            ASSERT_TRUE(HexadecimalCharsToInt<char>[static_cast<char>('a' + i)] == (i + 10));
         }
 
         for (u16 i : Range<u16>(6)) {
-            EXPECT_TRUE(HexadecimalCharsToInt<char>[static_cast<char>('A' + i)] == (i + 10));
+            ASSERT_TRUE(HexadecimalCharsToInt<char>[static_cast<char>('A' + i)] == (i + 10));
         }
 
         return true;
@@ -46,15 +46,15 @@ namespace cerb::debug
     CERBERUS_TEST_FUNC(testU16Char2Hex)
     {
         for (u16 i : Range<u16>(10)) {
-            EXPECT_TRUE(HexadecimalCharsToInt<char16_t>[u'0' + i] == i);
+            ASSERT_TRUE(HexadecimalCharsToInt<char16_t>[u'0' + i] == i);
         }
 
         for (u16 i : Range<u16>(6)) {
-            EXPECT_TRUE(HexadecimalCharsToInt<char16_t>[u'a' + i] == (i + 10));
+            ASSERT_TRUE(HexadecimalCharsToInt<char16_t>[u'a' + i] == (i + 10));
         }
 
         for (u16 i : Range<u16>(6)) {
-            EXPECT_TRUE(HexadecimalCharsToInt<char16_t>[u'A' + i] == (i + 10));
+            ASSERT_TRUE(HexadecimalCharsToInt<char16_t>[u'A' + i] == (i + 10));
         }
 
         return true;

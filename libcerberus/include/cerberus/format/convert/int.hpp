@@ -76,8 +76,8 @@ namespace cerb::fmt
                 number = abs(number);
             }
 
-            template<std::integral U>
-            static constexpr auto cast(U value) -> CharT
+            template<std::integral Integral>
+            CERBLIB_DECL static auto cast(Integral value) -> CharT
             {
                 return static_cast<CharT>(value);
             }

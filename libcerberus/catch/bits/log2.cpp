@@ -23,28 +23,28 @@ namespace cerb::debug
 
     CERBLIB_DECL auto testLog2OnInts() -> bool
     {
-        EXPECT_EQUAL(log2(pow2<u32>(3U)), 3);
-        EXPECT_EQUAL(log2(pow2<u32>(0U)), 0);
-        EXPECT_EQUAL(log2(pow2<u64>(31UL)), 31);
-        EXPECT_EQUAL(log2(0U), -1);
+        ASSERT_EQUAL(log2(pow2<u32>(3U)), 3);
+        ASSERT_EQUAL(log2(pow2<u32>(0U)), 0);
+        ASSERT_EQUAL(log2(pow2<u64>(31UL)), 31);
+        ASSERT_EQUAL(log2(0U), -1);
         return true;
     }
 
     CERBLIB_DECL auto testLog2OnF32() -> bool
     {
-        EXPECT_EQUAL(log2(pow2f(3U)), 3);
-        EXPECT_EQUAL(log2(pow2f(0U)), 0);
-        EXPECT_EQUAL(log2(pow2f(10U)), 10);
-        EXPECT_EQUAL(log2(0.0F), -1);
+        ASSERT_EQUAL(log2(pow2f(3U)), 3);
+        ASSERT_EQUAL(log2(pow2f(0U)), 0);
+        ASSERT_EQUAL(log2(pow2f(10U)), 10);
+        ASSERT_EQUAL(log2(0.0F), -1);
         return true;
     }
 
     CERBLIB_DECL auto testLog2OnF64() -> bool
     {
-        EXPECT_EQUAL(log2(pow2d(3U)), 3);
-        EXPECT_EQUAL(log2(pow2d(0U)), 0);
-        EXPECT_EQUAL(log2(pow2d(10U)), 10);
-        EXPECT_EQUAL(log2(0.0), -1);
+        ASSERT_EQUAL(log2(pow2d(3U)), 3);
+        ASSERT_EQUAL(log2(pow2d(0U)), 0);
+        ASSERT_EQUAL(log2(pow2d(10U)), 10);
+        ASSERT_EQUAL(log2(0.0), -1);
         return true;
     }
 

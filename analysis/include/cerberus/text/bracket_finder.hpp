@@ -10,8 +10,8 @@ namespace cerb::text
     template<CharacterLiteral CharT>
     class BracketFinder
     {
-        template<std::integral T>
-        CERBLIB_DECL static auto cast(T value) -> CharT
+        template<std::integral Int>
+        CERBLIB_DECL static auto cast(Int value) -> CharT
         {
             return value;
         }

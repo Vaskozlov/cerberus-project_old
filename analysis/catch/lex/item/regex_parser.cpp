@@ -11,58 +11,58 @@ namespace cerb::debug
 
     auto testRegexParserOnBasicString() -> bool
     {
-        ConstBitmap<1, pow2<size_t>(bitsizeof(char))> bitmap;
-        GeneratorForText<char> text_generator{ TestInput };
-        RegexParser<char> regex_parser{ text_generator, bitmap };
+        Bitmap bitmap;
+        GeneratorForText text_generator{ TestInput };
+        RegexParser regex_parser{ text_generator, bitmap };
 
         for (u16 chr : Range<u16>('\0', '\t')) {
-            EXPECT_TRUE(bitmap.at<0>(chr) == 0);
+            ASSERT_TRUE(bitmap.at(chr) == 0);
         }
 
-        EXPECT_TRUE(bitmap.at<0>(asUInt('\t')));
+        ASSERT_TRUE(bitmap.at(asUInt('\t')));
 
         for (u16 chr : Range<u16>('\t' + 1, '-')) {
-            EXPECT_TRUE(bitmap.at<0>(chr) == 0);
+            ASSERT_TRUE(bitmap.at(chr) == 0);
         }
 
-        EXPECT_TRUE(bitmap.at<0>(asUInt('-')));
+        ASSERT_TRUE(bitmap.at(asUInt('-')));
 
         for (u16 chr : Range<u16>('-' + 1, '0')) {
-            EXPECT_TRUE(bitmap.at<0>(chr) == 0);
+            ASSERT_TRUE(bitmap.at(chr) == 0);
         }
 
         for (u16 chr : Range<u16>('0', '9' + 1)) {
-            EXPECT_TRUE(bitmap.at<0>(chr));
+            ASSERT_TRUE(bitmap.at(chr));
         }
 
         for (u16 chr : Range<u16>('0', '9' + 1)) {
-            EXPECT_TRUE(bitmap.at<0>(chr));
+            ASSERT_TRUE(bitmap.at(chr));
         }
 
         for (u16 chr : Range<u16>('9' + 1, 'A')) {
-            EXPECT_TRUE(bitmap.at<0>(chr) == 0);
+            ASSERT_TRUE(bitmap.at(chr) == 0);
         }
 
         for (u16 chr : Range<u16>('A', 'Z' + 1)) {
-            EXPECT_TRUE(bitmap.at<0>(chr));
+            ASSERT_TRUE(bitmap.at(chr) == 1);
         }
 
         for (u16 chr : Range<u16>('Z' + 1, '_')) {
-            EXPECT_TRUE(bitmap.at<0>(chr) == 0);
+            ASSERT_TRUE(bitmap.at(chr) == 0);
         }
 
-        EXPECT_TRUE(bitmap.at<0>(asUInt('_')));
+        ASSERT_TRUE(bitmap.at(asUInt('_')));
 
         for (u16 chr : Range<u16>('_' + 1, 'a')) {
-            EXPECT_TRUE(bitmap.at<0>(chr) == 0);
+            ASSERT_TRUE(bitmap.at(chr) == 0);
         }
 
         for (u16 chr : Range<u16>('a', 'z' + 1)) {
-            EXPECT_TRUE(bitmap.at<0>(chr));
+            ASSERT_TRUE(bitmap.at(chr));
         }
 
         for (u16 chr : Range<u16>('z' + 1, 0xFF)) {
-            EXPECT_TRUE(bitmap.at<0>(chr) == 0);
+            ASSERT_TRUE(bitmap.at(chr) == 0);
         }
 
         return true;
@@ -70,7 +70,7 @@ namespace cerb::debug
 
     auto testRegexParser() -> int
     {
-        EXPECT_TRUE(testRegexParserOnBasicString());
+        ASSERT_TRUE(testRegexParserOnBasicString());
         return 0;
     }
 }// namespace cerb::debug

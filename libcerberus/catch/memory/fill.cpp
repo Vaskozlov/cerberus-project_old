@@ -32,12 +32,12 @@ namespace cerb::debug
 
     CERBERUS_TEST_FUNC(testFillOnArrayOfInts)
     {
-        EXPECT_TRUE(testFillOnArray<u8>(0xAC));
-        EXPECT_TRUE(testFillOnArray<u16>(0xABCD));
-        EXPECT_TRUE(testFillOnArray<u32>(0x1234'ABCD));
+        ASSERT_TRUE(testFillOnArray<u8>(0xAC));
+        ASSERT_TRUE(testFillOnArray<u16>(0xABCD));
+        ASSERT_TRUE(testFillOnArray<u32>(0x1234'ABCD));
 
         if constexpr (sizeof(u64) != sizeof(u32)) {
-            EXPECT_TRUE(testFillOnArray<u64>(0x1234'5678'9ABC'DEF0));
+            ASSERT_TRUE(testFillOnArray<u64>(0x1234'5678'9ABC'DEF0));
         }
 
         return true;
@@ -45,20 +45,20 @@ namespace cerb::debug
 
     CERBERUS_TEST_FUNC(testFillOnArrayOfFloats)
     {
-        EXPECT_TRUE(testFillOnArray<float>(TestFloatValue));
-        EXPECT_TRUE(testFillOnArray<double>(TestDoubleValue));
+        ASSERT_TRUE(testFillOnArray<float>(TestFloatValue));
+        ASSERT_TRUE(testFillOnArray<double>(TestDoubleValue));
         return true;
     }
 
 
     CERBERUS_TEST_FUNC(testFillOnPointerOfInts)
     {
-        EXPECT_TRUE(testFillOnPointer<u8>(0xAC));
-        EXPECT_TRUE(testFillOnPointer<u16>(0xABCD));
-        EXPECT_TRUE(testFillOnPointer<u32>(0x1234'ABCD));
+        ASSERT_TRUE(testFillOnPointer<u8>(0xAC));
+        ASSERT_TRUE(testFillOnPointer<u16>(0xABCD));
+        ASSERT_TRUE(testFillOnPointer<u32>(0x1234'ABCD));
 
         if constexpr (sizeof(u64) != sizeof(u32)) {
-            EXPECT_TRUE(testFillOnPointer<u64>(0x1234'5678'9ABC'DEF0));
+            ASSERT_TRUE(testFillOnPointer<u64>(0x1234'5678'9ABC'DEF0));
         }
 
         return true;
@@ -66,22 +66,22 @@ namespace cerb::debug
 
     CERBERUS_TEST_FUNC(testFillOnPointerOfFloats)
     {
-        EXPECT_TRUE(testFillOnPointer<float>(TestFloatValue));
-        EXPECT_TRUE(testFillOnPointer<double>(TestDoubleValue));
+        ASSERT_TRUE(testFillOnPointer<float>(TestFloatValue));
+        ASSERT_TRUE(testFillOnPointer<double>(TestDoubleValue));
         return true;
     }
 
-    CERBERUS_TEST_FUNC_STD_STRING(testFillOnArrayOfStrings)
+    CERBERUS_TEST_FUNC_WITH_CONSTEXPR_STRING(testFillOnArrayOfStrings)
     {
         std::string const long_string = "Hello, world! It's a long string!";
-        EXPECT_TRUE(testFillOnArray<std::string>(long_string));
+        ASSERT_TRUE(testFillOnArray<std::string>(long_string));
         return true;
     }
 
-    CERBERUS_TEST_FUNC_STD_STRING(testFillOnPointerOfStrings)
+    CERBERUS_TEST_FUNC_WITH_CONSTEXPR_STRING(testFillOnPointerOfStrings)
     {
         std::string const long_string = "Hello, world! It's a long string!";
-        EXPECT_TRUE(testFillOnPointer<std::string>(long_string));
+        ASSERT_TRUE(testFillOnPointer<std::string>(long_string));
         return true;
     }
 

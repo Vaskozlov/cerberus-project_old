@@ -9,8 +9,8 @@ namespace cerb::debug
         std::array first_array = { 10, 20, 30, 40, 50 };
         std::array second_array = { 10, 20, 30, 40, 51 };
 
-        EXPECT_TRUE(equal(first_array, first_array));
-        EXPECT_FALSE(equal(first_array, second_array));
+        ASSERT_TRUE(equal(first_array, first_array));
+        ASSERT_FALSE(equal(first_array, second_array));
 
         return true;
     }
@@ -21,8 +21,8 @@ namespace cerb::debug
         std::string_view second_string = "Hello, World!";
         std::string_view copy_of_first_string = "Hello, World?";
 
-        EXPECT_FALSE(equal(first_string, second_string));
-        EXPECT_TRUE(equal(first_string, copy_of_first_string));
+        ASSERT_FALSE(equal(first_string, second_string));
+        ASSERT_TRUE(equal(first_string, copy_of_first_string));
 
         return true;
     }

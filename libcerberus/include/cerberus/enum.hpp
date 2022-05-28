@@ -12,8 +12,8 @@
             __VA_ARGS__                                                                            \
         };                                                                                         \
                                                                                                    \
-        template<std::integral T>                                                                  \
-        CERBLIB_DECL static auto cast(T value2cast) -> LocalEnum                                   \
+        template<std::integral Int>                                                                \
+        CERBLIB_DECL static auto cast(Int value2cast) -> LocalEnum                                 \
         {                                                                                          \
             return static_cast<LocalEnum>(value2cast);                                             \
         }                                                                                          \

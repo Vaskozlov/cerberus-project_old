@@ -9,7 +9,7 @@ namespace cerb::debug
         // NOLINTBEGIN magic numbers
         forEach(
             [&counter](int elem) {
-                EXPECT_EQUAL(elem, counter * 10);
+                ASSERT_EQUAL(elem, counter * 10);
                 ++counter;
             },
             0,
@@ -20,7 +20,7 @@ namespace cerb::debug
             50);
         // NOLINTEND
 
-        EXPECT_EQUAL(counter, 6);
+        ASSERT_EQUAL(counter, 6);
         return true;
     }
 
