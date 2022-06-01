@@ -72,7 +72,8 @@ namespace cerb::analysis
         explicit constexpr AnalysisException(
             BasicStringView<char> const &exception_message,
             text::GeneratorForText<CharT> const &generator)
-          : text_generator(generator), unable_to_show_message(getNonCharErrorMessage()),
+          : text_generator(generator),
+            unable_to_show_message(getNonCharErrorMessage(exception_message)),
             message(getErrorMessage(exception_message))
         {}
 
@@ -86,19 +87,21 @@ namespace cerb::analysis
         }
 
     private:
-        static auto getNonCharErrorMessage() -> std::string
+        auto getNonCharErrorMessage(BasicStringView<char> const &exception_message)
+            -> std::string const &
         {
             using namespace string_view_literals;
 
             if constexpr (not std::is_same_v<char, CharT>) {
                 static const std::string message = fmt::format<char>(
-                    "Unable to show "
-                    "error message, because AnalysisException character type is {}. Use "
-                    "AnalysisException::getMessage() instead"_sv,
-                    typeid(CharT).name());
+                    "{}\n"
+                    "Warning! Character type is {} instead of {}, so error message might have some "
+                    "defects. Please use getMessage() instead.\n"_sv,
+                    getErrorMessage(exception_message), typeid(CharT).name(), typeid(char).name());
                 return message;
             } else {
-                return "";
+                static const std::string message{};
+                return message;
             }
         }
 

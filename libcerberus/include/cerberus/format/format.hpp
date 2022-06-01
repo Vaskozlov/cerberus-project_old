@@ -9,7 +9,7 @@
 
 namespace cerb::fmt
 {
-    CERBERUS_EXCEPTION(FmtConverterError, std::exception);
+    CERBERUS_EXCEPTION(FmtConverterError, cerb::CerberusException);
 
     namespace private_
     {

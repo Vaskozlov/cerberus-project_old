@@ -150,7 +150,7 @@ namespace cerb::text
         {
             setupGenerator();
 
-            if (start() == ScanApiStatus::SKIP_CHAR) {
+            if (onStart() == ScanApiStatus::SKIP_CHAR) {
                 nextChar();
             }
 
@@ -159,12 +159,16 @@ namespace cerb::text
                 nextChar();
             }
 
-            end();
+            onEnd();
         }
 
-        CERBLIB_DECL virtual auto start() -> ScanApiStatus = 0;
+        CERBLIB_DECL virtual auto onStart() -> ScanApiStatus = 0;
+        constexpr virtual auto onEnd() -> void
+        {
+            // empty method
+        }
+
         constexpr virtual auto processChar(CharT) -> void = 0;
-        constexpr virtual auto end() -> void = 0;
 
         auto operator=(ScanApi const &) -> ScanApi & = default;
         auto operator=(ScanApi &&) noexcept -> ScanApi & = default;

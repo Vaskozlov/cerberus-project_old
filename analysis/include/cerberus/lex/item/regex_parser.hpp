@@ -24,7 +24,7 @@ namespace cerb::lex::regex
         }
 
     private:
-        constexpr auto start() -> text::ScanApiStatus override
+        constexpr auto onStart() -> text::ScanApiStatus override
         {
             checkRegexStart();
             return text::ScanApiStatus::SKIP_CHAR;
@@ -42,7 +42,7 @@ namespace cerb::lex::regex
             }
         }
 
-        constexpr auto end() -> void override
+        constexpr auto onEnd() -> void override
         {
             checkRangeClosing();
             checkRangeNonEmpty();
@@ -112,7 +112,7 @@ namespace cerb::lex::regex
         constexpr auto checkRangeNonEmpty() const -> void
         {
             if (not is_filled) {
-                throw RegexParsingError("There are no characters in regex!", getGenerator());
+                throw RegexParsingError("There are not any characters in regex!", getGenerator());
             }
         }
 

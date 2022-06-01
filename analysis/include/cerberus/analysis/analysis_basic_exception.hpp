@@ -5,7 +5,7 @@
 
 namespace cerb::analysis
 {
-    CERBERUS_EXCEPTION(BasicAnalysisException, std::exception);
+    CERBERUS_EXCEPTION(BasicAnalysisException, cerb::CerberusException);
 }
 
 #endif /* CERBERUS_ANALYSIS_BASIC_EXCEPTION_HPP*/

@@ -33,20 +33,20 @@ namespace cerb::debug
 
     auto testBracketFinderOnErrorCase() -> bool
     {
-        try {
-            CERBLIB_UNUSED(auto) = findBracket('(', ')', GeneratorForText(ErroneousTestInput));
-            CANT_BE_REACHED;
-        } catch (BracketFinderError const &) {}
+        ERROR_EXPECTED(
+            CERBLIB_UNUSED(auto) = findBracket('(', ')', GeneratorForText(ErroneousTestInput)),
+            BracketFinderError,
+            "Unexpected EoF!")
 
         return true;
     }
 
     auto testBracketFinderOnErrorCaseU16() -> bool
     {
-        try {
-            CERBLIB_UNUSED(auto) = findBracket(u'(', u')', GeneratorForText(ErroneousTestInputU16));
-            CANT_BE_REACHED;
-        } catch (BracketFinderError const &) {}
+        ERROR_EXPECTED(
+            CERBLIB_UNUSED(auto) = findBracket(u'(', u')', GeneratorForText(ErroneousTestInputU16)),
+            BracketFinderError,
+            "Unexpected EoF!")
 
         return true;
     }

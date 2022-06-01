@@ -11,6 +11,8 @@ namespace cerb::debug
     auto testStringModule() -> int;
 
     auto testFmt() -> int;
+
+    auto testLazyExecutor() -> int;
 }// namespace cerb::debug
 
 auto main() -> int
@@ -28,6 +30,8 @@ auto main() -> int
     testStringModule();
 
     testFmt();
+
+    testLazyExecutor();
 
     return 0;
 }

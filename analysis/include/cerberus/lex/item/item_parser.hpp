@@ -63,7 +63,7 @@ namespace cerb::lex
         }
 
     private:
-        constexpr auto start() -> text::ScanApiStatus override
+        constexpr auto onStart() -> text::ScanApiStatus override
         {
             return text::ScanApiStatus::DO_NOT_SKIP_CHAR;
         }
@@ -109,7 +109,7 @@ namespace cerb::lex
                 setTag(ItemFlags::PREFIX);
                 break;
 
-            case cast('r'):
+            case cast('^'):
                 setTag(ItemFlags::REVERSE);
                 break;
 
@@ -119,7 +119,7 @@ namespace cerb::lex
             }
         }
 
-        constexpr auto end() -> void override
+        constexpr auto onEnd() -> void override
         {
             checkItemNotEmpty();
         }
@@ -200,6 +200,13 @@ namespace cerb::lex
             static_assert(std::is_base_of_v<BasicItem<CharT>, T>);
 
             return std::make_unique<T>(analysis_globals, std::forward<Ts>(args)...);
+        }
+
+        constexpr auto completeLastItem() -> void
+        {
+            if (recent_item != nullptr) {
+                // empty now
+            }
         }
 
         constexpr auto makeNonterminalGlobal(std::basic_string<CharT> &&str) -> void

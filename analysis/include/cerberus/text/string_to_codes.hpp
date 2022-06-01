@@ -27,7 +27,7 @@ namespace cerb::text
         }
 
     private:
-        constexpr auto start() -> text::ScanApiStatus override
+        constexpr auto onStart() -> text::ScanApiStatus override
         {
             checkStringStart();
             return text::ScanApiStatus::SKIP_CHAR;
@@ -42,9 +42,6 @@ namespace cerb::text
                 parsed_string.push_back(chr);
             }
         }
-
-        constexpr auto end() -> void override
-        {}
 
         constexpr auto checkStringStart() const -> void
         {
