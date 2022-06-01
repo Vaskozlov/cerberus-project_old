@@ -48,6 +48,13 @@ namespace cerb
             return storage.empty();
         }
 
+        constexpr auto reverseValues() -> void
+        {
+            for (size_t &chunk : storage) {
+                chunk = ~chunk;
+            }
+        }
+
         Bitmap() = default;
 
     private:

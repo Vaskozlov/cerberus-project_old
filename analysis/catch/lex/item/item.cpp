@@ -85,7 +85,7 @@ namespace cerb::debug
 
         ASSERT_NOT_EQUAL(string_item, nullptr);
 
-        ASSERT_TRUE(string_item->getString() == "for");
+        ASSERT_TRUE(string_item->getString() == "rof");
         ASSERT_TRUE(string_item->flags.isSet(ItemFlags::PLUS));
         ASSERT_TRUE(string_item->flags.isSet(ItemFlags::PREFIX));
         ASSERT_TRUE(string_item->flags.isSet(ItemFlags::REVERSE));

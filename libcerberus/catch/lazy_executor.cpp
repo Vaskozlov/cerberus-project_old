@@ -36,7 +36,6 @@ namespace cerb::debug
             executor.join();
             ASSERT_EQUAL(static_cast<int>(counter), tasks_number);
             ASSERT_TRUE(std::ranges::all_of(value_to_zero, [](int value) { return value == 0; }));
-            return;
         }
 
         auto applyOption(LazyExecutorOptions option) -> void
@@ -72,7 +71,7 @@ namespace cerb::debug
             return counter_value;
         }
 
-        static constexpr int tasks_number = 128;
+        static constexpr int tasks_number = 512;
 
         std::atomic<int> counter{ 0 };
         LazyExecutor<int> executor{ std::thread::hardware_concurrency() };

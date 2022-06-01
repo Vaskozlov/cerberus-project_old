@@ -93,15 +93,15 @@ namespace cerb::analysis
             using namespace string_view_literals;
 
             if constexpr (not std::is_same_v<char, CharT>) {
-                static const std::string message = fmt::format<char>(
+                static const std::string temporary_message = fmt::format<char>(
                     "{}\n"
                     "Warning! Character type is {} instead of {}, so error message might have some "
                     "defects. Please use getMessage() instead.\n"_sv,
                     getErrorMessage(exception_message), typeid(CharT).name(), typeid(char).name());
-                return message;
+                return temporary_message;
             } else {
-                static const std::string message{};
-                return message;
+                static const std::string temporary_message{};
+                return temporary_message;
             }
         }
 

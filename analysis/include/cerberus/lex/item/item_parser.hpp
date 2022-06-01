@@ -1,6 +1,7 @@
 #ifndef CERBERUS_ITEM_PARSER_HPP
 #define CERBERUS_ITEM_PARSER_HPP
 
+#include <cerberus/lex/item/alloc.hpp>
 #include <cerberus/lex/item/regex.hpp>
 #include <cerberus/lex/item/string.hpp>
 #include <cerberus/text/bracket_finder.hpp>
@@ -14,7 +15,6 @@
     using item_parser_t::flags;                                                                    \
     using item_parser_t::item_id;                                                                  \
     using item_parser_t::items;                                                                    \
-    using item_parser_t::recent_item;                                                              \
     using item_parser_t::rule_generator;                                                           \
     using item_parser_t::analysis_globals
 
@@ -78,14 +78,17 @@ namespace cerb::lex
                 break;
 
             case cast('\"'):
+                completeLastItem();
                 addString();
                 break;
 
             case cast('('):
+                completeLastItem();
                 addItemParser();
                 break;
 
             case cast('['):
+                completeLastItem();
                 addRegex();
                 break;
 
@@ -124,22 +127,33 @@ namespace cerb::lex
             checkItemNotEmpty();
         }
 
+        constexpr auto postInitializationSetup() -> void override
+        {
+            if (flags.isSet(ItemFlags::REVERSE)) {
+                throw DotItemParsingError("Unable to apply reverse rule to item.", getGenerator());
+            }
+        }
+
         constexpr auto setTag(ItemFlags new_tag) -> void
         {
             checkItemExistence();
-            recent_item->flags |= new_tag;
+
+            auto &last_item = items.back();
+            last_item->flags |= new_tag;
         }
 
         constexpr auto setRepetitionRule(ItemFlags new_rule) -> void
         {
             checkItemExistence();
             checkRuleOverloading();
-            recent_item->flags |= new_rule;
+
+            auto &last_item = items.back();
+            last_item->flags |= new_rule;
         }
 
         constexpr auto addString() -> void
         {
-            createNewItem<string::StringItem<CharT>>(rule_generator);
+            allocator.newString(rule_generator);
         }
 
         constexpr auto addItemParser() -> void
@@ -149,16 +163,15 @@ namespace cerb::lex
             size_t border = getBorder();
             text::GeneratorForText<CharT> forked_gen =
                 rule_generator.fork(item_begin_length, border);
+            auto *new_item = allocator.newItemParser(id(), forked_gen);
 
-            auto *new_item = createNewItem<ItemParser<CharT>>(id(), forked_gen);
             new_item->checkItemIsNotNonterminal();
-
             skipItemBorder(border);
         }
 
         constexpr auto addRegex() -> void
         {
-            createNewItem<regex::RegexItem<CharT>>(rule_generator);
+            allocator.newRegex(rule_generator);
         }
 
         constexpr auto addNonTerminal() -> void
@@ -182,30 +195,11 @@ namespace cerb::lex
             return findBracket(cast('('), cast(')'), getGenerator());
         }
 
-        template<typename T, typename... Ts>
-        constexpr auto createNewItem(Ts &&...args) -> T *
-        {
-            static_assert(std::is_base_of_v<BasicItem<CharT>, T>);
-
-            item_ptr new_item = allocateNewItem<T>(std::forward<Ts>(args)...);
-            recent_item = new_item.get();
-
-            items.emplace_back(std::move(new_item));
-            return dynamic_cast<T *>(recent_item);
-        }
-
-        template<typename T, typename... Ts>
-        CERBLIB_DECL auto allocateNewItem(Ts &&...args) -> item_ptr
-        {
-            static_assert(std::is_base_of_v<BasicItem<CharT>, T>);
-
-            return std::make_unique<T>(analysis_globals, std::forward<Ts>(args)...);
-        }
-
         constexpr auto completeLastItem() -> void
         {
-            if (recent_item != nullptr) {
-                // empty now
+            if (not items.empty()) {
+                auto &last_item = items.back();
+                last_item->postInitializationSetup();
             }
         }
 
@@ -232,7 +226,7 @@ namespace cerb::lex
 
         constexpr auto checkThatNonTerminalCanBeAdded() const -> void
         {
-            if (recent_item != nullptr) {
+            if (not items.empty()) {
                 throw DotItemParsingError(
                     "Non terminals can't coexist with other rules!", getGenerator());
             }
@@ -240,7 +234,7 @@ namespace cerb::lex
 
         constexpr auto checkItemExistence() const -> void
         {
-            if (recent_item == nullptr) {
+            if (items.empty()) {
                 throw DotItemParsingError(
                     "Unable to apply operation, because current item hasn't"
                     " been created!",
@@ -253,7 +247,10 @@ namespace cerb::lex
             constexpr ItemFlags repetition_rules =
                 ItemFlags::PLUS | ItemFlags::STAR | ItemFlags::QUESTION;
 
-            if (recent_item->flags.isAnyOfSet(repetition_rules)) {
+            auto &last_item = items.back();
+            auto last_item_flags = last_item->flags;
+
+            if (last_item_flags.isAnyOfSet(repetition_rules)) {
                 throw DotItemParsingError("Unable to apply more than one rule!", getGenerator());
             }
         }
@@ -261,7 +258,7 @@ namespace cerb::lex
     protected:
         text::GeneratorForText<CharT> rule_generator{};
         std::vector<item_ptr> items{};
-        BasicItem<CharT> *recent_item{};
+        Allocator<CharT> allocator{ analysis_globals, items };
         size_t item_id{};
     };
 
