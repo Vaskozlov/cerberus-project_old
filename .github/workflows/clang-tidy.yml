@@ -12,7 +12,7 @@ concurrency:
 jobs:
   tidy:
     name: Clang-Tidy
-    runs-on: self-hosted
+    runs-on: [ self-hosted, Ubuntu, linux ]
     if: ${{ github.event_name == 'push' ||  github.event_name == 'pull_request' }}
     steps:
       - uses: actions/checkout@v2
