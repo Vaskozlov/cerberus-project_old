@@ -11,45 +11,33 @@ namespace cerb::debug
     {
         AnalysisGlobals<char> parameters{};
 
-        try {
-            CERBLIB_UNUSED(auto) = DotItem<char>(parameters, 0, "[]");
-            CANT_BE_REACHED;
-        } catch (RegexParser<char>::RegexParsingError const &error) {
-            ASSERT_EQUAL(
-                error.getMessage(),
-                "Analysis error occurred: There are no characters in regex! File: , line: 1, char: "
-                "2\n[]\n ^");
-        }
+        ERROR_EXPECTED(
+            CERBLIB_UNUSED(auto) = DotItem<char>(parameters, 0, "[]"),
+            RegexParsingError<char>,
+            "Analysis error occurred: There are not any characters in regex! File: , line: 1, "
+            "char: 2\n[]\n ^")
     }
 
     auto dotItemErrorCaseEmptyString() -> void
     {
         AnalysisGlobals<char> parameters{};
 
-        try {
-            CERBLIB_UNUSED(auto) = DotItem<char>(parameters, 0, "\"\"");
-            CANT_BE_REACHED;
-        } catch (StringItem<char>::StringItemError const &error) {
-            ASSERT_EQUAL(
-                error.getMessage(),
-                "Analysis error occurred: Empty strings are not allowed! File: , line: 1, char: 2\n"
-                "\"\"\n ^");
-        }
+        ERROR_EXPECTED(
+            CERBLIB_UNUSED(auto) = DotItem<char>(parameters, 0, "\"\""),
+            StringItem<char>::StringItemError,
+            "Analysis error occurred: Empty strings are not allowed! File: , line: 1, char: 2\n"
+            "\"\"\n ^")
     }
 
     auto dotItemErrorCaseEmptyItem() -> void
     {
         AnalysisGlobals<char> parameters{};
 
-        try {
-            CERBLIB_UNUSED(auto) = lex::DotItem<char>(parameters, 0, "()");
-            CANT_BE_REACHED;
-        } catch (ItemParser<char>::DotItemParsingError const &error) {
-            ASSERT_EQUAL(
-                error.getMessage(),
-                "Analysis error occurred: Empty items are not allowed! File: , line: 1, char: 2\n"
-                "()\n ^");
-        }
+        ERROR_EXPECTED(
+            CERBLIB_UNUSED(auto) = lex::DotItem<char>(parameters, 0, "()"),
+            DotItemParsingError<char>,
+            "Analysis error occurred: Empty items are not allowed! File: , line: 1, char: 2\n"
+            "()\n ^")
     }
 
     auto testDotItemCreationOnErrorCases() -> void
@@ -87,7 +75,7 @@ namespace cerb::debug
     auto testDotItemOnStringAndRegex() -> void
     {
         AnalysisGlobals<char> parameters{};
-        DotItem<char> item{ parameters, 2, "\"for\"p+[a-zA-Z_]*" };
+        DotItem<char> item{ parameters, 2, "\"for\"^p+[a-zA-Z_]*" };
         auto const &items = item.getItems();
 
         ASSERT_EQUAL(items.size(), 2);
@@ -97,9 +85,10 @@ namespace cerb::debug
 
         ASSERT_NOT_EQUAL(string_item, nullptr);
 
-        ASSERT_TRUE(string_item->getString() == "for");
+        ASSERT_TRUE(string_item->getString() == "rof");
         ASSERT_TRUE(string_item->flags.isSet(ItemFlags::PLUS));
         ASSERT_TRUE(string_item->flags.isSet(ItemFlags::PREFIX));
+        ASSERT_TRUE(string_item->flags.isSet(ItemFlags::REVERSE));
 
         auto const &back_item = items.back();
         auto const *regex_item = dynamic_cast<RegexItem<char> *>(back_item.get());
@@ -129,6 +118,7 @@ namespace cerb::debug
         auto const *regex_item = dynamic_cast<RegexItem<char> *>(back_item.get());
 
         ASSERT_NOT_EQUAL(regex_item, nullptr);
+
         ASSERT_TRUE(regex_item->flags.isSet(ItemFlags::PLUS));
     }
 

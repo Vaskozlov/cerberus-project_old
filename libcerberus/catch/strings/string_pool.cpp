@@ -24,10 +24,9 @@ namespace cerb::debug
         ASSERT_EQUAL(string_pool["Hello"], 0);
         ASSERT_EQUAL(string_pool["World"], 1);
 
-        try {
-            CERBLIB_UNUSED(auto) = string_pool["Test"];
-            CANT_BE_REACHED;
-        } catch (std::out_of_range const &) {}
+        ERROR_EXPECTED(
+            CERBLIB_UNUSED(auto) = string_pool["Test"], std::out_of_range,
+            "Cerberus string pool does not contains given element!")
 
         return true;
     }

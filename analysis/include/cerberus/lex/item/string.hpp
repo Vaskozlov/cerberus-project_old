@@ -31,6 +31,13 @@ namespace cerb::lex::string
             }
         }
 
+        constexpr auto postInitializationSetup() -> void override
+        {
+            if (flags.isSet(ItemFlags::REVERSE)) {
+                std::ranges::reverse(string);
+            }
+        }
+
         std::basic_string<CharT> string{};
         size_t index{};
     };

@@ -23,6 +23,11 @@ namespace cerb::lex::regex
             RegexParser<CharT> regex_parser{ regex_rule, available_chars };
         }
 
+        constexpr auto postInitializationSetup() -> void override
+        {
+            if (flags.isSet(ItemFlags::REVERSE)) {}
+        }
+
         Bitmap available_chars{};
     };
 

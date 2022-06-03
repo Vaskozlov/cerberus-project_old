@@ -2,6 +2,7 @@
 #define CERBERUS_REGEX_PARSER_HPP
 
 #include <cerberus/bitmap.hpp>
+#include <cerberus/lex/item/errros/regex_parsing_errors.hpp>
 #include <cerberus/lex/lexical_analysis_exception.hpp>
 #include <cerberus/number.hpp>
 #include <cerberus/reference_wrapper.hpp>
@@ -13,9 +14,11 @@ namespace cerb::lex::regex
     struct RegexParser : text::ScanApi<false, CharT>
     {
         CERBLIB_SCAN_API_ACCESS(false, CharT);
-        CERBERUS_ANALYSIS_EXCEPTION(RegexParsingError, CharT, BasicLexicalAnalysisException);
+
+        friend RegexParsingErrors<CharT>;
 
         using scan_api_t::cast;
+        using Error = RegexParsingErrors<CharT>;
 
         constexpr RegexParser(text::GeneratorForText<CharT> &regex, Bitmap &bitmap_for_chars)
           : scan_api_t(regex), available_chars(bitmap_for_chars)
@@ -24,15 +27,15 @@ namespace cerb::lex::regex
         }
 
     private:
-        constexpr auto start() -> text::ScanApiStatus override
+        constexpr auto onStart() -> text::ScanApiStatus override
         {
-            checkRegexStart();
+            Error::checkRegexStart(*this);
             return text::ScanApiStatus::SKIP_CHAR;
         }
 
         constexpr auto processChar(CharT chr) -> void override
         {
-            checkDoubleRegexOpening(chr);
+            Error::checkDoubleRegexOpening(*this, chr);
 
             if (chr == cast('-')) {
                 is_range_of_chars = true;
@@ -42,10 +45,10 @@ namespace cerb::lex::regex
             }
         }
 
-        constexpr auto end() -> void override
+        constexpr auto onEnd() -> void override
         {
-            checkRangeClosing();
-            checkRangeNonEmpty();
+            Error::checkRangeClosing(*this);
+            Error::checkRangeNonEmpty(*this);
         }
 
         constexpr auto addCharToBitmap(CharT chr) -> void
@@ -61,7 +64,7 @@ namespace cerb::lex::regex
 
         constexpr auto fillRangeOfChars(CharT begin, CharT end) -> void
         {
-            checkCharsOrder(begin, end);
+            Error::checkCharsOrder(*this, begin, end);
             available_chars.multiSet<1>(asUInt(begin), asUInt(end) + 1);
 
             is_range_of_chars = false;
@@ -81,49 +84,6 @@ namespace cerb::lex::regex
         {
             is_filled = true;
             available_chars.set<1>(asUInt(chr));
-        }
-
-        CERBLIB_DECL static auto isBeginOfRegex(CharT chr) -> bool
-        {
-            return chr == cast('[');
-        }
-
-        constexpr auto checkCharsOrder(CharT begin, CharT end) const -> void
-        {
-            if (begin > end) {
-                throw RegexParsingError("Chars in regex are in a wrong order!", getGenerator());
-            }
-        }
-
-        constexpr auto checkRegexStart() const -> void
-        {
-            if (not isBeginOfRegex(getChar())) {
-                throw RegexParsingError("Unable to parse a regular expression!", getGenerator());
-            }
-        }
-
-        constexpr auto checkRangeClosing() const -> void
-        {
-            if (is_range_of_chars) {
-                throw RegexParsingError("Range of chars is not closed!", getGenerator());
-            }
-        }
-
-        constexpr auto checkRangeNonEmpty() const -> void
-        {
-            if (not is_filled) {
-                throw RegexParsingError("There are no characters in regex!", getGenerator());
-            }
-        }
-
-        constexpr auto checkDoubleRegexOpening(CharT chr) const -> void
-        {
-            if (chr == cast('[')) {
-                throw RegexParsingError(
-                    "Unable to open regex inside regex. If you want to use "
-                    "'[' as a character type use '\\[' instead.",
-                    getGenerator());
-            }
         }
 
         Bitmap &available_chars;

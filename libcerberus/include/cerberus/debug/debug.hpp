@@ -16,6 +16,14 @@
 
 #define CANT_BE_REACHED ASSERT_TRUE(false)
 #define MUST_BE_REACHED ASSERT_TRUE(true)
+#define ERROR_EXPECTED(x, error_type, error_message)                                               \
+    try {                                                                                          \
+        x;                                                                                         \
+        CANT_BE_REACHED;                                                                           \
+    } catch (error_type const &error) {                                                            \
+        ASSERT_EQUAL(std::basic_string_view(error.what()), error_message);                         \
+    }
+
 
 #define CERBERUS_TEST(value)                                                                       \
     static_assert(value);                                                                          \
@@ -63,8 +71,8 @@
 
 namespace cerb::debug
 {
-    CERBERUS_EXCEPTION(RuntimeError, std::exception);
-    CERBERUS_EXCEPTION(CompileTimeError, std::exception);
+    CERBERUS_EXCEPTION(RuntimeError, cerb::CerberusException);
+    CERBERUS_EXCEPTION(CompileTimeError, cerb::CerberusException);
 
     template<typename T>
     concept Printable = std::is_constructible_v<fmt::formatter<T>>;

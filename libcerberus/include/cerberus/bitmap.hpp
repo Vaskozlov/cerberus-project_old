@@ -48,6 +48,13 @@ namespace cerb
             return storage.empty();
         }
 
+        constexpr auto reverseValues() -> void
+        {
+            for (size_t &chunk : storage) {
+                chunk = ~chunk;
+            }
+        }
+
         Bitmap() = default;
 
     private:
@@ -59,10 +66,10 @@ namespace cerb
 
         constexpr auto checkStorageCapacity(size_t index) -> void
         {
-            constexpr size_t additional_block = 2;
+            constexpr size_t additional_blocks = 2;
 
             if (index >= storage.size() * bitsizeof(size_t)) {
-                storage.resize(index / bitsizeof(size_t) + additional_block, 0);
+                storage.resize(index / bitsizeof(size_t) + additional_blocks, 0);
             }
         }
 

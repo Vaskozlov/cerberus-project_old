@@ -9,7 +9,7 @@
 
 namespace cerb::fmt
 {
-    CERBERUS_EXCEPTION(FmtConverterError, std::exception);
+    CERBERUS_EXCEPTION(FmtConverterError, cerb::CerberusException);
 
     namespace private_
     {
@@ -29,9 +29,7 @@ namespace cerb::fmt
             Converter() = default;
 
             template<typename... Ts>
-            constexpr explicit Converter(
-                BasicStringView<char> const &string_to_format,
-                Ts &&...args)
+            constexpr explicit Converter(string_view const &string_to_format, Ts &&...args)
               : formatter(string_to_format)
             {
                 formatString(std::forward<Ts>(args)...);
@@ -182,7 +180,7 @@ namespace cerb::fmt
             }
 
             std::basic_string<CharT> formatted_string{};
-            BasicStringView<char> formatter{};
+            string_view formatter{};
             size_t current_char_index{};
             bool fmt_open{};
             bool initialized{};
@@ -191,8 +189,7 @@ namespace cerb::fmt
     }// namespace private_
 
     template<typename CharT, typename... Ts>
-    CERBLIB_DECL auto format(BasicStringView<char> const &formatter, Ts &&...args)
-        -> std::basic_string<CharT>
+    CERBLIB_DECL auto format(string_view const &formatter, Ts &&...args) -> std::basic_string<CharT>
     {
         using namespace private_;
 

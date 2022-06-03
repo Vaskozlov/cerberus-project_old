@@ -48,6 +48,10 @@ namespace cerb
 
         CERBLIB_DECL auto operator[](str_t const &string) const -> TokenType
         {
+            if (not tokens_by_strings.contains(string)) {
+                throw std::out_of_range("Cerberus string pool does not contains given element!");
+            }
+
             return tokens_by_strings.at(string);
         }
 

@@ -1,6 +1,7 @@
 #ifndef CERBERUS_BASIC_ITEM_HPP
 #define CERBERUS_BASIC_ITEM_HPP
 
+#include <cerberus/lazy_executor.hpp>
 #include <cerberus/lex/lexical_analysis_exception.hpp>
 #include <cerberus/string_pool.hpp>
 #include <cerberus/text/generator_for_text.hpp>
@@ -39,6 +40,7 @@ namespace cerb::lex
         AnalysisGlobals() = default;
 
         StringPool<CharT, size_t, true> nonterminals{};
+        LazyExecutor<std::any> lazy_executor{ 2 };
     };
 
     template<CharacterLiteral CharT>
@@ -49,6 +51,8 @@ namespace cerb::lex
         {
             return static_cast<CharT>(value);
         }
+
+        virtual constexpr auto postInitializationSetup() -> void = 0;
 
         BasicItem() = default;
         BasicItem(BasicItem const &) = default;
@@ -66,6 +70,10 @@ namespace cerb::lex
         AnalysisGlobals<CharT> &analysis_globals;
         ItemFlags flags{ ItemFlags::NONE };
     };
+
+    // NOLINTNEXTLINE
+    inline LazyExecutor LexicalAnalysisLazyExecutor{ max<uint>(
+        2U, std::thread::hardware_concurrency()) };
 
 #ifndef CERBERUS_HEADER_ONLY
     extern template struct AnalysisGlobals<char>;

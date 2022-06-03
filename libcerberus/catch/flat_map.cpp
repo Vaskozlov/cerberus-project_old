@@ -32,10 +32,7 @@ namespace cerb::debug
         FlatMap<int, int, 1> flat_map{};
         flat_map.insert({ 0, 0 });
 
-        try {
-            flat_map.emplace(0, 0);
-            CANT_BE_REACHED;
-        } catch (std::out_of_range const &) {}
+        ERROR_EXPECTED(flat_map.emplace(0, 0), std::out_of_range, "Cerberus flat map is full!")
     }
 
     auto testFlatMap() -> int
