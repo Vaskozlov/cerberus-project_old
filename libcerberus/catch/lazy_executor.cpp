@@ -80,7 +80,7 @@ namespace cerb::debug
             return counter_value;
         }
 
-        static constexpr int tasks_number = 128;
+        static constexpr int tasks_number = 512;
 
         std::atomic<int> counter{ 0 };
         LazyExecutor<int> executor{ std::thread::hardware_concurrency() };
@@ -89,16 +89,11 @@ namespace cerb::debug
 
     auto testLazyExecutor() -> int
     {
-        constexpr auto number_of_tests = 16;
+        LazyExecutorTester executor_test_default{ LazyExecutorOptions::DEFAULT };
+        LazyExecutorTester executor_test_with_extra_thread{ LazyExecutorOptions::ADD_THREAD };
+        LazyExecutorTester executor_test_with_removed_thread{ LazyExecutorOptions::REMOVE_THREAD };
+        LazyExecutorTester executor_test_with_joined_thread{ LazyExecutorOptions::JOIN };
 
-        for (size_t i = 0; i < number_of_tests; ++i) {
-            LazyExecutorTester executor_test_default{ LazyExecutorOptions::DEFAULT };
-            LazyExecutorTester executor_test_with_extra_thread{ LazyExecutorOptions::ADD_THREAD };
-            LazyExecutorTester executor_test_with_removed_thread{
-                LazyExecutorOptions::REMOVE_THREAD
-            };
-            LazyExecutorTester executor_test_with_joined_thread{ LazyExecutorOptions::JOIN };
-        }
         return 0;
     }
 }// namespace cerb::debug
