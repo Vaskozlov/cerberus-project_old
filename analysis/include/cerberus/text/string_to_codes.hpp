@@ -6,15 +6,18 @@
 
 namespace cerb::text
 {
+    CERBERUS_EXCEPTION(BasicStringToCodesTranslationError, BasicTextAnalysisException);
+
+    template<CharacterLiteral CharT>
+    CERBERUS_ANALYSIS_EXCEPTION(
+        StringToCodesTranslationError, CharT, BasicStringToCodesTranslationError);
+
     template<CharacterLiteral CharT>
     class StringToCodes : private ScanApi<false, CharT>
     {
         CERBLIB_SCAN_API_ACCESS(false, CharT);
 
     public:
-        CERBERUS_ANALYSIS_EXCEPTION(
-            StringToCodesTranslationError, CharT, BasicTextAnalysisException);
-
         constexpr auto parsedString() -> std::basic_string<CharT> &
         {
             return parsed_string;

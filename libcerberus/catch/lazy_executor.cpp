@@ -4,8 +4,9 @@
 
 namespace cerb::debug
 {
-    // NOLINTNEXTLINE
-    CERBERUS_ENUM(LazyExecutorOptions, u16, DEFAULT = 0, REMOVE_THREAD = 1, ADD_THREAD = 2);
+
+    CERBERUS_ENUM(// NOLINTNEXTLINE
+        LazyExecutorOptions, u16, DEFAULT = 0, REMOVE_THREAD = 1, ADD_THREAD = 2, JOIN = 4);
 
     struct LazyExecutorTester
     {
@@ -33,7 +34,7 @@ namespace cerb::debug
 
         auto endJobs() -> void
         {
-            executor.join();
+            executor.stop();
             ASSERT_EQUAL(static_cast<int>(counter), tasks_number);
             ASSERT_TRUE(std::ranges::all_of(value_to_zero, [](int value) { return value == 0; }));
         }
@@ -47,6 +48,10 @@ namespace cerb::debug
 
             case LazyExecutorOptions::REMOVE_THREAD:
                 executor.removeThread();
+                break;
+
+            case LazyExecutorOptions::JOIN:
+                executor.join();
                 break;
 
             default:
@@ -83,6 +88,7 @@ namespace cerb::debug
         LazyExecutorTester executor_test_default{ LazyExecutorOptions::DEFAULT };
         LazyExecutorTester executor_test_with_extra_thread{ LazyExecutorOptions::ADD_THREAD };
         LazyExecutorTester executor_test_with_removed_thread{ LazyExecutorOptions::REMOVE_THREAD };
+        LazyExecutorTester executor_test_with_joined_thread{ LazyExecutorOptions::JOIN };
         return 0;
     }
 }// namespace cerb::debug

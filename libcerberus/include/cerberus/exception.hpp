@@ -35,6 +35,9 @@ namespace cerb
     protected:
         std::string_view message{};
     };
+
+    template<typename T>
+    concept CerberusExceptionType = std::is_base_of_v<CerberusException, T>;
 }// namespace cerb
 
 #endif /* CERBERUS_EXCEPTION_HPP */

@@ -76,25 +76,18 @@ namespace cerb
             }
         }
 
-        auto join() -> void
+        auto stop() -> void
         {
             waitUntilQueueIsEmpty();
-
             std::scoped_lock lock{ queue_lock };
-
             joinAllRunningThreads();
         }
 
-        auto stop() -> void
+        auto join() -> void
         {
-            join();
-            run = false;
-
-            for (auto &thread : threads_storage) {
-                if (thread.joinable()) {
-                    thread.join();
-                }
-            }
+            stop();
+            run = true;
+            restartThreads();
         }
 
         auto operator=(LazyExecutor &&) -> LazyExecutor & = delete;
@@ -128,11 +121,9 @@ namespace cerb
             using namespace std::chrono_literals;
 
             Action action{};
-            std::atomic<size_t> &busy_threads = executor->busy_threads;
 
             if (tryToGrabAction(executor, action)) {
                 executeTask(action);
-                --busy_threads;
             } else {
                 std::this_thread::sleep_for(20ms);
             }
@@ -140,13 +131,10 @@ namespace cerb
 
         static auto tryToGrabAction(LazyExecutor *executor, Action &action) -> bool
         {
-            std::atomic<size_t> &busy_threads = executor->busy_threads;
             std::deque<Action> &queue = executor->actions_queue;
             std::scoped_lock lock{ executor->queue_lock };
 
             if (not queue.empty()) {
-                ++busy_threads;
-
                 action = queue.front();
                 queue.pop_front();
 
@@ -170,12 +158,24 @@ namespace cerb
             }
         }
 
-        auto joinAllRunningThreads() const -> void
+        auto restartThreads() -> void
         {
-            using namespace std::chrono_literals;
+            auto run_flag = threads_run_flag.begin();
 
-            while (busy_threads != 0) {
-                std::this_thread::sleep_for(1ms);
+            for (std::jthread &thread : threads_storage) {
+                thread = std::jthread(threadLoop, this, std::to_address(run_flag));
+                ++run_flag;
+            }
+        }
+
+        auto joinAllRunningThreads() -> void
+        {
+            run = false;
+
+            for (std::jthread &thread : threads_storage) {
+                if (thread.joinable()) {
+                    thread.join();
+                }
             }
         }
 
@@ -188,7 +188,6 @@ namespace cerb
         std::list<std::jthread> threads_storage{};
         std::list<bool> threads_run_flag;
         std::mutex queue_lock{};
-        std::atomic<size_t> busy_threads{};
         bool run{ true };
     };
 }// namespace cerb

@@ -11,7 +11,7 @@
     struct name : public cerb::analysis::AnalysisException<CharT, from>                            \
     {                                                                                              \
         constexpr name(                                                                            \
-            cerb::BasicStringView<char> const &exception_message,                                  \
+            cerb::string_view const &exception_message,                                            \
             cerb::text::GeneratorForText<CharT> const &generator)                                  \
           : cerb::analysis::AnalysisException<CharT, from>(exception_message, generator)           \
         {}                                                                                         \
@@ -19,7 +19,7 @@
 
 namespace cerb::analysis
 {
-    template<CharacterLiteral CharT, ExceptionType ExceptionT = BasicAnalysisException>
+    template<CharacterLiteral CharT, CerberusExceptionType ExceptionT = BasicAnalysisException>
     struct AnalysisException : public ExceptionT
     {
         CERBLIB_DECL auto getOffset() const -> size_t
@@ -70,10 +70,10 @@ namespace cerb::analysis
         AnalysisException() noexcept = default;
 
         explicit constexpr AnalysisException(
-            BasicStringView<char> const &exception_message,
+            string_view const &exception_message,
             text::GeneratorForText<CharT> const &generator)
           : text_generator(generator),
-            unable_to_show_message(getNonCharErrorMessage(exception_message)),
+            basic_char_message(getNonCharErrorMessage(exception_message)),
             message(getErrorMessage(exception_message))
         {}
 
@@ -82,13 +82,12 @@ namespace cerb::analysis
             if constexpr (std::is_same_v<char, CharT>) {
                 return message.c_str();
             } else {
-                return unable_to_show_message.c_str();
+                return basic_char_message.c_str();
             }
         }
 
     private:
-        auto getNonCharErrorMessage(BasicStringView<char> const &exception_message)
-            -> std::string const &
+        auto getNonCharErrorMessage(string_view const &exception_message) -> std::string const &
         {
             using namespace string_view_literals;
 
@@ -105,8 +104,7 @@ namespace cerb::analysis
             }
         }
 
-        auto getErrorMessage(BasicStringView<char> const &exception_message)
-            -> std::basic_string<CharT>
+        auto getErrorMessage(string_view const &exception_message) -> std::basic_string<CharT>
         {
             using namespace string_view_literals;
 
@@ -129,7 +127,7 @@ namespace cerb::analysis
         }
 
         text::GeneratorForText<CharT> const &text_generator;
-        std::string unable_to_show_message{};
+        std::string basic_char_message{};
         std::basic_string<CharT> message{};
     };
 

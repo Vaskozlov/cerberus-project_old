@@ -13,7 +13,7 @@ namespace cerb::debug
 
         ERROR_EXPECTED(
             CERBLIB_UNUSED(auto) = DotItem<char>(parameters, 0, "[]"),
-            RegexParser<char>::RegexParsingError,
+            RegexParsingError<char>,
             "Analysis error occurred: There are not any characters in regex! File: , line: 1, "
             "char: 2\n[]\n ^")
     }
@@ -35,7 +35,7 @@ namespace cerb::debug
 
         ERROR_EXPECTED(
             CERBLIB_UNUSED(auto) = lex::DotItem<char>(parameters, 0, "()"),
-            ItemParser<char>::DotItemParsingError,
+            DotItemParsingError<char>,
             "Analysis error occurred: Empty items are not allowed! File: , line: 1, char: 2\n"
             "()\n ^")
     }
