@@ -140,7 +140,7 @@ namespace cerb::lex
         {
             Error::checkItemExistence(*this);
 
-            auto &last_item = items.back();
+            item_ptr &last_item = items.back();
             last_item->flags |= new_tag;
         }
 
@@ -149,7 +149,7 @@ namespace cerb::lex
             Error::checkItemExistence(*this);
             Error::checkRuleOverloading(*this);
 
-            auto &last_item = items.back();
+            item_ptr &last_item = items.back();
             last_item->flags |= new_rule;
         }
 
@@ -160,16 +160,16 @@ namespace cerb::lex
 
         constexpr auto addItemParser() -> void
         {
-            constexpr size_t item_begin_length = cerb::strlen("(");
+            constexpr size_t begin_item_length = cerb::strlen("(");
 
-            size_t border = getBorder();
+            size_t item_length = getItemLength();
             text::GeneratorForText<CharT> forked_gen =
-                rule_generator.fork(item_begin_length, border);
+                rule_generator.fork(begin_item_length, item_length);
             auto *new_item =
                 Allocator<CharT>::newItemParser(analysis_globals, items, id(), forked_gen);
 
             Error::checkItemIsNotNonterminal(*new_item);
-            skipItemBorder(border);
+            skipItemBorder(item_length);
         }
 
         constexpr auto addRegex() -> void
@@ -193,7 +193,7 @@ namespace cerb::lex
             scan_api_t::skip(border);
         }
 
-        CERBLIB_DECL auto getBorder() const -> size_t
+        CERBLIB_DECL auto getItemLength() const -> size_t
         {
             return findBracket(cast('('), cast(')'), getGenerator());
         }
@@ -201,7 +201,7 @@ namespace cerb::lex
         constexpr auto completeLastItem() -> void
         {
             if (not items.empty()) {
-                auto &last_item = items.back();
+                item_ptr &last_item = items.back();
                 last_item->postInitializationSetup();
             }
         }

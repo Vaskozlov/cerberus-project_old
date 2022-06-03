@@ -71,12 +71,16 @@ namespace cerb::debug
 
         static auto testFunction(LazyExecutorTester *tester) -> int
         {
+            using namespace std::chrono_literals;
+
             int counter_value = tester->counter++;
             tester->value_to_zero[static_cast<uint>(counter_value)] = 0;// NOLINT
+            std::this_thread::sleep_for(1ms);
+
             return counter_value;
         }
 
-        static constexpr int tasks_number = 512;
+        static constexpr int tasks_number = 128;
 
         std::atomic<int> counter{ 0 };
         LazyExecutor<int> executor{ std::thread::hardware_concurrency() };
@@ -85,10 +89,16 @@ namespace cerb::debug
 
     auto testLazyExecutor() -> int
     {
-        LazyExecutorTester executor_test_default{ LazyExecutorOptions::DEFAULT };
-        LazyExecutorTester executor_test_with_extra_thread{ LazyExecutorOptions::ADD_THREAD };
-        LazyExecutorTester executor_test_with_removed_thread{ LazyExecutorOptions::REMOVE_THREAD };
-        LazyExecutorTester executor_test_with_joined_thread{ LazyExecutorOptions::JOIN };
+        constexpr auto number_of_tests = 16;
+
+        for (size_t i = 0; i < number_of_tests; ++i) {
+            LazyExecutorTester executor_test_default{ LazyExecutorOptions::DEFAULT };
+            LazyExecutorTester executor_test_with_extra_thread{ LazyExecutorOptions::ADD_THREAD };
+            LazyExecutorTester executor_test_with_removed_thread{
+                LazyExecutorOptions::REMOVE_THREAD
+            };
+            LazyExecutorTester executor_test_with_joined_thread{ LazyExecutorOptions::JOIN };
+        }
         return 0;
     }
 }// namespace cerb::debug

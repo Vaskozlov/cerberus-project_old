@@ -40,6 +40,7 @@ namespace cerb::lex
         AnalysisGlobals() = default;
 
         StringPool<CharT, size_t, true> nonterminals{};
+        LazyExecutor<std::any> lazy_executor{ 2 };
     };
 
     template<CharacterLiteral CharT>

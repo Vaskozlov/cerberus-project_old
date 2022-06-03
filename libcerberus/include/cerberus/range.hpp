@@ -66,7 +66,9 @@ namespace cerb
         {}
 
     private:
-        Int begin_of_range{ 0 }, end_of_range{ 0 }, increment{ 1 };
+        Int begin_of_range{ 0 };
+        Int end_of_range{ 0 };
+        Int increment{ 1 };
     };
 
     template<std::integral Int>

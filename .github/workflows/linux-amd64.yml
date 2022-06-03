@@ -12,7 +12,7 @@ jobs:
       matrix:
         config:
           - name: Linux GCC
-            os: [ self-hosted, linux, X64 ]
+            os: [ self-hosted, Linux, X64 ]
     name: CMake (${{ matrix.config.name }})
     runs-on: ${{ matrix.config.os }}
     steps:
