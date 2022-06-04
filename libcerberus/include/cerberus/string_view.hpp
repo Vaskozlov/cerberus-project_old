@@ -14,10 +14,8 @@ namespace cerb
     struct BasicStringView;
 
     template<typename T, typename CharT>
-    concept StringType =
-        CharacterLiteral<CharT> &&
-        IsAnyOfV<
-            T, BasicStringView<CharT>, std::basic_string<CharT>, std::basic_string_view<CharT>>;
+    concept StringType = CharacterLiteral<CharT> && IsAnyOfV<
+        T, BasicStringView<CharT>, std::basic_string<CharT>, std::basic_string_view<CharT>>;
 
     template<CharacterLiteral CharT>
     struct CERBLIB_TRIVIAL BasicStringView
