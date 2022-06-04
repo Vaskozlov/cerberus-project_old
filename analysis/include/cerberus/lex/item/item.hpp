@@ -10,6 +10,16 @@ namespace cerb::lex
     {
         CERBLIB_ITEM_PARSER_ACCESS(CharT);
 
+        CERBLIB_DECL auto operator==(DotItem const &other) const -> bool
+        {
+            return id() == other.id();
+        }
+
+        CERBLIB_DECL auto operator<=>(DotItem const &other) const -> decltype(auto)
+        {
+            return id() <=> other.id();
+        }
+
         constexpr DotItem(
             AnalysisGlobals<CharT> &analysis_parameters, size_t id_of_item,
             BasicStringView<CharT> const &rule)

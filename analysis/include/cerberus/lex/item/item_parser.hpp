@@ -39,7 +39,7 @@ namespace cerb::lex
             return item_id;
         }
 
-        CERBLIB_DECL auto getItems() const -> std::vector<item_ptr> const &
+        CERBLIB_DECL auto getItems() const -> SmallVector<item_ptr> const &
         {
             return items;
         }
@@ -213,7 +213,7 @@ namespace cerb::lex
 
     protected:
         text::GeneratorForText<CharT> rule_generator{};
-        std::vector<item_ptr> items{};
+        SmallVector<item_ptr> items{};
         size_t item_id{};
     };
 

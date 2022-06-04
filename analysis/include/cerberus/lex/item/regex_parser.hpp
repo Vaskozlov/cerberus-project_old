@@ -83,7 +83,7 @@ namespace cerb::lex::regex
         constexpr auto setChar(CharT chr) -> void
         {
             is_filled = true;
-            available_chars.set<1>(asUInt(chr));
+            available_chars.template set<1>(asUInt(chr));
         }
 
         Bitmap &available_chars;

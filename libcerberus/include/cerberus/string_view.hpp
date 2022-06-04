@@ -13,10 +13,11 @@ namespace cerb
     template<CharacterLiteral T>
     struct BasicStringView;
 
-    template<typename T>
-    concept StringType = IsAnyOfV<
-        T, BasicStringView<GetValueType<T>>, std::basic_string<GetValueType<T>>,
-        std::basic_string_view<GetValueType<T>>>;
+    template<typename T, typename CharT>
+    concept StringType =
+        CharacterLiteral<CharT> &&
+        IsAnyOfV<
+            T, BasicStringView<CharT>, std::basic_string<CharT>, std::basic_string_view<CharT>>;
 
     template<CharacterLiteral CharT>
     struct CERBLIB_TRIVIAL BasicStringView
@@ -152,7 +153,7 @@ namespace cerb
             return operator==(BasicStringView<CharT>(other));
         }
 
-        template<StringType T>
+        template<StringType<CharT> T>
         CERBLIB_DECL auto operator==(T const &other) const -> bool
         {
             auto other_str = BasicStringView<CharT>(std::data(other), std::size(other));
@@ -164,7 +165,7 @@ namespace cerb
             return operator<=>(BasicStringView<CharT>(other));
         }
 
-        template<StringType T>
+        template<StringType<CharT> T>
         CERBLIB_DECL auto operator<=>(T const &other) const
         {
             size_t maximum_checking_length = min<size_type>(length, std::size(other));
@@ -193,7 +194,7 @@ namespace cerb
           : length(ptrdiff(first, last)), string(first)
         {}
 
-        template<StringType T>// NOLINTNEXTLINE
+        template<StringType<CharT> T>// NOLINTNEXTLINE
         constexpr BasicStringView(T const &str) : length(std::size(str)), string(std::data(str))
         {}
 

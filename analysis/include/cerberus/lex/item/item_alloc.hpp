@@ -35,7 +35,7 @@ namespace cerb::lex
 
         template<typename... Ts>
         constexpr static auto newItemParser(
-            AnalysisGlobals<CharT> &analysis_globals, std::vector<item_ptr> &items, Ts &&...args)
+            AnalysisGlobals<CharT> &analysis_globals, SmallVector<item_ptr> &items, Ts &&...args)
             -> ItemParser<CharT> *
         {
             return newItem<ItemParser<CharT>>(analysis_globals, items, std::forward<Ts>(args)...);
@@ -43,7 +43,7 @@ namespace cerb::lex
 
         template<typename... Ts>
         constexpr static auto newRegex(
-            AnalysisGlobals<CharT> &analysis_globals, std::vector<item_ptr> &items, Ts &&...args)
+            AnalysisGlobals<CharT> &analysis_globals, SmallVector<item_ptr> &items, Ts &&...args)
             -> regex::RegexItem<CharT> *
         {
             return newItem<regex::RegexItem<CharT>>(
@@ -52,7 +52,7 @@ namespace cerb::lex
 
         template<typename... Ts>
         constexpr static auto newString(
-            AnalysisGlobals<CharT> &analysis_globals, std::vector<item_ptr> &items, Ts &&...args)
+            AnalysisGlobals<CharT> &analysis_globals, SmallVector<item_ptr> &items, Ts &&...args)
             -> string::StringItem<CharT> *
         {
             return newItem<string::StringItem<CharT>>(
@@ -64,7 +64,7 @@ namespace cerb::lex
     private:
         template<ItemObject<CharT> ItemT, typename... Ts>
         CERBLIB_DECL static auto newItem(
-            AnalysisGlobals<CharT> &analysis_globals, std::vector<item_ptr> &items, Ts &&...args)
+            AnalysisGlobals<CharT> &analysis_globals, SmallVector<item_ptr> &items, Ts &&...args)
             -> ItemT *
         {
             item_ptr new_item =

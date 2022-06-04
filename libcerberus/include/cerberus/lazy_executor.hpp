@@ -2,7 +2,6 @@
 #define CERBERUS_LAZY_EXECUTOR_HPP
 
 #include <any>
-#include <cerberus/bitmap.hpp>
 #include <cerberus/cerberus.hpp>
 #include <cerberus/exception.hpp>
 #include <cerberus/memory.hpp>

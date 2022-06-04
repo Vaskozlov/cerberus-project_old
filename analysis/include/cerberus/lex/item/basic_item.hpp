@@ -3,6 +3,7 @@
 
 #include <cerberus/lazy_executor.hpp>
 #include <cerberus/lex/lexical_analysis_exception.hpp>
+#include <cerberus/small_vector.hpp>
 #include <cerberus/string_pool.hpp>
 #include <cerberus/text/generator_for_text.hpp>
 #include <cerberus/text/string_to_codes.hpp>
