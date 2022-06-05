@@ -19,24 +19,24 @@ namespace cerb::debug
             ASSERT_TRUE(bitmap.at(chr) == 0);
         }
 
-        ASSERT_TRUE(bitmap.at(asUInt('\t')));
+        ASSERT_TRUE(bitmap.at(asUInt('\t')) == 1);
 
         for (u16 chr : Range<u16>('\t' + 1, '-')) {
             ASSERT_TRUE(bitmap.at(chr) == 0);
         }
 
-        ASSERT_TRUE(bitmap.at(asUInt('-')));
+        ASSERT_TRUE(bitmap.at(asUInt('-')) == 1);
 
         for (u16 chr : Range<u16>('-' + 1, '0')) {
             ASSERT_TRUE(bitmap.at(chr) == 0);
         }
 
         for (u16 chr : Range<u16>('0', '9' + 1)) {
-            ASSERT_TRUE(bitmap.at(chr));
+            ASSERT_TRUE(bitmap.at(chr) == 1);
         }
 
         for (u16 chr : Range<u16>('0', '9' + 1)) {
-            ASSERT_TRUE(bitmap.at(chr));
+            ASSERT_TRUE(bitmap.at(chr) == 1);
         }
 
         for (u16 chr : Range<u16>('9' + 1, 'A')) {
@@ -58,7 +58,7 @@ namespace cerb::debug
         }
 
         for (u16 chr : Range<u16>('a', 'z' + 1)) {
-            ASSERT_TRUE(bitmap.at(chr));
+            ASSERT_TRUE(bitmap.at(chr) == 1);
         }
 
         for (u16 chr : Range<u16>('z' + 1, 0xFF)) {
