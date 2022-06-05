@@ -13,7 +13,8 @@
     using basic_item_t = BasicItem<CharT>;                                                         \
     using basic_item_t::analysis_globals;                                                          \
     using basic_item_t::cast;                                                                      \
-    using basic_item_t::flags
+    using basic_item_t::flags;                                                                     \
+    using typename basic_item_t::ScanResult
 
 #define CERBLIB_BASIC_ITEM_ARGS cerb::lex::AnalysisGlobals<CharT> &analysis_parameters
 #define CERBLIB_CONSTRUCT_BASIC_ITEM basic_item_t(analysis_parameters)
@@ -54,7 +55,11 @@ namespace cerb::lex
             return static_cast<CharT>(value);
         }
 
-        // virtual constexpr auto scan() -> void = 0;
+        struct ScanResult
+        {
+        };
+
+        CERBLIB_DECL virtual auto scan() const -> ScanResult = 0;
         virtual constexpr auto postInitializationSetup() -> void = 0;
 
         BasicItem() = default;

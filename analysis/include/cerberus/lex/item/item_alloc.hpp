@@ -23,7 +23,7 @@ namespace cerb::lex
     }
 
     template<CharacterLiteral CharT>
-    struct ItemParser;
+    struct DotItem;
 
     template<typename ItemT, typename CharT>
     concept ItemObject = std::is_base_of_v<BASIC_ITEM_CHART, ItemT>;
@@ -34,11 +34,11 @@ namespace cerb::lex
         using item_ptr = std::unique_ptr<BasicItem<CharT>>;
 
         template<typename... Ts>
-        constexpr static auto newItemParser(
+        constexpr static auto newDotItem(
             AnalysisGlobals<CharT> &analysis_globals, SmallVector<item_ptr> &items, Ts &&...args)
-            -> ItemParser<CharT> *
+            -> DotItem<CharT> *
         {
-            return newItem<ItemParser<CharT>>(analysis_globals, items, std::forward<Ts>(args)...);
+            return newItem<DotItem<CharT>>(analysis_globals, items, std::forward<Ts>(args)...);
         }
 
         template<typename... Ts>

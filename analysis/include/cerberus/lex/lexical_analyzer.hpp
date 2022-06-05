@@ -12,18 +12,23 @@ namespace cerb::lex
     class LexicalAnalyzer
     {
     private:
+        using rule_t = Rule<CharT, CharForId>;
+
         struct InitPack
         {
             BasicStringView<CharForId> rule_name{};
             BasicStringView<CharT> rule{};
+            std::function<void(Token<CharT>)> completion;
+
+            static auto emptyFunction(Token<CharT> /*unused*/) -> void
+            {}
         };
 
     public:
         constexpr auto addSource(BasicStringView<CharT> const &input) -> void
         {
             InputAnalyzer<CharT, CharForId> input_analyzer{ text::GeneratorForText{ input },
-                                                            hash_to_names, dot_items,
-                                                            analysis_globals };
+                                                            dot_items, analysis_globals };
         }
 
         LexicalAnalyzer() = default;
@@ -61,15 +66,13 @@ namespace cerb::lex
             std::scoped_lock lock{ dot_item_mutex };
 
             if (not dot_items.contains(id)) {
-                dot_items.emplace(id, std::vector<DotItem<CharT>>{});
-                hash_to_names[id] = rule_name;
+                dot_items.emplace(id, Rule<CharT>{ std::vector<DotItem<CharT>>{}, rule_name });
             }
 
-            dot_items[id].push_back(std::move(item));
+            dot_items[id].items.push_back(std::move(item));
         }
 
-        std::map<size_t, BasicStringView<CharForId>> hash_to_names{};
-        std::map<size_t, std::vector<DotItem<CharT>>> dot_items{};
+        std::map<size_t, rule_t> dot_items{};
         AnalysisGlobals<CharT> analysis_globals{};
         std::mutex dot_item_mutex{};
     };

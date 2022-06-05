@@ -16,6 +16,11 @@ namespace cerb::lex::string
             return string;
         }
 
+        CERBLIB_DECL auto scan() const -> ScanResult override
+        {
+            return ScanResult{};
+        }
+
         constexpr StringItem(CERBLIB_BASIC_ITEM_ARGS, text::GeneratorForText<CharT> &generator)
           : CERBLIB_CONSTRUCT_BASIC_ITEM, string(convertStringToCodes(cast('\"'), generator))
         {

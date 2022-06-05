@@ -6,7 +6,7 @@
 namespace cerb::lex
 {
     template<CharacterLiteral CharT>
-    struct ItemParser;
+    struct DotItem;
 
     CERBERUS_EXCEPTION(BasicDotItemParsingError, BasicLexicalAnalysisException);
 
@@ -14,77 +14,76 @@ namespace cerb::lex
     CERBERUS_ANALYSIS_EXCEPTION(DotItemParsingError, CharT, BasicDotItemParsingError);
 
     template<CharacterLiteral CharT>
-    struct ItemParsingErrors
+    struct DotItemErrors
     {
-        using item_parser_t = ItemParser<CharT>;
+        using dot_item_t = DotItem<CharT>;
 
-        constexpr static auto mistakeInRegex(item_parser_t const &item_parser) -> void
+        constexpr static auto mistakeInRegex(dot_item_t const &dot_item) -> void
         {
-            throwException("Error in regex during the rule parsing!", item_parser);
+            throwException("Error in regex during the rule parsing!", dot_item);
         }
 
-        constexpr static auto checkItemNotEmpty(item_parser_t const &item_parser) -> void
+        constexpr static auto checkItemNotEmpty(dot_item_t const &dot_item) -> void
         {
-            auto &items = item_parser.items;
-            auto flags = item_parser.flags;
+            auto &items = dot_item.items;
+            auto flags = dot_item.flags;
 
             if (items.empty() && not flags.isSet(ItemFlags::NONTERMINAL)) {
-                throwException("Empty items are not allowed!", item_parser);
+                throwException("Empty items are not allowed!", dot_item);
             }
         }
 
-        constexpr static auto checkItemIsNotNonterminal(item_parser_t const &item_parser) -> void
+        constexpr static auto checkItemIsNotNonterminal(dot_item_t const &dot_item) -> void
         {
-            auto &flags = item_parser.flags;
+            auto &flags = dot_item.flags;
 
             if (flags.isSet(ItemFlags::NONTERMINAL)) {
                 throwException(
                     "Nonterminals can't coexist with other rules and can't be used in recursion!",
-                    item_parser);
+                    dot_item);
             }
         }
 
-        constexpr static auto checkThatNonTerminalCanBeAdded(item_parser_t const &item_parser)
-            -> void
+        constexpr static auto checkThatNonTerminalCanBeAdded(dot_item_t const &dot_item) -> void
         {
-            auto &items = item_parser.items;
+            auto &items = dot_item.items;
 
             if (not items.empty()) {
-                throwException("Non terminals can't coexist with other rules!", item_parser);
+                throwException("Non terminals can't coexist with other rules!", dot_item);
             }
         }
 
-        constexpr static auto checkItemExistence(item_parser_t const &item_parser) -> void
+        constexpr static auto checkItemExistence(dot_item_t const &dot_item) -> void
         {
-            auto &items = item_parser.items;
+            auto &items = dot_item.items;
 
             if (items.empty()) {
                 throwException(
                     "Unable to apply operation, because current item hasn't"
                     " been created!",
-                    item_parser);
+                    dot_item);
             }
         }
 
-        constexpr static auto checkRuleOverloading(item_parser_t const &item_parser) -> void
+        constexpr static auto checkRuleOverloading(dot_item_t const &dot_item) -> void
         {
             constexpr ItemFlags repetition_rules =
                 ItemFlags::PLUS | ItemFlags::STAR | ItemFlags::QUESTION;
 
-            auto &items = item_parser.items;
+            auto &items = dot_item.items;
             auto &last_item = items.back();
             auto last_item_flags = last_item->flags;
 
             if (last_item_flags.isAnyOfSet(repetition_rules)) {
-                throwException("Unable to apply more than one rule!", item_parser);
+                throwException("Unable to apply more than one rule!", dot_item);
             }
         }
 
     private:
-        constexpr static auto
-            throwException(string_view const &message, item_parser_t const &item_parser) -> void
+        constexpr static auto throwException(string_view const &message, dot_item_t const &dot_item)
+            -> void
         {
-            throw DotItemParsingError(message, item_parser.getGenerator());
+            throw DotItemParsingError(message, dot_item.getGenerator());
         }
     };
 }// namespace cerb::lex
