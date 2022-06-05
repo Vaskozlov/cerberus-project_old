@@ -12,12 +12,12 @@ namespace cerb::lex
 
         CERBLIB_DECL auto operator==(DotItem const &other) const -> bool
         {
-            return id() == other.id();
+            return getId() == other.getId();
         }
 
         CERBLIB_DECL auto operator<=>(DotItem const &other) const -> decltype(auto)
         {
-            return id() <=> other.id();
+            return getId() <=> other.getId();
         }
 
         constexpr DotItem(

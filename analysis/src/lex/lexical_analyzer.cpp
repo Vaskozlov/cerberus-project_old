@@ -2,7 +2,7 @@
 
 namespace cerb::lex
 {
-    template struct LexicalAnalyzer<char>;
-    template struct LexicalAnalyzer<char8_t>;
-    template struct LexicalAnalyzer<char16_t>;
+    template class LexicalAnalyzer<char>;
+    template class LexicalAnalyzer<char8_t>;
+    template class LexicalAnalyzer<char16_t>;
 }// namespace cerb::lex

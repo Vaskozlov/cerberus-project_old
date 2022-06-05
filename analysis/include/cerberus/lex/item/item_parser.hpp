@@ -11,7 +11,7 @@
 #define CERBLIB_ITEM_PARSER_ACCESS(CharT)                                                          \
     using item_parser_t = cerb::lex::ItemParser<CharT>;                                            \
     using typename item_parser_t::item_ptr;                                                        \
-    using item_parser_t::id;                                                                       \
+    using item_parser_t::getId;                                                                    \
     using item_parser_t::cast;                                                                     \
     using item_parser_t::flags;                                                                    \
     using item_parser_t::item_id;                                                                  \
@@ -34,7 +34,7 @@ namespace cerb::lex
         using Error = ItemParsingErrors<CharT>;
         using item_ptr = std::unique_ptr<BasicItem<CharT>>;
 
-        CERBLIB_DECL auto id() const -> size_t
+        CERBLIB_DECL auto getId() const -> size_t
         {
             return item_id;
         }
@@ -166,7 +166,7 @@ namespace cerb::lex
             text::GeneratorForText<CharT> forked_gen =
                 rule_generator.fork(begin_item_length, item_length);
             auto *new_item =
-                Allocator<CharT>::newItemParser(analysis_globals, items, id(), forked_gen);
+                Allocator<CharT>::newItemParser(analysis_globals, items, getId(), forked_gen);
 
             Error::checkItemIsNotNonterminal(*new_item);
             skipItemBorder(item_length);
@@ -208,7 +208,7 @@ namespace cerb::lex
 
         constexpr auto makeNonterminalGlobal(std::basic_string<CharT> &&str) -> void
         {
-            analysis_globals.emplaceNonterminal(std::move(str), id());
+            analysis_globals.emplaceNonterminal(std::move(str), getId());
         }
 
     protected:

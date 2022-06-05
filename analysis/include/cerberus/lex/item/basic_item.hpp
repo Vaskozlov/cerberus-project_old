@@ -3,6 +3,7 @@
 
 #include <cerberus/lazy_executor.hpp>
 #include <cerberus/lex/lexical_analysis_exception.hpp>
+#include <cerberus/lex/token.hpp>
 #include <cerberus/small_vector.hpp>
 #include <cerberus/string_pool.hpp>
 #include <cerberus/text/generator_for_text.hpp>
@@ -53,6 +54,7 @@ namespace cerb::lex
             return static_cast<CharT>(value);
         }
 
+        // virtual constexpr auto scan() -> void = 0;
         virtual constexpr auto postInitializationSetup() -> void = 0;
 
         BasicItem() = default;
