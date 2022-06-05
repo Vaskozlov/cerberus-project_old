@@ -5,14 +5,11 @@ set tempPath=".\tmp"
 if not exist "%tempPath%\tmp"      mkdir "%tempPath%\tmp"
 
 cd "%tempPath%"
-set extra_path=\vcpkg\scripts\buildsystems\vcpkg.cmake
-set CMAKE_TOOLCHAIN_FILE=%cd%%extra_path%
+set CMAKE_TOOLCHAIN_FILE=C:\vcpkg\scripts\buildsystems\vcpkg.cmake
 set cmake_dir=C:\\\"Program Files\"\CMake\bin
 
-powershell -Command "git clone https://github.com/microsoft/vcpkg"
-powershell -Command ".\vcpkg\bootstrap-vcpkg.bat"
-powershell -Command ".\vcpkg\vcpkg install fmt:x64-windows"
-powershell -Command ".\vcpkg\vcpkg install boost:x64-windows-static"
+powershell -Command "C:\vcpkg\vcpkg install fmt:x64-windows"
+powershell -Command "C:\vcpkg\vcpkg install boost:x64-windows-static"
 
 cd ..\..\..
 
