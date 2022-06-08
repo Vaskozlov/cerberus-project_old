@@ -16,7 +16,8 @@ namespace cerb::lex::string
             return string;
         }
 
-        CERBLIB_DECL auto scan() const -> ScanResult override
+        CERBLIB_DECL auto scan(text::GeneratorForText<CharT> /*unused*/) const
+            -> ScanResult override
         {
             return ScanResult{};
         }

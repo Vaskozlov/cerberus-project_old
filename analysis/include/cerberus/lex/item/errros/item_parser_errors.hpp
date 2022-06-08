@@ -14,16 +14,16 @@ namespace cerb::lex
     CERBERUS_ANALYSIS_EXCEPTION(DotItemParsingError, CharT, BasicDotItemParsingError);
 
     template<CharacterLiteral CharT>
-    struct DotItemErrors
+    struct DotItemChecks
     {
         using dot_item_t = DotItem<CharT>;
 
         constexpr static auto mistakeInRegex(dot_item_t const &dot_item) -> void
         {
-            throwException("Error in regex during the rule parsing!", dot_item);
+            throwException("Check in regex during the rule parsing!", dot_item);
         }
 
-        constexpr static auto checkItemNotEmpty(dot_item_t const &dot_item) -> void
+        constexpr static auto itemNotEmpty(dot_item_t const &dot_item) -> void
         {
             auto &items = dot_item.items;
             auto flags = dot_item.flags;
@@ -33,7 +33,7 @@ namespace cerb::lex
             }
         }
 
-        constexpr static auto checkItemIsNotNonterminal(dot_item_t const &dot_item) -> void
+        constexpr static auto itemIsNotNonterminal(dot_item_t const &dot_item) -> void
         {
             auto &flags = dot_item.flags;
 
@@ -44,7 +44,7 @@ namespace cerb::lex
             }
         }
 
-        constexpr static auto checkThatNonTerminalCanBeAdded(dot_item_t const &dot_item) -> void
+        constexpr static auto nonTerminalCanBeAdded(dot_item_t const &dot_item) -> void
         {
             auto &items = dot_item.items;
 
@@ -53,7 +53,7 @@ namespace cerb::lex
             }
         }
 
-        constexpr static auto checkItemExistence(dot_item_t const &dot_item) -> void
+        constexpr static auto itemExistence(dot_item_t const &dot_item) -> void
         {
             auto &items = dot_item.items;
 
@@ -65,7 +65,7 @@ namespace cerb::lex
             }
         }
 
-        constexpr static auto checkRuleOverloading(dot_item_t const &dot_item) -> void
+        constexpr static auto ruleOverloading(dot_item_t const &dot_item) -> void
         {
             constexpr ItemFlags repetition_rules =
                 ItemFlags::PLUS | ItemFlags::STAR | ItemFlags::QUESTION;

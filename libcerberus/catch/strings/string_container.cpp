@@ -1,25 +1,27 @@
 #include <cerberus/debug/debug.hpp>
-#include <cerberus/string_pool.hpp>
+#include <cerberus/string_container.hpp>
 
 namespace cerb::debug
 {
+    using namespace string_view_literals;
+
     // NOLINTNEXTLINE
-    static const StringPool<char, unsigned> TestStringPool({ { "Hello", 0 }, { "World", 1 } });
+    static const StringContainer<char, unsigned> TestStringPool({ { "Hello", 0 }, { "World", 1 } });
 
     auto testStringPoolContains() -> bool
     {
-        StringPool<char, unsigned> string_pool = TestStringPool;
+        StringContainer<char, unsigned> string_pool = TestStringPool;
 
-        ASSERT_TRUE(string_pool.contains("Hello"));
-        ASSERT_TRUE(string_pool.contains("World"));
+        ASSERT_TRUE(string_pool.contains("Hello"_sv));
+        ASSERT_TRUE(string_pool.contains("World"_sv));
 
-        ASSERT_FALSE(string_pool.contains("Test"));
+        ASSERT_FALSE(string_pool.contains("Test"_sv));
         return true;
     }
 
     auto testStringPoolSubscript() -> bool
     {
-        StringPool<char, unsigned> string_pool = TestStringPool;
+        StringContainer<char, unsigned> string_pool = TestStringPool;
 
         ASSERT_EQUAL(string_pool["Hello"], 0);
         ASSERT_EQUAL(string_pool["World"], 1);
@@ -33,10 +35,10 @@ namespace cerb::debug
 
     auto testStringPoolEmplace() -> bool
     {
-        StringPool<char, unsigned> string_pool = TestStringPool;
+        StringContainer<char, unsigned> string_pool = TestStringPool;
 
         string_pool.emplace("Test", 3);
-        ASSERT_TRUE(string_pool.contains("Test"));
+        ASSERT_TRUE(string_pool.contains("Test"_sv));
         ASSERT_TRUE(string_pool["Test"] == 3);
 
         return true;
@@ -44,9 +46,9 @@ namespace cerb::debug
 
     auto testStringPoolFindLongestMatchingString() -> bool
     {
-        StringPool<char, unsigned> string_pool = TestStringPool;
+        StringContainer<char, unsigned> string_pool = TestStringPool;
 
-        ASSERT_EQUAL(string_pool.findLongestStringInPool("WorldIt'sATest"), "World");
+        ASSERT_EQUAL(string_pool.findLongestString("WorldIt'sATest"_sv), "World");
         return true;
     }
 

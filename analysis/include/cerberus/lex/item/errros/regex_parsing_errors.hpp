@@ -14,40 +14,40 @@ namespace cerb::lex::regex
     CERBERUS_ANALYSIS_EXCEPTION(RegexParsingError, CharT, BasicRegexParsingError);
 
     template<CharacterLiteral CharT>
-    struct RegexParsingErrors
+    struct RegexParsingChecks
     {
         using regex_parser_t = RegexParser<CharT>;
 
-        constexpr static auto
-            checkCharsOrder(regex_parser_t const &regex_parser, CharT begin, CharT end) -> void
+        constexpr static auto charsOrder(regex_parser_t const &regex_parser, CharT begin, CharT end)
+            -> void
         {
             if (begin > end) {
                 throwException("Chars in regex are in a wrong order!", regex_parser);
             }
         }
 
-        constexpr static auto checkRegexStart(regex_parser_t const &regex_parser) -> void
+        constexpr static auto regexStart(regex_parser_t const &regex_parser) -> void
         {
             if (not isBeginOfRegex(regex_parser.getChar())) {
                 throwException("Unable to parse a regular expression!", regex_parser);
             }
         }
 
-        constexpr static auto checkRangeClosing(regex_parser_t const &regex_parser) -> void
+        constexpr static auto rangeClosing(regex_parser_t const &regex_parser) -> void
         {
             if (regex_parser.is_range_of_chars) {
                 throwException("Range of chars is not closed!", regex_parser);
             }
         }
 
-        constexpr static auto checkRangeNonEmpty(regex_parser_t const &regex_parser) -> void
+        constexpr static auto rangeNonEmpty(regex_parser_t const &regex_parser) -> void
         {
             if (not regex_parser.is_filled) {
                 throwException("There are not any characters in regex!", regex_parser);
             }
         }
 
-        constexpr static auto checkDoubleRegexOpening(regex_parser_t const &regex_parser, CharT chr)
+        constexpr static auto doubleRegexOpening(regex_parser_t const &regex_parser, CharT chr)
             -> void
         {
             if (chr == static_cast<CharT>('[')) {

@@ -75,6 +75,13 @@ namespace cerb::lex
             return convertSmartPointerToAnOrdinary<ItemT>(last_item);
         }
 
+        template<ItemObject<CharT> ItemT, typename... Ts>
+        CERBLIB_DECL static auto
+            constructNewItem(AnalysisGlobals<CharT> &analysis_globals, Ts &&...args) -> item_ptr
+        {
+            return std::make_unique<ItemT>(analysis_globals, std::forward<Ts>(args)...);
+        }
+
         template<ItemObject<CharT> ItemT>
         constexpr static auto convertSmartPointerToAnOrdinary(item_ptr &pointer) -> ItemT *
         {
@@ -90,13 +97,6 @@ namespace cerb::lex
             if (item == nullptr) {
                 throw AllocationError("Unable to allocate new item.");
             }
-        }
-
-        template<ItemObject<CharT> ItemT, typename... Ts>
-        CERBLIB_DECL static auto
-            constructNewItem(AnalysisGlobals<CharT> &analysis_globals, Ts &&...args) -> item_ptr
-        {
-            return std::make_unique<ItemT>(analysis_globals, std::forward<Ts>(args)...);
         }
     };
 }// namespace cerb::lex

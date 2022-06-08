@@ -11,7 +11,8 @@ namespace cerb::lex::regex
     {
         CERBLIB_BASIC_ITEM_ACCESS(CharT);
 
-        CERBLIB_DECL auto scan() const -> ScanResult override
+        CERBLIB_DECL auto scan(text::GeneratorForText<CharT> /*unused*/) const
+            -> ScanResult override
         {
             return ScanResult{};
         }

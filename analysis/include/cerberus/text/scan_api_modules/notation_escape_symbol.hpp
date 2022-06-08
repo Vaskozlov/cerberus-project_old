@@ -2,16 +2,17 @@
 #define CERBERUS_NOTATION_ESCAPE_SYMBOL_HPP
 
 #include <cerberus/text/generator_for_text.hpp>
+#include <cerberus/text/scan_api_modules/scan_api_mode.hpp>
 
 namespace cerb::text
 {
-    template<bool UseCleanChars, CharacterLiteral CharT>
+    template<ScanApiMode Mode, CharacterLiteral CharT>
     struct ScanApi;
 
-    template<bool UseCleanChars, CharacterLiteral CharT>
+    template<ScanApiMode Mode, CharacterLiteral CharT>
     struct NotationEscapeSymbol
     {
-        using scan_api_t = ScanApi<UseCleanChars, CharT>;
+        using scan_api_t = ScanApi<Mode, CharT>;
 
         CERBLIB_DECL auto convert() -> CharT
         {
@@ -60,9 +61,8 @@ namespace cerb::text
         u32 length{};
     };
 
-    template<size_t Notation, bool UseCleanChars, CharacterLiteral CharT>
-    CERBLIB_DECL auto convertCharEscape(ScanApi<UseCleanChars, CharT> &scan_api, u32 length)
-        -> CharT
+    template<size_t Notation, ScanApiMode Mode, CharacterLiteral CharT>
+    CERBLIB_DECL auto convertCharEscape(ScanApi<Mode, CharT> &scan_api, u32 length) -> CharT
     {
         constexpr size_t hexadecimal_notation = 16;
         static_assert(Notation <= hexadecimal_notation);
@@ -72,20 +72,20 @@ namespace cerb::text
     }
 
 #ifndef CERBERUS_HEADER_ONLY
-    extern template struct NotationEscapeSymbol<false, char>;
-    extern template struct NotationEscapeSymbol<true, char>;
+    extern template struct NotationEscapeSymbol<RAW_CHARS, char>;
+    extern template struct NotationEscapeSymbol<CLEAN_CHARS, char>;
 
-    extern template struct NotationEscapeSymbol<false, char8_t>;
-    extern template struct NotationEscapeSymbol<true, char8_t>;
+    extern template struct NotationEscapeSymbol<RAW_CHARS, char8_t>;
+    extern template struct NotationEscapeSymbol<CLEAN_CHARS, char8_t>;
 
-    extern template struct NotationEscapeSymbol<false, char16_t>;
-    extern template struct NotationEscapeSymbol<true, char16_t>;
+    extern template struct NotationEscapeSymbol<RAW_CHARS, char16_t>;
+    extern template struct NotationEscapeSymbol<CLEAN_CHARS, char16_t>;
 
-    extern template struct NotationEscapeSymbol<false, char32_t>;
-    extern template struct NotationEscapeSymbol<true, char32_t>;
+    extern template struct NotationEscapeSymbol<RAW_CHARS, char32_t>;
+    extern template struct NotationEscapeSymbol<CLEAN_CHARS, char32_t>;
 
-    extern template struct NotationEscapeSymbol<false, wchar_t>;
-    extern template struct NotationEscapeSymbol<true, wchar_t>;
+    extern template struct NotationEscapeSymbol<RAW_CHARS, wchar_t>;
+    extern template struct NotationEscapeSymbol<CLEAN_CHARS, wchar_t>;
 #endif /* CERBERUS_HEADER_ONLY */
 
 }// namespace cerb::text

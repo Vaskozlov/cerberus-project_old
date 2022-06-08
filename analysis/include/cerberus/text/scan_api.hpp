@@ -27,11 +27,11 @@ namespace cerb::text
     template<CharacterLiteral CharT>
     CERBERUS_ANALYSIS_EXCEPTION(ScanApiError, CharT, BasicScanApiError);
 
-    template<bool UseCleanChars, CharacterLiteral CharT>
+    template<ScanApiMode Mode, CharacterLiteral CharT>
     struct ScanApi
     {
-        friend EscapeSymbol<UseCleanChars, CharT>;
-        friend NotationEscapeSymbol<UseCleanChars, CharT>;
+        friend EscapeSymbol<Mode, CharT>;
+        friend NotationEscapeSymbol<Mode, CharT>;
 
         template<std::integral Int>
         CERBLIB_DECL static auto cast(Int value) -> CharT
@@ -51,17 +51,21 @@ namespace cerb::text
 
         CERBLIB_DECL auto getFutureChar() const -> CharT
         {
-            return text_generator.getCurrentChar(1);
+            if constexpr (Mode == CLEAN_CHARS) {
+                return getFutureCleanChar();
+            } else {
+                return getFutureRawChar();
+            }
         }
 
         constexpr auto skip(size_t times) -> void
         {
-            text_generator.template skip<UseCleanChars>(times);
+            text_generator.template skip<Mode>(times);
         }
 
         constexpr auto nextChar() -> CharT
         {
-            if constexpr (UseCleanChars) {
+            if constexpr (Mode == CLEAN_CHARS) {
                 return text_generator.getCleanChar();
             } else {
                 return text_generator.getRawChar();
@@ -148,6 +152,22 @@ namespace cerb::text
         virtual ~ScanApi() = default;
 
     private:
+        CERBLIB_DECL auto getFutureRawChar() const -> CharT
+        {
+            return text_generator.getCurrentChar(1);
+        }
+
+        CERBLIB_DECL auto getFutureCleanChar() const -> CharT
+        {
+            ssize_t i = 1;
+
+            while (lex::isLayout(text_generator.getCurrentChar(i))) {
+                // empty loop
+            }
+
+            return text_generator.getCurrentChar(i + 1);
+        }
+
         constexpr auto throwException(string_view const &message) -> void
         {
             throw ScanApiError(message, text_generator);
@@ -163,20 +183,20 @@ namespace cerb::text
     extern template struct ScanApiError<char32_t>;
     extern template struct ScanApiError<wchar_t>;
 
-    extern template struct ScanApi<false, char>;
-    extern template struct ScanApi<true, char>;
+    extern template struct ScanApi<RAW_CHARS, char>;
+    extern template struct ScanApi<CLEAN_CHARS, char>;
 
-    extern template struct ScanApi<false, char8_t>;
-    extern template struct ScanApi<true, char8_t>;
+    extern template struct ScanApi<RAW_CHARS, char8_t>;
+    extern template struct ScanApi<CLEAN_CHARS, char8_t>;
 
-    extern template struct ScanApi<false, char16_t>;
-    extern template struct ScanApi<true, char16_t>;
+    extern template struct ScanApi<RAW_CHARS, char16_t>;
+    extern template struct ScanApi<CLEAN_CHARS, char16_t>;
 
-    extern template struct ScanApi<false, char32_t>;
-    extern template struct ScanApi<true, char32_t>;
+    extern template struct ScanApi<RAW_CHARS, char32_t>;
+    extern template struct ScanApi<CLEAN_CHARS, char32_t>;
 
-    extern template struct ScanApi<false, wchar_t>;
-    extern template struct ScanApi<true, wchar_t>;
+    extern template struct ScanApi<RAW_CHARS, wchar_t>;
+    extern template struct ScanApi<CLEAN_CHARS, wchar_t>;
 #endif /* CERBERUS_HEADER_ONLY */
 
 }// namespace cerb::text

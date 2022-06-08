@@ -2,13 +2,15 @@
 #define CERBERUS_ESCAPE_SYMBOL_HPP
 
 #include <cerberus/text/scan_api_modules/notation_escape_symbol.hpp>
+#include <cerberus/text/scan_api_modules/scan_api_mode.hpp>
 
 namespace cerb::text
 {
-    template<bool UseCleanChars, CharacterLiteral CharT>
+    template<ScanApiMode Mode, CharacterLiteral CharT>
     struct EscapeSymbol
     {
-        using scan_api_t = ScanApi<UseCleanChars, CharT>;
+        using symbol_pair = Pair<CharT, CharT, PairComparison::BY_FIRST_VALUE>;
+        using scan_api_t = ScanApi<Mode, CharT>;
 
         template<std::integral Int>
         CERBLIB_DECL static auto cast(Int value) -> CharT
@@ -60,19 +62,18 @@ namespace cerb::text
                 break;
             }
 
-            return searchForSymbol(chr);
+            return searchForSpecialUserSymbol(chr);
         }
 
         EscapeSymbol() = default;
         constexpr EscapeSymbol(
             scan_api_t &api_for_scan,
-            std::initializer_list<Pair<CharT, CharT, PairComparison::BY_FIRST_VALUE>> const
-                &other_symbols)
+            std::initializer_list<symbol_pair> const &other_symbols)
           : scan_api(api_for_scan), special_symbols(other_symbols)
         {}
 
     private:
-        CERBLIB_DECL auto searchForSymbol(CharT chr) -> CharT
+        CERBLIB_DECL auto searchForSpecialUserSymbol(CharT chr) const -> CharT
         {
             auto location = std::find(special_symbols.begin(), special_symbols.end(), chr);
 
@@ -84,13 +85,12 @@ namespace cerb::text
         }
 
         scan_api_t &scan_api;
-        std::initializer_list<Pair<CharT, CharT, PairComparison::BY_FIRST_VALUE>> const
-            &special_symbols;
+        std::initializer_list<symbol_pair> const &special_symbols;
     };
 
-    template<bool UseCleanChars, CharacterLiteral CharT>
+    template<ScanApiMode Mode, CharacterLiteral CharT>
     CERBLIB_DECL auto processCharEscape(
-        ScanApi<UseCleanChars, CharT> &scan_api,
+        ScanApi<Mode, CharT> &scan_api,
         std::initializer_list<Pair<CharT, CharT, PairComparison::BY_FIRST_VALUE>> const
             &special_symbols) -> CharT
     {
@@ -99,20 +99,20 @@ namespace cerb::text
     }
 
 #ifndef CERBERUS_HEADER_ONLY
-    extern template struct EscapeSymbol<false, char>;
-    extern template struct EscapeSymbol<true, char>;
+    extern template struct EscapeSymbol<RAW_CHARS, char>;
+    extern template struct EscapeSymbol<CLEAN_CHARS, char>;
 
-    extern template struct EscapeSymbol<false, char8_t>;
-    extern template struct EscapeSymbol<true, char8_t>;
+    extern template struct EscapeSymbol<RAW_CHARS, char8_t>;
+    extern template struct EscapeSymbol<CLEAN_CHARS, char8_t>;
 
-    extern template struct EscapeSymbol<false, char16_t>;
-    extern template struct EscapeSymbol<true, char16_t>;
+    extern template struct EscapeSymbol<RAW_CHARS, char16_t>;
+    extern template struct EscapeSymbol<CLEAN_CHARS, char16_t>;
 
-    extern template struct EscapeSymbol<false, char32_t>;
-    extern template struct EscapeSymbol<true, char32_t>;
+    extern template struct EscapeSymbol<RAW_CHARS, char32_t>;
+    extern template struct EscapeSymbol<CLEAN_CHARS, char32_t>;
 
-    extern template struct EscapeSymbol<false, wchar_t>;
-    extern template struct EscapeSymbol<true, wchar_t>;
+    extern template struct EscapeSymbol<RAW_CHARS, wchar_t>;
+    extern template struct EscapeSymbol<CLEAN_CHARS, wchar_t>;
 #endif /* CERBERUS_HEADER_ONLY */
 
 }// namespace cerb::text

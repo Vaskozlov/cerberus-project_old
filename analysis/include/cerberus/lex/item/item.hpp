@@ -13,14 +13,14 @@ namespace cerb::lex
     template<CharacterLiteral CharT>
     struct DotItem
       : public BasicItem<CharT>
-      , private text::ScanApi<true, CharT>
+      , private text::ScanApi<text::CLEAN_CHARS, CharT>
     {
         CERBLIB_BASIC_ITEM_ACCESS(CharT);
-        CERBLIB_SCAN_API_ACCESS(true, CharT);
+        CERBLIB_SCAN_API_ACCESS(text::CLEAN_CHARS, CharT);
 
-        friend DotItemErrors<CharT>;
+        friend DotItemChecks<CharT>;
 
-        using Error = DotItemErrors<CharT>;
+        using Check = DotItemChecks<CharT>;
         using item_ptr = std::unique_ptr<BasicItem<CharT>>;
 
         CERBLIB_DECL auto getId() const -> size_t
@@ -33,7 +33,8 @@ namespace cerb::lex
             return items;
         }
 
-        CERBLIB_DECL auto scan() const -> ScanResult override
+        CERBLIB_DECL auto scan(text::GeneratorForText<CharT> /*unused*/) const
+            -> ScanResult override
         {
             return ScanResult{};
         }
@@ -60,8 +61,8 @@ namespace cerb::lex
         constexpr DotItem(
             AnalysisGlobals<CharT> &analysis_parameters, size_t id_of_item,
             text::GeneratorForText<CharT> const &gen)
-          : CERBLIB_CONSTRUCT_BASIC_ITEM, scan_api_t(rule_generator),
-            rule_generator(std::move(gen)), item_id(id_of_item)
+          : CERBLIB_CONSTRUCT_BASIC_ITEM, scan_api_t(rule_generator), rule_generator(gen),
+            item_id(id_of_item)
         {
             scan_api_t::beginScanning(CharEnum<CharT>::EoF);
         }
@@ -74,7 +75,7 @@ namespace cerb::lex
 
         constexpr auto processChar(CharT chr) -> void override
         {
-            Error::checkItemIsNotNonterminal(*this);
+            Check::itemIsNotNonterminal(*this);
 
             switch (chr) {
             case cast('\''):
@@ -121,13 +122,13 @@ namespace cerb::lex
                 break;
 
             default:
-                Error::mistakeInRegex(*this);
+                Check::mistakeInRegex(*this);
             }
         }
 
         constexpr auto onEnd() -> void override
         {
-            Error::checkItemNotEmpty(*this);
+            Check::itemNotEmpty(*this);
         }
 
         constexpr auto postInitializationSetup() -> void override
@@ -139,7 +140,7 @@ namespace cerb::lex
 
         constexpr auto setTag(ItemFlags new_tag) -> void
         {
-            Error::checkItemExistence(*this);
+            Check::itemExistence(*this);
 
             item_ptr &last_item = items.back();
             last_item->flags |= new_tag;
@@ -147,8 +148,8 @@ namespace cerb::lex
 
         constexpr auto setRepetitionRule(ItemFlags new_rule) -> void
         {
-            Error::checkItemExistence(*this);
-            Error::checkRuleOverloading(*this);
+            Check::itemExistence(*this);
+            Check::ruleOverloading(*this);
 
             item_ptr &last_item = items.back();
             last_item->flags |= new_rule;
@@ -169,7 +170,7 @@ namespace cerb::lex
             auto *new_item =
                 Allocator<CharT>::newDotItem(analysis_globals, items, getId(), forked_gen);
 
-            Error::checkItemIsNotNonterminal(*new_item);
+            Check::itemIsNotNonterminal(*new_item);
             skipItemBorder(item_length);
         }
 
@@ -180,7 +181,7 @@ namespace cerb::lex
 
         constexpr auto addNonTerminal() -> void
         {
-            Error::checkThatNonTerminalCanBeAdded(*this);
+            Check::nonTerminalCanBeAdded(*this);
 
             std::basic_string<CharT> converted_str =
                 convertStringToCodes(cast('\''), rule_generator);

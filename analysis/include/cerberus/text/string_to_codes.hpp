@@ -13,9 +13,9 @@ namespace cerb::text
         StringToCodesTranslationError, CharT, BasicStringToCodesTranslationError);
 
     template<CharacterLiteral CharT>
-    class StringToCodes : private ScanApi<false, CharT>
+    class StringToCodes : private ScanApi<RAW_CHARS, CharT>
     {
-        CERBLIB_SCAN_API_ACCESS(false, CharT);
+        CERBLIB_SCAN_API_ACCESS(RAW_CHARS, CharT);
 
     public:
         constexpr auto parsedString() -> std::basic_string<CharT> &

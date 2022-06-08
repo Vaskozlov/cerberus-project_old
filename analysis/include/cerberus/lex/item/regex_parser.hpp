@@ -11,14 +11,14 @@
 namespace cerb::lex::regex
 {
     template<CharacterLiteral CharT>
-    struct RegexParser : text::ScanApi<false, CharT>
+    struct RegexParser : text::ScanApi<text::RAW_CHARS, CharT>
     {
-        CERBLIB_SCAN_API_ACCESS(false, CharT);
+        CERBLIB_SCAN_API_ACCESS(text::RAW_CHARS, CharT);
 
-        friend RegexParsingErrors<CharT>;
+        friend RegexParsingChecks<CharT>;
 
         using scan_api_t::cast;
-        using Error = RegexParsingErrors<CharT>;
+        using Check = RegexParsingChecks<CharT>;
 
         constexpr RegexParser(text::GeneratorForText<CharT> &regex, Bitmap &bitmap_for_chars)
           : scan_api_t(regex), available_chars(bitmap_for_chars)
@@ -29,13 +29,13 @@ namespace cerb::lex::regex
     private:
         constexpr auto onStart() -> text::ScanApiStatus override
         {
-            Error::checkRegexStart(*this);
+            Check::regexStart(*this);
             return text::ScanApiStatus::SKIP_CHAR;
         }
 
         constexpr auto processChar(CharT chr) -> void override
         {
-            Error::checkDoubleRegexOpening(*this, chr);
+            Check::doubleRegexOpening(*this, chr);
 
             if (chr == cast('-')) {
                 is_range_of_chars = true;
@@ -47,8 +47,8 @@ namespace cerb::lex::regex
 
         constexpr auto onEnd() -> void override
         {
-            Error::checkRangeClosing(*this);
-            Error::checkRangeNonEmpty(*this);
+            Check::rangeClosing(*this);
+            Check::rangeNonEmpty(*this);
         }
 
         constexpr auto addCharToBitmap(CharT chr) -> void
@@ -64,7 +64,7 @@ namespace cerb::lex::regex
 
         constexpr auto fillRangeOfChars(CharT begin, CharT end) -> void
         {
-            Error::checkCharsOrder(*this, begin, end);
+            Check::charsOrder(*this, begin, end);
             available_chars.multiSet<1>(asUInt(begin), asUInt(end) + 1);
 
             is_range_of_chars = false;

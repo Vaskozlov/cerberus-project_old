@@ -4,6 +4,7 @@
 #include <cerberus/lex/char.hpp>
 #include <cerberus/text/generator_modules/tabs_and_spaces_saver.hpp>
 #include <cerberus/text/location_in_file.hpp>
+#include <cerberus/text/scan_api_modules/scan_api_mode.hpp>
 #include <cerberus/text/text_exception.hpp>
 #include <string>
 
@@ -90,11 +91,11 @@ namespace cerb::text
             return getCurrentChar();
         }
 
-        template<bool SkipCleanChars = false>
+        template<ScanApiMode Mode = RAW_CHARS>
         constexpr auto skip(size_t times) -> void
         {
             for (size_t i = 0; i != times; ++i) {
-                if constexpr (SkipCleanChars) {
+                if constexpr (Mode == CLEAN_CHARS) {
                     getCleanChar();
                 } else {
                     getRawChar();
