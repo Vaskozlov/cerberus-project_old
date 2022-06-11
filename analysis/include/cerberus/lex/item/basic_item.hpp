@@ -22,7 +22,7 @@
 namespace cerb::lex
 {
     CERBERUS_ENUM(// NOLINTNEXTLINE
-        ItemFlags, u16, NONE = 0b0, STAR = 0b1, PLUS = 0b10, QUESTION = 0b1'00, FIXED = 0b1'000,
+        ItemFlags, u32, NONE = 0b0, STAR = 0b1, PLUS = 0b10, QUESTION = 0b1'00, FIXED = 0b1'000,
         PREFIX = 0b10'000, REVERSE = 0b100'000, NONTERMINAL = 0b10'000'000);
 
     // NOLINTNEXTLINE
@@ -55,7 +55,7 @@ namespace cerb::lex
         AnalysisGlobals() = default;
 
         string_container_t nonterminals{};
-        LazyExecutor<std::any> lazy_executor{ 2 };
+        LazyExecutor<> lazy_executor{ 2 };
     };
 
     template<CharacterLiteral CharT>

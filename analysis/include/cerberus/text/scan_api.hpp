@@ -3,12 +3,13 @@
 
 #include <cerberus/analysis/analysis_exception.hpp>
 #include <cerberus/text/generator_for_text.hpp>
+#include <cerberus/text/scan_api_modules/comment_skipper.hpp>
 #include <cerberus/text/scan_api_modules/escape_symbol.hpp>
 
 #define CERBLIB_SCAN_API_ACCESS(UseCleanChars, CharT)                                              \
     using scan_api_t = cerb::text::ScanApi<UseCleanChars, CharT>;                                  \
     using scan_api_t::getChar;                                                                     \
-    using scan_api_t::getFutureChar;                                                               \
+    using scan_api_t::getFutureRawChar;                                                            \
     using scan_api_t::nextChar;                                                                    \
     using scan_api_t::canContinueParsing;                                                          \
     using scan_api_t::getNextCharAndCheckForEoF;                                                   \
@@ -27,11 +28,12 @@ namespace cerb::text
     template<CharacterLiteral CharT>
     CERBERUS_ANALYSIS_EXCEPTION(ScanApiError, CharT, BasicScanApiError);
 
-    template<ScanApiMode Mode, CharacterLiteral CharT>
+    template<SkipMode Mode, CharacterLiteral CharT>
     struct ScanApi
     {
         friend EscapeSymbol<Mode, CharT>;
         friend NotationEscapeSymbol<Mode, CharT>;
+        using symbol_pair = Pair<CharT, CharT, PairComparison::BY_FIRST_VALUE>;
 
         template<std::integral Int>
         CERBLIB_DECL static auto cast(Int value) -> CharT
@@ -49,13 +51,9 @@ namespace cerb::text
             return text_generator.getCurrentChar();
         }
 
-        CERBLIB_DECL auto getFutureChar() const -> CharT
+        CERBLIB_DECL auto getFutureRawChar() const -> CharT
         {
-            if constexpr (Mode == CLEAN_CHARS) {
-                return getFutureCleanChar();
-            } else {
-                return getFutureRawChar();
-            }
+            return text_generator.getCurrentChar(1);
         }
 
         constexpr auto skip(size_t times) -> void
@@ -65,6 +63,8 @@ namespace cerb::text
 
         constexpr auto nextChar() -> CharT
         {
+            comment_skipper.skipComment();
+
             if constexpr (Mode == CLEAN_CHARS) {
                 return text_generator.getCleanChar();
             } else {
@@ -107,9 +107,8 @@ namespace cerb::text
             }
         }
 
-        constexpr auto parseEscapeSequence(
-            std::initializer_list<Pair<CharT, CharT, PairComparison::BY_FIRST_VALUE>> const
-                &special_symbols) -> CharT
+        CERBLIB_DECL auto
+            parseEscapeSequence(std::initializer_list<symbol_pair> const &special_symbols) -> CharT
         {
             return processCharEscape(*this, special_symbols);
         }
@@ -145,35 +144,41 @@ namespace cerb::text
         ScanApi(ScanApi const &) = default;
         ScanApi(ScanApi &&) noexcept = default;
 
-        constexpr explicit ScanApi(GeneratorForText<CharT> &generator_for_text)
-          : text_generator(generator_for_text)
+        constexpr explicit ScanApi(
+            GeneratorForText<CharT> &generator_for_text,
+            BasicStringView<CharT> const &single_line_comment = {},
+            BasicStringView<CharT> const &multiline_comment_begin = {},
+            BasicStringView<CharT> const &multiline_comment_end = {})
+          : text_generator(generator_for_text), comment_skipper(
+                                                    generator_for_text,
+                                                    single_line_comment,
+                                                    multiline_comment_begin,
+                                                    multiline_comment_end)
         {}
 
         virtual ~ScanApi() = default;
 
     private:
-        CERBLIB_DECL auto getFutureRawChar() const -> CharT
-        {
-            return text_generator.getCurrentChar(1);
-        }
-
         CERBLIB_DECL auto getFutureCleanChar() const -> CharT
         {
+            using namespace lex;
+
             ssize_t i = 1;
 
-            while (lex::isLayout(text_generator.getCurrentChar(i))) {
+            while (isLayout(text_generator.getCurrentChar(i))) {
                 // empty loop
             }
 
             return text_generator.getCurrentChar(i + 1);
         }
 
-        constexpr auto throwException(string_view const &message) -> void
+        constexpr auto throwException(string_view const &message) const -> void
         {
             throw ScanApiError(message, text_generator);
         }
 
         GeneratorForText<CharT> &text_generator;
+        CommentSkipper<CharT> comment_skipper;
     };
 
 #ifndef CERBERUS_HEADER_ONLY

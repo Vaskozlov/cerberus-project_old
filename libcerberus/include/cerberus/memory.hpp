@@ -121,7 +121,9 @@ namespace cerb
         CERBLIB_DECL auto strlenForPointer(CharT const *str) -> size_t
         {
             constexpr auto max_length = std::numeric_limits<u32>::max();
-            return ptrdiff(str, find(str, static_cast<CharT>(0), max_length));
+
+            auto terminator_iterator = find(str, static_cast<CharT>(0), max_length);
+            return ptrdiff(str, terminator_iterator);
         }
     }// namespace private_
 
@@ -129,7 +131,10 @@ namespace cerb
     constexpr auto fill(T *dest, AutoCopyType<T> value, size_t times) -> void
     {
 #if CERBLIB_AMD64
-        if constexpr (std::is_trivially_copy_assignable_v<T> && CanBeStoredAsIntegral<T>) {
+        constexpr bool is_suitable_for_fast_fill =
+            std::is_trivially_copy_assignable_v<T> && CanBeStoredAsIntegral<T>;
+
+        if constexpr (is_suitable_for_fast_fill) {
             if CERBLIB_RUNTIME {
                 return amd64::fill(dest, value, times);
             }
@@ -142,9 +147,10 @@ namespace cerb
     constexpr auto fill(T &dest, AutoCopyType<GetValueType<T>> value) -> void
     {
 #if CERBLIB_AMD64
-        if constexpr (
-            RawAccessible<T> && ClassValueFastCopiable<T> &&
-            CanBeStoredAsIntegral<GetValueType<T>>) {
+        constexpr bool is_suitable_for_fast_fill =
+            RawAccessible<T> && ClassValueFastCopiable<T> && CanBeStoredAsIntegral<GetValueType<T>>;
+
+        if constexpr (is_suitable_for_fast_fill) {
             if CERBLIB_RUNTIME {
                 return amd64::fill(std::data(dest), value, std::size(dest));
             }
@@ -200,8 +206,7 @@ namespace cerb
     CERBLIB_DECL auto find(T const *location, AutoCopyType<T> value, size_t limit) -> T const *
     {
 #if CERBLIB_AMD64
-        [[maybe_unused]] constexpr bool suitable_for_fast_search =
-            CanBeStoredAsIntegral<T> && std::is_trivial_v<T>;
+        constexpr bool suitable_for_fast_search = CanBeStoredAsIntegral<T> && std::is_trivial_v<T>;
 
         if constexpr (suitable_for_fast_search) {
             if CERBLIB_RUNTIME {
@@ -292,6 +297,7 @@ namespace cerb
     CERBLIB_DECL auto strlen(T const &str) -> size_t
     {
         using namespace private_;
+        static_assert(std::is_array_v<T> || std::is_pointer_v<T>);
 
         if constexpr (std::is_array_v<T>) {
             return strlenForArray<>(str);

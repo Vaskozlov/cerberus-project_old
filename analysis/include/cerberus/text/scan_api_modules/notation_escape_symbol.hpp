@@ -2,14 +2,14 @@
 #define CERBERUS_NOTATION_ESCAPE_SYMBOL_HPP
 
 #include <cerberus/text/generator_for_text.hpp>
-#include <cerberus/text/scan_api_modules/scan_api_mode.hpp>
+#include <cerberus/text/scan_api_modules/skip_mode.hpp>
 
 namespace cerb::text
 {
-    template<ScanApiMode Mode, CharacterLiteral CharT>
+    template<SkipMode Mode, CharacterLiteral CharT>
     struct ScanApi;
 
-    template<ScanApiMode Mode, CharacterLiteral CharT>
+    template<SkipMode Mode, CharacterLiteral CharT>
     struct NotationEscapeSymbol
     {
         using scan_api_t = ScanApi<Mode, CharT>;
@@ -20,13 +20,11 @@ namespace cerb::text
             CharT final_char = CharEnum<CharT>::EoF;
 
             for (u32 i = 0; i != length; ++i) {
-                if (isOutOfNotation(scan_api.getFutureChar(), notation)) {
+                if (isOutOfNotation(scan_api.getFutureRawChar(), notation)) {
                     break;
                 }
 
-                CharT chr = scan_api.getNextCharAndCheckForEoF();
-                final_char *= static_cast<CharT>(notation);
-                final_char += convertSymbolToInt(chr);
+                final_char = applySymbolToResult(final_char);
             }
 
             return final_char;
@@ -39,6 +37,16 @@ namespace cerb::text
         {}
 
     private:
+        CERBLIB_DECL auto applySymbolToResult(CharT final_char) const -> CharT
+        {
+            CharT chr = scan_api.getNextCharAndCheckForEoF();
+
+            final_char *= static_cast<CharT>(notation);
+            final_char += convertSymbolToInt(chr);
+
+            return final_char;
+        }
+
         CERBLIB_DECL static auto isOutOfNotation(CharT chr, u32 notation) -> bool
         {
             if (not hexadecimal_chars.contains(chr)) {
@@ -61,7 +69,7 @@ namespace cerb::text
         u32 length{};
     };
 
-    template<size_t Notation, ScanApiMode Mode, CharacterLiteral CharT>
+    template<size_t Notation, SkipMode Mode, CharacterLiteral CharT>
     CERBLIB_DECL auto convertCharEscape(ScanApi<Mode, CharT> &scan_api, u32 length) -> CharT
     {
         constexpr size_t hexadecimal_notation = 16;

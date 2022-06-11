@@ -43,6 +43,9 @@ namespace cerb::debug
             TestIntegrals.data() + TestIntegrals.size() - 1);
 
         ASSERT_EQUAL(find(TestIntegrals, 500), TestIntegrals.end());
+        ASSERT_EQUAL(
+            find(TestIntegrals.data(), 500, TestIntegrals.size()),
+            TestIntegrals.data() + TestIntegrals.size());
 
         return true;
     }

@@ -21,10 +21,11 @@ namespace cerb::debug
     private:
         auto startJobs(LazyExecutorOptions option) -> void
         {
-            auto call_test_function = [this]() { return testFunction(this); };
+            constexpr auto apply_option_after = tasks_number / 8;
+            auto call_test_function = [this]() { return testFunction(*this); };
 
             for (size_t i = 0; i != tasks_number; ++i) {
-                if (i == tasks_number / 8) {
+                if (i == apply_option_after) {
                     applyOption(option);
                 }
 
@@ -73,10 +74,10 @@ namespace cerb::debug
             }
         }
 
-        static auto testFunction(LazyExecutorTester *tester) -> int
+        static auto testFunction(LazyExecutorTester &tester) -> int
         {
-            int counter_value = tester->counter++;
-            tester->value_to_zero[static_cast<uint>(counter_value)] = 0;// NOLINT
+            int counter_value = tester.counter++;
+            tester.value_to_zero[static_cast<uint>(counter_value)] = 0;// NOLINT
 
             randomAction();
 
@@ -96,9 +97,11 @@ namespace cerb::debug
 
         static constexpr int tasks_number = 512;
 
+        // NOLINTBEGIN
         static inline std::random_device random_device{};
         static inline std::mt19937 engine{ random_device() };
         static inline std::uniform_int_distribution<u16> distribution{ 0, 1 };
+        // NOLINTEND
 
         std::atomic<int> counter{ 0 };
         LazyExecutor<int> executor{ std::thread::hardware_concurrency() };

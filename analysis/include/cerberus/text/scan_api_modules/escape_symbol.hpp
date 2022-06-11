@@ -2,11 +2,11 @@
 #define CERBERUS_ESCAPE_SYMBOL_HPP
 
 #include <cerberus/text/scan_api_modules/notation_escape_symbol.hpp>
-#include <cerberus/text/scan_api_modules/scan_api_mode.hpp>
+#include <cerberus/text/scan_api_modules/skip_mode.hpp>
 
 namespace cerb::text
 {
-    template<ScanApiMode Mode, CharacterLiteral CharT>
+    template<SkipMode Mode, CharacterLiteral CharT>
     struct EscapeSymbol
     {
         using symbol_pair = Pair<CharT, CharT, PairComparison::BY_FIRST_VALUE>;
@@ -88,7 +88,7 @@ namespace cerb::text
         std::initializer_list<symbol_pair> const &special_symbols;
     };
 
-    template<ScanApiMode Mode, CharacterLiteral CharT>
+    template<SkipMode Mode, CharacterLiteral CharT>
     CERBLIB_DECL auto processCharEscape(
         ScanApi<Mode, CharT> &scan_api,
         std::initializer_list<Pair<CharT, CharT, PairComparison::BY_FIRST_VALUE>> const
