@@ -143,6 +143,12 @@ namespace cerb
 
         CERBLIB_DECL auto containsAt(size_t index, BasicStringView const &str) const -> bool
         {
+            auto const new_str_length = size() - index;
+
+            if (new_str_length < str.size()) {
+                return false;
+            }
+
             return BasicStringView(begin() + index, str.size()).operator==(str);
         }
 
