@@ -1,5 +1,5 @@
-#ifndef CERBERUS_STRING_POOL_HPP
-#define CERBERUS_STRING_POOL_HPP
+#ifndef CERBERUS_STRING_CONTAINER_HPP
+#define CERBERUS_STRING_CONTAINER_HPP
 
 #include <cerberus/const_bitmap.hpp>
 #include <cerberus/number.hpp>
@@ -10,7 +10,7 @@
 namespace cerb
 {
     template<CharacterLiteral CharT, typename TokenType, bool UseStdString = false>
-    struct StringPool
+    struct StringContainer
     {
         constexpr static size_t number_of_chars = pow2<size_t>(bitsizeof(CharT));
 
@@ -55,7 +55,8 @@ namespace cerb
             return tokens_by_strings.at(string);
         }
 
-        CERBLIB_DECL auto findLongestStringInPool(str_t const &string) const -> str_t
+        template<StringType<CharT> Str>
+        CERBLIB_DECL auto findLongestString(Str const &string) const -> Str
         {
             size_t fetched_string_size = 0;
             auto level = available_chars.begin();
@@ -69,10 +70,11 @@ namespace cerb
                 ++fetched_string_size;
             }
 
-            return { string.begin(), fetched_string_size };
+            return { string.begin(), string.begin() + fetched_string_size };
         }
 
-        CERBLIB_DECL auto contains(str_t const &string) const -> bool
+        template<StringType<CharT> Str>
+        CERBLIB_DECL auto contains(Str const &string) const -> bool
         {
             auto level = available_chars.begin();
 
@@ -86,9 +88,10 @@ namespace cerb
             return true;
         }
 
-        StringPool() = default;
+        StringContainer() = default;
 
-        constexpr StringPool(std::initializer_list<value_type> const &nodes) : available_chars(4)
+        constexpr StringContainer(std::initializer_list<value_type> const &nodes)
+          : available_chars(4)
         {
             auto emplace_node = [this](value_type const &node) { this->emplace(node); };
             std::ranges::for_each(nodes, emplace_node);
@@ -129,4 +132,4 @@ namespace cerb
     };
 }// namespace cerb
 
-#endif /* CERBERUS_STRING_POOL_HPP */
+#endif /* CERBERUS_STRING_CONTAINER_HPP */

@@ -1,10 +1,10 @@
 #include <cerberus/debug/debug.hpp>
 #include <cerberus/enum.hpp>
 #include <cerberus/lazy_executor.hpp>
+#include <random>
 
 namespace cerb::debug
 {
-
     CERBERUS_ENUM(// NOLINTNEXTLINE
         LazyExecutorOptions, u16, DEFAULT = 0, REMOVE_THREAD = 1, ADD_THREAD = 2, JOIN = 4);
 
@@ -21,22 +21,27 @@ namespace cerb::debug
     private:
         auto startJobs(LazyExecutorOptions option) -> void
         {
+            constexpr auto apply_option_after = tasks_number / 8;
+            auto call_test_function = [this]() { return testFunction(*this); };
+
             for (size_t i = 0; i != tasks_number; ++i) {
-                if (i == tasks_number / 4) {
+                if (i == apply_option_after) {
                     applyOption(option);
                 }
 
-                executor.addJob([this]() { return testFunction(this); });
+                executor.addJob(call_test_function);
             }
 
-            endJobs();
+            finishJobs();
         }
 
-        auto endJobs() -> void
+        auto finishJobs() -> void
         {
+            auto is_zero = [](int value) { return value == 0; };
             executor.stop();
+
             ASSERT_EQUAL(static_cast<int>(counter), tasks_number);
-            ASSERT_TRUE(std::ranges::all_of(value_to_zero, [](int value) { return value == 0; }));
+            ASSERT_TRUE(std::ranges::all_of(value_to_zero, is_zero));
         }
 
         auto applyOption(LazyExecutorOptions option) -> void
@@ -69,18 +74,34 @@ namespace cerb::debug
             }
         }
 
-        static auto testFunction(LazyExecutorTester *tester) -> int
+        static auto testFunction(LazyExecutorTester &tester) -> int
         {
-            using namespace std::chrono_literals;
+            int counter_value = tester.counter++;
+            tester.value_to_zero[static_cast<uint>(counter_value)] = 0;// NOLINT
 
-            int counter_value = tester->counter++;
-            tester->value_to_zero[static_cast<uint>(counter_value)] = 0;// NOLINT
-            std::this_thread::sleep_for(1ms);
+            randomAction();
 
             return counter_value;
         }
 
+        static auto randomAction() -> void
+        {
+            using namespace std::chrono_literals;
+
+            if (distribution(engine) == 0) {
+                std::this_thread::yield();
+            } else {
+                std::this_thread::sleep_for(1ms);
+            }
+        }
+
         static constexpr int tasks_number = 512;
+
+        // NOLINTBEGIN
+        static inline std::random_device random_device{};
+        static inline std::mt19937 engine{ random_device() };
+        static inline std::uniform_int_distribution<u16> distribution{ 0, 1 };
+        // NOLINTEND
 
         std::atomic<int> counter{ 0 };
         LazyExecutor<int> executor{ std::thread::hardware_concurrency() };

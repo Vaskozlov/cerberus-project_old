@@ -2,16 +2,17 @@
 #define CERBERUS_NOTATION_ESCAPE_SYMBOL_HPP
 
 #include <cerberus/text/generator_for_text.hpp>
+#include <cerberus/text/scan_api_modules/skip_mode.hpp>
 
 namespace cerb::text
 {
-    template<bool UseCleanChars, CharacterLiteral CharT>
+    template<SkipMode Mode, CharacterLiteral CharT>
     struct ScanApi;
 
-    template<bool UseCleanChars, CharacterLiteral CharT>
+    template<SkipMode Mode, CharacterLiteral CharT>
     struct NotationEscapeSymbol
     {
-        using scan_api_t = ScanApi<UseCleanChars, CharT>;
+        using scan_api_t = ScanApi<Mode, CharT>;
 
         CERBLIB_DECL auto convert() -> CharT
         {
@@ -19,13 +20,11 @@ namespace cerb::text
             CharT final_char = CharEnum<CharT>::EoF;
 
             for (u32 i = 0; i != length; ++i) {
-                if (isOutOfNotation(scan_api.getFutureChar(), notation)) {
+                if (isOutOfNotation(scan_api.getFutureRawChar(), notation)) {
                     break;
                 }
 
-                CharT chr = scan_api.getNextCharAndCheckForEoF();
-                final_char *= static_cast<CharT>(notation);
-                final_char += convertSymbolToInt(chr);
+                final_char = applySymbolToResult(final_char);
             }
 
             return final_char;
@@ -38,6 +37,16 @@ namespace cerb::text
         {}
 
     private:
+        CERBLIB_DECL auto applySymbolToResult(CharT final_char) const -> CharT
+        {
+            CharT chr = scan_api.getNextCharAndCheckForEoF();
+
+            final_char *= static_cast<CharT>(notation);
+            final_char += convertSymbolToInt(chr);
+
+            return final_char;
+        }
+
         CERBLIB_DECL static auto isOutOfNotation(CharT chr, u32 notation) -> bool
         {
             if (not hexadecimal_chars.contains(chr)) {
@@ -60,9 +69,8 @@ namespace cerb::text
         u32 length{};
     };
 
-    template<size_t Notation, bool UseCleanChars, CharacterLiteral CharT>
-    CERBLIB_DECL auto convertCharEscape(ScanApi<UseCleanChars, CharT> &scan_api, u32 length)
-        -> CharT
+    template<size_t Notation, SkipMode Mode, CharacterLiteral CharT>
+    CERBLIB_DECL auto convertCharEscape(ScanApi<Mode, CharT> &scan_api, u32 length) -> CharT
     {
         constexpr size_t hexadecimal_notation = 16;
         static_assert(Notation <= hexadecimal_notation);
@@ -72,20 +80,20 @@ namespace cerb::text
     }
 
 #ifndef CERBERUS_HEADER_ONLY
-    extern template struct NotationEscapeSymbol<false, char>;
-    extern template struct NotationEscapeSymbol<true, char>;
+    extern template struct NotationEscapeSymbol<RAW_CHARS, char>;
+    extern template struct NotationEscapeSymbol<CLEAN_CHARS, char>;
 
-    extern template struct NotationEscapeSymbol<false, char8_t>;
-    extern template struct NotationEscapeSymbol<true, char8_t>;
+    extern template struct NotationEscapeSymbol<RAW_CHARS, char8_t>;
+    extern template struct NotationEscapeSymbol<CLEAN_CHARS, char8_t>;
 
-    extern template struct NotationEscapeSymbol<false, char16_t>;
-    extern template struct NotationEscapeSymbol<true, char16_t>;
+    extern template struct NotationEscapeSymbol<RAW_CHARS, char16_t>;
+    extern template struct NotationEscapeSymbol<CLEAN_CHARS, char16_t>;
 
-    extern template struct NotationEscapeSymbol<false, char32_t>;
-    extern template struct NotationEscapeSymbol<true, char32_t>;
+    extern template struct NotationEscapeSymbol<RAW_CHARS, char32_t>;
+    extern template struct NotationEscapeSymbol<CLEAN_CHARS, char32_t>;
 
-    extern template struct NotationEscapeSymbol<false, wchar_t>;
-    extern template struct NotationEscapeSymbol<true, wchar_t>;
+    extern template struct NotationEscapeSymbol<RAW_CHARS, wchar_t>;
+    extern template struct NotationEscapeSymbol<CLEAN_CHARS, wchar_t>;
 #endif /* CERBERUS_HEADER_ONLY */
 
 }// namespace cerb::text

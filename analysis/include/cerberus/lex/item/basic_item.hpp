@@ -3,8 +3,9 @@
 
 #include <cerberus/lazy_executor.hpp>
 #include <cerberus/lex/lexical_analysis_exception.hpp>
+#include <cerberus/lex/token.hpp>
 #include <cerberus/small_vector.hpp>
-#include <cerberus/string_pool.hpp>
+#include <cerberus/string_container.hpp>
 #include <cerberus/text/generator_for_text.hpp>
 #include <cerberus/text/string_to_codes.hpp>
 
@@ -12,7 +13,8 @@
     using basic_item_t = BasicItem<CharT>;                                                         \
     using basic_item_t::analysis_globals;                                                          \
     using basic_item_t::cast;                                                                      \
-    using basic_item_t::flags
+    using basic_item_t::flags;                                                                     \
+    using typename basic_item_t::ScanResult
 
 #define CERBLIB_BASIC_ITEM_ARGS cerb::lex::AnalysisGlobals<CharT> &analysis_parameters
 #define CERBLIB_CONSTRUCT_BASIC_ITEM basic_item_t(analysis_parameters)
@@ -20,39 +22,57 @@
 namespace cerb::lex
 {
     CERBERUS_ENUM(// NOLINTNEXTLINE
-        ItemFlags, u16, NONE = 0b0, STAR = 0b1, PLUS = 0b10, QUESTION = 0b1'00, FIXED = 0b1'000,
+        ItemFlags, u32, NONE = 0b0, STAR = 0b1, PLUS = 0b10, QUESTION = 0b1'00, FIXED = 0b1'000,
         PREFIX = 0b10'000, REVERSE = 0b100'000, NONTERMINAL = 0b10'000'000);
+
+    // NOLINTNEXTLINE
+    CERBERUS_ENUM(ScanResultStatus, u16, NONE = 0b0, SUCCESS = 0b1, FAILURE = 0b10);
 
     template<CharacterLiteral CharT>
     struct AnalysisGlobals
     {
+        using string_container_t = StringContainer<CharT, size_t, true>;
+        using tokens_storage_iterator = typename string_container_t::tokens_storage_iterator;
+
+        constexpr auto containsNonterminal(BasicStringView<CharT> const &nonterminal) const -> bool
+        {
+            auto longest = nonterminals.findLongestString(nonterminal);
+            return nonterminals.contains(longest);
+        }
+
         constexpr auto emplaceNonterminal(std::basic_string<CharT> &&str, size_t id)
-            -> decltype(auto)
+            -> std::pair<tokens_storage_iterator, bool>
         {
             return nonterminals.emplace(std::move(str), id);
         }
 
         constexpr auto emplaceNonterminal(std::basic_string<CharT> const &str, size_t id)
-            -> decltype(auto)
+            -> std::pair<tokens_storage_iterator, bool>
         {
             return nonterminals.emplace(str, id);
         }
 
         AnalysisGlobals() = default;
 
-        StringPool<CharT, size_t, true> nonterminals{};
-        LazyExecutor<std::any> lazy_executor{ 2 };
+        string_container_t nonterminals{};
+        LazyExecutor<> lazy_executor{ 2 };
     };
 
     template<CharacterLiteral CharT>
     struct BasicItem
     {
+        struct ScanResult
+        {
+            ScanResultStatus status{};
+        };
+
         template<std::integral Int>
         CERBLIB_DECL static auto cast(Int value) -> CharT
         {
             return static_cast<CharT>(value);
         }
 
+        CERBLIB_DECL virtual auto scan(text::GeneratorForText<CharT>) const -> ScanResult = 0;
         virtual constexpr auto postInitializationSetup() -> void = 0;
 
         BasicItem() = default;

@@ -11,6 +11,12 @@ namespace cerb::lex::regex
     {
         CERBLIB_BASIC_ITEM_ACCESS(CharT);
 
+        CERBLIB_DECL auto scan(text::GeneratorForText<CharT> /*unused*/) const
+            -> ScanResult override
+        {
+            return ScanResult{};
+        }
+
         constexpr RegexItem(CERBLIB_BASIC_ITEM_ARGS, text::GeneratorForText<CharT> &regex_rule)
           : CERBLIB_CONSTRUCT_BASIC_ITEM
         {
@@ -25,7 +31,9 @@ namespace cerb::lex::regex
 
         constexpr auto postInitializationSetup() -> void override
         {
-            if (flags.isSet(ItemFlags::REVERSE)) {}
+            if (flags.isSet(ItemFlags::REVERSE)) {
+                available_chars.reverseValues();
+            }
         }
 
         Bitmap available_chars{};

@@ -8,48 +8,48 @@ namespace cerb::text
     template struct ScanApiError<char32_t>;
     template struct ScanApiError<wchar_t>;
 
-    template struct ScanApi<false, char>;
-    template struct ScanApi<true, char>;
+    template struct ScanApi<RAW_CHARS, char>;
+    template struct ScanApi<CLEAN_CHARS, char>;
 
-    template struct ScanApi<false, char8_t>;
-    template struct ScanApi<true, char8_t>;
+    template struct ScanApi<RAW_CHARS, char8_t>;
+    template struct ScanApi<CLEAN_CHARS, char8_t>;
 
-    template struct ScanApi<false, char16_t>;
-    template struct ScanApi<true, char16_t>;
+    template struct ScanApi<RAW_CHARS, char16_t>;
+    template struct ScanApi<CLEAN_CHARS, char16_t>;
 
-    template struct ScanApi<false, char32_t>;
-    template struct ScanApi<true, char32_t>;
+    template struct ScanApi<RAW_CHARS, char32_t>;
+    template struct ScanApi<CLEAN_CHARS, char32_t>;
 
-    template struct ScanApi<false, wchar_t>;
-    template struct ScanApi<true, wchar_t>;
+    template struct ScanApi<RAW_CHARS, wchar_t>;
+    template struct ScanApi<CLEAN_CHARS, wchar_t>;
 
-    template struct NotationEscapeSymbol<false, char>;
-    template struct NotationEscapeSymbol<true, char>;
+    template struct NotationEscapeSymbol<RAW_CHARS, char>;
+    template struct NotationEscapeSymbol<CLEAN_CHARS, char>;
 
-    template struct NotationEscapeSymbol<false, char8_t>;
-    template struct NotationEscapeSymbol<true, char8_t>;
+    template struct NotationEscapeSymbol<RAW_CHARS, char8_t>;
+    template struct NotationEscapeSymbol<CLEAN_CHARS, char8_t>;
 
-    template struct NotationEscapeSymbol<false, char16_t>;
-    template struct NotationEscapeSymbol<true, char16_t>;
+    template struct NotationEscapeSymbol<RAW_CHARS, char16_t>;
+    template struct NotationEscapeSymbol<CLEAN_CHARS, char16_t>;
 
-    template struct NotationEscapeSymbol<false, char32_t>;
-    template struct NotationEscapeSymbol<true, char32_t>;
+    template struct NotationEscapeSymbol<RAW_CHARS, char32_t>;
+    template struct NotationEscapeSymbol<CLEAN_CHARS, char32_t>;
 
-    template struct NotationEscapeSymbol<false, wchar_t>;
-    template struct NotationEscapeSymbol<true, wchar_t>;
+    template struct NotationEscapeSymbol<RAW_CHARS, wchar_t>;
+    template struct NotationEscapeSymbol<CLEAN_CHARS, wchar_t>;
 
-    template struct EscapeSymbol<false, char>;
-    template struct EscapeSymbol<true, char>;
+    template struct EscapeSymbol<RAW_CHARS, char>;
+    template struct EscapeSymbol<CLEAN_CHARS, char>;
 
-    template struct EscapeSymbol<false, char8_t>;
-    template struct EscapeSymbol<true, char8_t>;
+    template struct EscapeSymbol<RAW_CHARS, char8_t>;
+    template struct EscapeSymbol<CLEAN_CHARS, char8_t>;
 
-    template struct EscapeSymbol<false, char16_t>;
-    template struct EscapeSymbol<true, char16_t>;
+    template struct EscapeSymbol<RAW_CHARS, char16_t>;
+    template struct EscapeSymbol<CLEAN_CHARS, char16_t>;
 
-    template struct EscapeSymbol<false, char32_t>;
-    template struct EscapeSymbol<true, char32_t>;
+    template struct EscapeSymbol<RAW_CHARS, char32_t>;
+    template struct EscapeSymbol<CLEAN_CHARS, char32_t>;
 
-    template struct EscapeSymbol<false, wchar_t>;
-    template struct EscapeSymbol<true, wchar_t>;
+    template struct EscapeSymbol<RAW_CHARS, wchar_t>;
+    template struct EscapeSymbol<CLEAN_CHARS, wchar_t>;
 }// namespace cerb::text

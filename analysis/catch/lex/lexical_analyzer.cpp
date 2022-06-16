@@ -7,7 +7,15 @@ namespace cerb::debug
 
     auto testLexicalAnalyzer() -> int
     {
-        LexicalAnalyzer<char> _ = LexicalAnalyzer<char>({ { "test", "[0-9]+p\"for\"" } });
+        auto completion = [](Token<char> const &) {};
+
+        LexicalAnalyzer<char> lexical_analyzer = { { "dot", "\'.\'", completion },
+                                                   { "int", "[0-9]+", completion },
+                                                   { "double", "[0-9]+\".\"[0-9]*", completion } };
+
+
+        lexical_analyzer.addSource("1010 . 1010.01");
+
         return 0;
     }
 }// namespace cerb::debug

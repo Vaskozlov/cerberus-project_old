@@ -59,7 +59,9 @@ namespace cerb
         auto addThread() -> void
         {
             threads_run_flag.emplace_back(true);
-            threads_storage.emplace_back(threadLoop, this, &threads_run_flag.back());
+
+            auto &run_flag = threads_run_flag.back();
+            threads_storage.emplace_back(threadLoop, std::ref(*this), std::ref(run_flag));
         }
 
         auto removeThread() -> void
@@ -108,14 +110,14 @@ namespace cerb
         }
 
     private:
-        static auto threadLoop(LazyExecutor *executor, bool const *run_flag) -> void
+        static auto threadLoop(LazyExecutor &executor, bool const &run_flag) -> void
         {
-            while (logicalAnd(executor->run, *run_flag)) {
+            while (logicalAnd(executor.run, run_flag)) {
                 tryToGrabAndExecuteTask(executor);
             }
         }
 
-        static auto tryToGrabAndExecuteTask(LazyExecutor *executor) -> void
+        static auto tryToGrabAndExecuteTask(LazyExecutor &executor) -> void
         {
             using namespace std::chrono_literals;
 
@@ -128,10 +130,10 @@ namespace cerb
             }
         }
 
-        static auto tryToGrabAction(LazyExecutor *executor, Action &action) -> bool
+        static auto tryToGrabAction(LazyExecutor &executor, Action &action) -> bool
         {
-            std::deque<Action> &queue = executor->actions_queue;
-            std::scoped_lock lock{ executor->queue_lock };
+            std::deque<Action> &queue = executor.actions_queue;
+            std::scoped_lock lock{ executor.queue_lock };
 
             if (not queue.empty()) {
                 action = queue.front();
@@ -162,7 +164,7 @@ namespace cerb
             auto run_flag = threads_run_flag.begin();
 
             for (std::jthread &thread : threads_storage) {
-                thread = std::jthread(threadLoop, this, std::to_address(run_flag));
+                thread = std::jthread(threadLoop, std::ref(*this), std::to_address(run_flag));
                 ++run_flag;
             }
         }

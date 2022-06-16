@@ -4,6 +4,7 @@
 #include <cerberus/lex/char.hpp>
 #include <cerberus/text/generator_modules/tabs_and_spaces_saver.hpp>
 #include <cerberus/text/location_in_file.hpp>
+#include <cerberus/text/scan_api_modules/skip_mode.hpp>
 #include <cerberus/text/text_exception.hpp>
 #include <string>
 
@@ -90,11 +91,11 @@ namespace cerb::text
             return getCurrentChar();
         }
 
-        template<bool SkipCleanChars = false>
+        template<SkipMode Mode = RAW_CHARS>
         constexpr auto skip(size_t times) -> void
         {
             for (size_t i = 0; i != times; ++i) {
-                if constexpr (SkipCleanChars) {
+                if constexpr (Mode == CLEAN_CHARS) {
                     getCleanChar();
                 } else {
                     getRawChar();
@@ -102,7 +103,7 @@ namespace cerb::text
             }
         }
 
-        template<bool SkipCleanChars = false>
+        template<SkipMode Mode = RAW_CHARS>
         CERBLIB_DECL auto fork(size_t from, size_t to) const -> GeneratorForText<CharT>
         {
             checkForkingBorders(from, to);
@@ -110,7 +111,7 @@ namespace cerb::text
             GeneratorForText<CharT> forked_generator = *this;
             BasicStringView<CharT> &forked_text = forked_generator.text;
 
-            forked_generator.skip(from);
+            forked_generator.template skip<Mode>(from);
 
             auto forked_text_begin = forked_text.begin();
             auto forked_text_length = to - from;

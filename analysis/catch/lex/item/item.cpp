@@ -108,7 +108,7 @@ namespace cerb::debug
         ASSERT_EQUAL(items.size(), 2);
 
         auto const &front_item = items.front();
-        auto const *parsing_item = dynamic_cast<ItemParser<char> *>(front_item.get());
+        auto const *parsing_item = dynamic_cast<DotItem<char> *>(front_item.get());
 
         ASSERT_NOT_EQUAL(parsing_item, nullptr);
 
