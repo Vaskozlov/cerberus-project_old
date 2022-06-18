@@ -1,16 +1,16 @@
 #ifndef CERBERUS_ESCAPE_SYMBOL_HPP
 #define CERBERUS_ESCAPE_SYMBOL_HPP
 
-#include <cerberus/text/scan_api_modules/notation_escape_symbol.hpp>
-#include <cerberus/text/scan_api_modules/skip_mode.hpp>
+#include <cerberus/text_scan_assistance/scan_api_modules/notation_escape_symbol.hpp>
+#include <cerberus/text_scan_assistance/scan_api_modules/skip_mode.hpp>
 
 namespace cerb::text
 {
-    template<SkipMode Mode, CharacterLiteral CharT>
+    template<CharacterLiteral CharT>
     struct EscapeSymbol
     {
+        using scan_api_t = ScanApi<CharT>;
         using symbol_pair = Pair<CharT, CharT, PairComparison::BY_FIRST_VALUE>;
-        using scan_api_t = ScanApi<Mode, CharT>;
 
         template<std::integral Int>
         CERBLIB_DECL static auto cast(Int value) -> CharT
@@ -20,7 +20,7 @@ namespace cerb::text
 
         constexpr auto parseEscapeSequence() -> CharT
         {
-            CharT chr = scan_api.getNextCharAndCheckForEoF();
+            CharT chr = scan_api.nextRawCharWithEoFCheck();
             constexpr size_t octal_notation = 8;
             constexpr size_t hexadecimal_notation = 16;
 
@@ -65,7 +65,8 @@ namespace cerb::text
             return searchForSpecialUserSymbol(chr);
         }
 
-        EscapeSymbol() = default;
+        CERBELIB_DEFAULT_NO_COPIABLE(EscapeSymbol);
+
         constexpr EscapeSymbol(
             scan_api_t &api_for_scan,
             std::initializer_list<symbol_pair> const &other_symbols)
@@ -88,9 +89,9 @@ namespace cerb::text
         std::initializer_list<symbol_pair> const &special_symbols;
     };
 
-    template<SkipMode Mode, CharacterLiteral CharT>
+    template<CharacterLiteral CharT>
     CERBLIB_DECL auto processCharEscape(
-        ScanApi<Mode, CharT> &scan_api,
+        ScanApi<CharT> &scan_api,
         std::initializer_list<Pair<CharT, CharT, PairComparison::BY_FIRST_VALUE>> const
             &special_symbols) -> CharT
     {
@@ -99,20 +100,11 @@ namespace cerb::text
     }
 
 #ifndef CERBERUS_HEADER_ONLY
-    extern template struct EscapeSymbol<RAW_CHARS, char>;
-    extern template struct EscapeSymbol<CLEAN_CHARS, char>;
-
-    extern template struct EscapeSymbol<RAW_CHARS, char8_t>;
-    extern template struct EscapeSymbol<CLEAN_CHARS, char8_t>;
-
-    extern template struct EscapeSymbol<RAW_CHARS, char16_t>;
-    extern template struct EscapeSymbol<CLEAN_CHARS, char16_t>;
-
-    extern template struct EscapeSymbol<RAW_CHARS, char32_t>;
-    extern template struct EscapeSymbol<CLEAN_CHARS, char32_t>;
-
-    extern template struct EscapeSymbol<RAW_CHARS, wchar_t>;
-    extern template struct EscapeSymbol<CLEAN_CHARS, wchar_t>;
+    extern template struct EscapeSymbol<char>;
+    extern template struct EscapeSymbol<char8_t>;
+    extern template struct EscapeSymbol<char16_t>;
+    extern template struct EscapeSymbol<char32_t>;
+    extern template struct EscapeSymbol<wchar_t>;
 #endif /* CERBERUS_HEADER_ONLY */
 
 }// namespace cerb::text

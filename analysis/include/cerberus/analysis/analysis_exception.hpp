@@ -4,8 +4,8 @@
 #include <cerberus/analysis/analysis_basic_exception.hpp>
 #include <cerberus/format/format.hpp>
 #include <cerberus/reference_wrapper.hpp>
-#include <cerberus/text/generator_for_text.hpp>
-#include <cerberus/text/string_reducer.hpp>
+#include <cerberus/text_scan_assistance/generator_for_text.hpp>
+#include <cerberus/text_scan_assistance/string_reducer.hpp>
 
 #define CERBERUS_ANALYSIS_EXCEPTION(name, CharT, from)                                             \
     struct name : public cerb::analysis::AnalysisException<CharT, from>                            \
@@ -24,22 +24,22 @@ namespace cerb::analysis
     {
         CERBLIB_DECL auto getOffset() const -> size_t
         {
-            return text_generator.charOffset();
+            return text_generator.getOffset();
         }
 
         CERBLIB_DECL auto getLine() const -> size_t
         {
-            return text_generator.line();
+            return text_generator.getLine();
         }
 
         CERBLIB_DECL auto getCharPosition() const -> size_t
         {
-            return text_generator.charPosition();
+            return text_generator.getColumn();
         }
 
         CERBLIB_DECL auto getFilename() const -> BasicStringView<char> const &
         {
-            return text_generator.filename();
+            return text_generator.getFilename();
         }
 
         CERBLIB_DECL auto getTabsAndSpaces() const -> std::basic_string<CharT> const &

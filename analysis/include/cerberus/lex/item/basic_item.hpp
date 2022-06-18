@@ -6,8 +6,8 @@
 #include <cerberus/lex/token.hpp>
 #include <cerberus/small_vector.hpp>
 #include <cerberus/string_container.hpp>
-#include <cerberus/text/generator_for_text.hpp>
-#include <cerberus/text/string_to_codes.hpp>
+#include <cerberus/text_scan_assistance/generator_for_text.hpp>
+#include <cerberus/text_scan_assistance/string_to_codes.hpp>
 
 #define CERBLIB_BASIC_ITEM_ACCESS(CharT)                                                           \
     using basic_item_t = BasicItem<CharT>;                                                         \

@@ -1,27 +1,31 @@
 #ifndef CERBERUS_TEXT_GENERATOR_HPP
 #define CERBERUS_TEXT_GENERATOR_HPP
 
-#include <cerberus/lex/char.hpp>
-#include <cerberus/text/generator_modules/tabs_and_spaces_saver.hpp>
-#include <cerberus/text/location_in_file.hpp>
-#include <cerberus/text/scan_api_modules/skip_mode.hpp>
-#include <cerberus/text/text_exception.hpp>
+#include <cerberus/char.hpp>
+#include <cerberus/text_scan_assistance/generator_modules/line_tracker.hpp>
+#include <cerberus/text_scan_assistance/generator_modules/tabs_and_spaces_saver.hpp>
+#include <cerberus/text_scan_assistance/location_in_file.hpp>
+#include <cerberus/text_scan_assistance/scan_api_modules/skip_mode.hpp>
+#include <cerberus/text_scan_assistance/text_exception.hpp>
 #include <string>
 
 namespace cerb::text
 {
-    CERBERUS_EXCEPTION(TextGeneratorError, BasicTextAnalysisException);
+    CERBERUS_EXCEPTION(TextGeneratorError, BasicTextScanningException);
 
-    template<CharacterLiteral CharT, CharacterLiteral FileNameT = char>
+    template<CharacterLiteral CharT, CharacterLiteral FileNameT>
     class GeneratorForText : public LocationInFile<FileNameT>
     {
         using char_enum = lex::CharEnum<CharT>;
         using iterator = GetIteratorType<BasicStringView<CharT>>;
+        using line_watcher_t = gen::LineWatcher<CharT, FileNameT>;
         using tabs_and_spaces_saver_t = gen::TabsAndSpacesSaver<CharT>;
+
+        friend line_watcher_t;
 
         CERBLIB_DECL auto currentBegin() const -> iterator
         {
-            return text.begin() + charOffset();
+            return text.begin() + getOffset();
         }
 
         CERBLIB_DECL auto currentEnd() const -> iterator
@@ -49,7 +53,7 @@ namespace cerb::text
 
         CERBLIB_DECL auto getCurrentLine() const -> BasicStringView<CharT> const &
         {
-            return current_line;
+            return line_watcher.get();
         }
 
         CERBLIB_DECL auto getRestOfTheText() const -> BasicStringView<CharT>
@@ -91,11 +95,10 @@ namespace cerb::text
             return getCurrentChar();
         }
 
-        template<SkipMode Mode = RAW_CHARS>
-        constexpr auto skip(size_t times) -> void
+        constexpr auto skip(size_t times, SkipMode mode = SkipMode::RAW_CHARS) -> void
         {
             for (size_t i = 0; i != times; ++i) {
-                if constexpr (Mode == CLEAN_CHARS) {
+                if (mode == CLEAN_CHARS) {
                     getCleanChar();
                 } else {
                     getRawChar();
@@ -103,7 +106,6 @@ namespace cerb::text
             }
         }
 
-        template<SkipMode Mode = RAW_CHARS>
         CERBLIB_DECL auto fork(size_t from, size_t to) const -> GeneratorForText<CharT>
         {
             checkForkingBorders(from, to);
@@ -111,7 +113,7 @@ namespace cerb::text
             GeneratorForText<CharT> forked_generator = *this;
             BasicStringView<CharT> &forked_text = forked_generator.text;
 
-            forked_generator.template skip<Mode>(from);
+            forked_generator.skip(from);
 
             auto forked_text_begin = forked_text.begin();
             auto forked_text_length = to - from;
@@ -127,7 +129,7 @@ namespace cerb::text
             BasicStringView<FileNameT> const &file_name = {})
           : location_t(file_name), text(file_content)
         {
-            updateCurrentLine();
+            line_watcher.forceUpdate(*this);
         }
 
     private:
@@ -139,42 +141,22 @@ namespace cerb::text
         constexpr auto processFirstRawChar() -> void
         {
             initialized = true;
-            tryToAddTabOrSpace();
+            tabs_and_spaces.newChar(getCurrentChar());
         }
 
         constexpr auto processRawChar() -> void
         {
             updateLocationToTheNextChar();
-            tryToUpdateLine();
-        }
-
-        constexpr auto tryToUpdateLine() -> void
-        {
-            if (needToUpdateLine()) {
-                updateCurrentLine();
-            }
-        }
-
-        CERBLIB_DECL auto needToUpdateLine() const -> bool
-        {
-            auto previous_offset = location_t::charOffset() - 1;
-            return at(previous_offset) == char_enum::NewLine;
-        }
-
-        constexpr auto updateCurrentLine() -> void
-        {
-            auto offset = location_t::charOffset();
-            size_t line_end = text.find(char_enum::NewLine, offset);
-            size_t line_length = line_end - offset;
-
-            current_line = { currentBegin(), line_length };
+            line_watcher.update(*this);
         }
 
         constexpr auto updateLocationToTheNextChar() -> void
         {
-            auto future_offset = location_t::charOffset() + 1;
+            auto new_char = getCurrentChar(1);
 
-            if (at(future_offset) == char_enum::NewLine) {
+            tabs_and_spaces.newChar(new_char);
+
+            if (new_char == char_enum::NewLine) {
                 processNewLine();
             } else {
                 processNewChar();
@@ -184,29 +166,16 @@ namespace cerb::text
         constexpr auto processNewLine() -> void
         {
             location_t::newLine();
-            tabs_and_spaces.clear();
         }
 
         constexpr auto processNewChar() -> void
         {
-            tryToClearTabsAndSpaces();
             location_t::newChar();
-            tryToAddTabOrSpace();
-        }
-
-        constexpr auto tryToClearTabsAndSpaces() -> void
-        {
-            tabs_and_spaces.tryToClear(getCurrentChar());
-        }
-
-        constexpr auto tryToAddTabOrSpace() -> void
-        {
-            tabs_and_spaces.tryToAdd(getCurrentChar());
         }
 
         CERBLIB_DECL auto calculateRealOffset(ssize_t offset) const -> size_t
         {
-            auto real_offset = static_cast<ssize_t>(charOffset()) + offset;
+            auto real_offset = static_cast<ssize_t>(getOffset()) + offset;
             checkOffset(real_offset);
 
             return static_cast<size_t>(real_offset);
@@ -214,20 +183,20 @@ namespace cerb::text
 
         CERBLIB_DECL auto isCurrentCharEoF() const -> bool
         {
-            auto chr = at(charOffset());
+            auto chr = at(getOffset());
             return lex::isEoF(chr);
         }
 
         constexpr static auto checkOffset(ssize_t offset) -> void
         {
             if (offset < 0) {
-                throw TextGeneratorError("Unable to access char at given charOffset!");
+                throw TextGeneratorError("Unable to access char at given getOffset!");
             }
         }
 
         constexpr auto checkForkingBorders(size_t from, size_t to) const -> void
         {
-            auto offset = charOffset();
+            auto offset = getOffset();
 
             if (logicalOr(from + offset >= text.size(), to + offset >= text.size(), from > to)) {
                 throw TextGeneratorError("Unable to fork generator with given borders");
@@ -235,8 +204,8 @@ namespace cerb::text
         }
 
         tabs_and_spaces_saver_t tabs_and_spaces{};
+        line_watcher_t line_watcher{};
         BasicStringView<CharT> text{};
-        BasicStringView<CharT> current_line{};
         bool initialized{ false };
     };
 

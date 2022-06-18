@@ -5,7 +5,7 @@
 
 namespace cerb::text
 {
-    CERBERUS_EXCEPTION(BasicTextAnalysisException, analysis::BasicAnalysisException);
+    CERBERUS_EXCEPTION(BasicTextScanningException, analysis::BasicAnalysisException);
 }
 
 #endif /* CERBERUS_TEXT_EXCEPTION_HPP */

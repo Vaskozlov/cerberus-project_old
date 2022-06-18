@@ -14,8 +14,10 @@ namespace cerb
     struct BasicStringView;
 
     template<typename T, typename CharT>
-    concept StringType = CharacterLiteral<CharT> && IsAnyOfV<
-        T, BasicStringView<CharT>, std::basic_string<CharT>, std::basic_string_view<CharT>>;
+    concept StringType =
+        CharacterLiteral<CharT> &&
+        IsAnyOfV<
+            T, BasicStringView<CharT>, std::basic_string<CharT>, std::basic_string_view<CharT>>;
 
     template<CharacterLiteral CharT>
     struct CERBLIB_TRIVIAL BasicStringView
@@ -143,9 +145,7 @@ namespace cerb
 
         CERBLIB_DECL auto containsAt(size_t index, BasicStringView const &str) const -> bool
         {
-            auto const new_str_length = size() - index;
-
-            if (new_str_length < str.size()) {
+            if (index + str.size() > size()) {
                 return false;
             }
 
@@ -186,7 +186,7 @@ namespace cerb
 
         BasicStringView() = default;
 
-        template<typename T>// NOLINTNEXTLINE
+        template<ArrayOrPointer T>// NOLINTNEXTLINE
         constexpr BasicStringView(T const &str) : length(strlen(str)), string(str)
         {}
 

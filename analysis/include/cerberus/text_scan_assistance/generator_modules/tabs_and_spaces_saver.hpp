@@ -1,7 +1,7 @@
 #ifndef CERBERUS_TABS_AND_SPACES_SAVER_HPP
 #define CERBERUS_TABS_AND_SPACES_SAVER_HPP
 
-#include <cerberus/lex/char.hpp>
+#include <cerberus/char.hpp>
 #include <string>
 
 namespace cerb::text::gen
@@ -16,22 +16,24 @@ namespace cerb::text::gen
             return tabs_and_spaces;
         }
 
-        constexpr auto clear() -> void
-        {
-            tabs_and_spaces.clear();
-        }
-
         CERBLIB_DECL auto empty() const -> bool
         {
             return tabs_and_spaces.empty();
         }
 
-        constexpr auto tryToClear(CharT chr) -> void
+        constexpr auto newChar(CharT new_char) -> void
         {
-            current_char = chr;
+            tryToClear();
+            tryToAdd(new_char);
+        }
 
+        TabsAndSpacesSaver() = default;
+
+    private:
+        constexpr auto tryToClear() -> void
+        {
             if (needToClear()) {
-                clear();
+                tabs_and_spaces.clear();
             }
         }
 
@@ -44,9 +46,6 @@ namespace cerb::text::gen
             }
         }
 
-        TabsAndSpacesSaver() = default;
-
-    private:
         CERBLIB_DECL auto needToClear() const -> bool
         {
             return logicalOr(

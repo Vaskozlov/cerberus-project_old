@@ -1,7 +1,7 @@
 #ifndef CERBERUS_STRING_REDUCER_HPP
 #define CERBERUS_STRING_REDUCER_HPP
 
-#include <cerberus/text/generator_for_text.hpp>
+#include <cerberus/text_scan_assistance/generator_for_text.hpp>
 #include <string>
 
 namespace cerb::text
@@ -22,7 +22,7 @@ namespace cerb::text
         StringReducer() = default;
 
         constexpr explicit StringReducer(GeneratorForText<CharT> const &generator)
-          : text_generator(generator), base_index(generator.charOffset() - 1)
+          : text_generator(generator), base_index(generator.getOffset() - 1)
         {
             reduceString();
         }

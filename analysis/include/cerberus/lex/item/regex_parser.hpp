@@ -6,14 +6,14 @@
 #include <cerberus/lex/lexical_analysis_exception.hpp>
 #include <cerberus/number.hpp>
 #include <cerberus/reference_wrapper.hpp>
-#include <cerberus/text/scan_api.hpp>
+#include <cerberus/text_scan_assistance/scan_api.hpp>
 
 namespace cerb::lex::regex
 {
     template<CharacterLiteral CharT>
-    struct RegexParser : text::ScanApi<text::RAW_CHARS, CharT>
+    struct RegexParser : text::ScanApi<CharT>
     {
-        CERBLIB_SCAN_API_ACCESS(text::RAW_CHARS, CharT);
+        CERBLIB_SCAN_API_ACCESS(CharT);
 
         friend RegexParsingChecks<CharT>;
 

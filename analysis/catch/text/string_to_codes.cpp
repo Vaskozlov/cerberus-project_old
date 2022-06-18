@@ -1,5 +1,5 @@
 #include <cerberus/debug/debug.hpp>
-#include <cerberus/text/string_to_codes.hpp>
+#include <cerberus/text_scan_assistance/string_to_codes.hpp>
 
 namespace cerb::debug
 {

@@ -54,7 +54,7 @@ namespace cerb::lex
         auto constructAndAddDotItem(InitPack const &init_pack) -> void
         {
             auto const &rule = init_pack.rule;
-            size_t id = hash::hashString(init_pack.rule_name);
+            size_t id = hash::hashString<CharForId>(init_pack.rule_name);
 
             DotItem<CharT> new_item = { analysis_globals, id, rule };
             emplaceNewDotItem(id, init_pack.rule_name, new_item);

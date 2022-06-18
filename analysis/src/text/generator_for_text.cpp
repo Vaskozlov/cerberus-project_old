@@ -1,4 +1,4 @@
-#include <cerberus/text/generator_for_text.hpp>
+#include <cerberus/text_scan_assistance/generator_for_text.hpp>
 
 namespace cerb::text
 {

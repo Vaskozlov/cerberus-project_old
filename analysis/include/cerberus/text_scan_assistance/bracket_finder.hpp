@@ -1,11 +1,11 @@
 #ifndef CERBERUS_BRACKET_FINDER_HPP
 #define CERBERUS_BRACKET_FINDER_HPP
 
-#include <cerberus/text/generator_for_text.hpp>
+#include <cerberus/text_scan_assistance/generator_for_text.hpp>
 
 namespace cerb::text
 {
-    CERBERUS_EXCEPTION(BracketFinderError, BasicTextAnalysisException);
+    CERBERUS_EXCEPTION(BracketFinderError, BasicTextScanningException);
 
     template<CharacterLiteral CharT>
     class BracketFinder
@@ -19,7 +19,7 @@ namespace cerb::text
     public:
         CERBLIB_DECL auto getPosition() const -> ssize_t
         {
-            return getChar() == close_bracket ? static_cast<ssize_t>(text.charOffset()) : -1;
+            return getChar() == close_bracket ? static_cast<ssize_t>(text.getOffset()) : -1;
         }
 
         BracketFinder() = default;
@@ -40,7 +40,7 @@ namespace cerb::text
                 processChar(chr);
             }
 
-            return text.charOffset() - 1;
+            return text.getOffset() - 1;
         }
 
     private:

@@ -1,5 +1,5 @@
+#include <cerberus/char.hpp>
 #include <cerberus/debug/debug.hpp>
-#include <cerberus/lex/char.hpp>
 #include <cerberus/range.hpp>
 
 namespace cerb::debug

@@ -1,5 +1,5 @@
 #include <cerberus/debug/debug.hpp>
-#include <cerberus/text/bracket_finder.hpp>
+#include <cerberus/text_scan_assistance/bracket_finder.hpp>
 
 namespace cerb::debug
 {

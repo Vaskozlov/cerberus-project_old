@@ -91,8 +91,8 @@ namespace cerb
             restartThreads();
         }
 
-        auto operator=(LazyExecutor &&) -> LazyExecutor & = delete;
-        auto operator=(LazyExecutor const &) -> LazyExecutor & = delete;
+        auto operator=(LazyExecutor &&) -> void = delete;
+        auto operator=(LazyExecutor const &) -> void = delete;
 
         LazyExecutor(LazyExecutor &&) = delete;
         LazyExecutor(LazyExecutor const &) = delete;

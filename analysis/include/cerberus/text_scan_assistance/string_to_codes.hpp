@@ -1,21 +1,21 @@
 #ifndef CERBERUS_STRING_TO_CODES_HPP
 #define CERBERUS_STRING_TO_CODES_HPP
 
-#include <cerberus/text/scan_api.hpp>
+#include <cerberus/text_scan_assistance/scan_api.hpp>
 #include <string>
 
 namespace cerb::text
 {
-    CERBERUS_EXCEPTION(BasicStringToCodesTranslationError, BasicTextAnalysisException);
+    CERBERUS_EXCEPTION(BasicStringToCodesTranslationError, BasicTextScanningException);
 
     template<CharacterLiteral CharT>
     CERBERUS_ANALYSIS_EXCEPTION(
         StringToCodesTranslationError, CharT, BasicStringToCodesTranslationError);
 
     template<CharacterLiteral CharT>
-    class StringToCodes : private ScanApi<RAW_CHARS, CharT>
+    class StringToCodes : private ScanApi<CharT>
     {
-        CERBLIB_SCAN_API_ACCESS(RAW_CHARS, CharT);
+        CERBLIB_SCAN_API_ACCESS(CharT);
 
     public:
         constexpr auto parsedString() -> std::basic_string<CharT> &

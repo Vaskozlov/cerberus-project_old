@@ -5,10 +5,13 @@ namespace cerb::debug
     auto testLexicalAnalyzer() -> int;
     auto testStringToCodes() -> int;
 
+    auto testCommentSkipper() -> int;
+
     auto testDotItem() -> int;
     auto testRegexParser() -> int;
     auto testBracketFinder() -> int;
 }// namespace cerb::debug
+
 
 auto main() -> int
 {
@@ -18,6 +21,8 @@ auto main() -> int
     testGeneratorForText();
     testLexicalAnalyzer();
     testStringToCodes();
+
+    testCommentSkipper();
 
     testDotItem();
     testRegexParser();

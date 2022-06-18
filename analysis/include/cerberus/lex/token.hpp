@@ -1,7 +1,7 @@
 #ifndef CERBERUS_TOKEN_HPP
 #define CERBERUS_TOKEN_HPP
 
-#include <cerberus/text/generator_for_text.hpp>
+#include <cerberus/text_scan_assistance/generator_for_text.hpp>
 
 namespace cerb::lex
 {

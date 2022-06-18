@@ -1,6 +1,6 @@
 #include <cerberus/debug/debug.hpp>
 #include <cerberus/range.hpp>
-#include <cerberus/text/generator_for_text.hpp>
+#include <cerberus/text_scan_assistance/generator_for_text.hpp>
 
 namespace cerb::debug
 {
@@ -68,7 +68,7 @@ namespace cerb::debug
         for (size_t i : Range(expected_text.size())) {
             char chr = text_generator.getCleanChar();
             ASSERT_EQUAL(chr, expected_text[i]);
-            ASSERT_EQUAL(text_generator.getTabsAndSpaces(), expected_tabs_and_spaces[i]);
+            ASSERT_EQUAL(text_generator.getTabsAndSpaces(), expected_tabs_and_spaces.at(i));
         }
 
         ASSERT_EQUAL(text_generator.getCleanChar(), '\0');

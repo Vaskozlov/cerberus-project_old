@@ -5,7 +5,7 @@
 #include <cerberus/lex/item/item_alloc.hpp>
 #include <cerberus/lex/item/regex.hpp>
 #include <cerberus/lex/item/string.hpp>
-#include <cerberus/text/bracket_finder.hpp>
+#include <cerberus/text_scan_assistance/bracket_finder.hpp>
 #include <utility>
 
 namespace cerb::lex
@@ -13,10 +13,10 @@ namespace cerb::lex
     template<CharacterLiteral CharT>
     struct DotItem
       : public BasicItem<CharT>
-      , private text::ScanApi<text::CLEAN_CHARS, CharT>
+      , private text::ScanApi<CharT>
     {
         CERBLIB_BASIC_ITEM_ACCESS(CharT);
-        CERBLIB_SCAN_API_ACCESS(text::CLEAN_CHARS, CharT);
+        CERBLIB_SCAN_API_ACCESS(CharT);
 
         friend DotItemChecks<CharT>;
 
@@ -61,8 +61,8 @@ namespace cerb::lex
         constexpr DotItem(
             AnalysisGlobals<CharT> &analysis_parameters, size_t id_of_item,
             text::GeneratorForText<CharT> const &gen)
-          : CERBLIB_CONSTRUCT_BASIC_ITEM, scan_api_t(rule_generator), rule_generator(gen),
-            item_id(id_of_item)
+          : CERBLIB_CONSTRUCT_BASIC_ITEM, scan_api_t(rule_generator, text::CLEAN_CHARS),
+            rule_generator(gen), item_id(id_of_item)
         {
             scan_api_t::beginScanning(CharEnum<CharT>::EoF);
         }

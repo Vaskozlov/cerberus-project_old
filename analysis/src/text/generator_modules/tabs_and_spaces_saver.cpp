@@ -1,4 +1,4 @@
-#include <cerberus/text/generator_modules/tabs_and_spaces_saver.hpp>
+#include <cerberus/text_scan_assistance/generator_modules/tabs_and_spaces_saver.hpp>
 
 namespace cerb::text::gen
 {

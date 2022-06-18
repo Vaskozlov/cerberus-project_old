@@ -2,8 +2,8 @@
 #define CERBERUS_COMMENT_SKIPPER_HPP
 
 #include <cerberus/analysis/analysis_exception.hpp>
-#include <cerberus/text/generator_for_text.hpp>
-#include <cerberus/text/scan_api_modules/skip_mode.hpp>
+#include <cerberus/text_scan_assistance/generator_for_text.hpp>
+#include <cerberus/text_scan_assistance/scan_api_modules/skip_mode.hpp>
 
 namespace cerb::text
 {
@@ -29,7 +29,7 @@ namespace cerb::text
             }
         }
 
-        CommentSkipper() = default;
+        CERBELIB_DEFAULT_NO_COPIABLE(CommentSkipper);
 
         constexpr explicit CommentSkipper(
             GeneratorForText<CharT> &generator_for_text,
@@ -55,7 +55,7 @@ namespace cerb::text
         {
             text_generator.skip(single_line.size());
 
-            while (isNewLineOrEoF(text_generator.getRawChar())) {
+            while (not isNewLineOrEoF(text_generator.getRawChar())) {
                 // empty loop
             }
         }
@@ -65,15 +65,18 @@ namespace cerb::text
             size_t offset = multiline_begin.size();
             GeneratorForText<CharT> comment_begin = text_generator;
 
-            text_generator.skip(offset);
-
-            while (not text.containsAt(offset, multiline_end)) {
+            while (offset + multiline_end.size() < text.size() &&
+                   not text.containsAt(offset, multiline_end)) {
                 ++offset;
             }
+
+            text_generator.skip(offset);
 
             if (not text.containsAt(offset, multiline_end)) {
                 throw CommentSkipperException<CharT>("Unterminated comment.", comment_begin);
             }
+
+            text_generator.skip(multiline_end.size());
         }
 
         CERBLIB_DECL static auto isNewLineOrEoF(CharT chr) -> bool
