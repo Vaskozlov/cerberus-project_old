@@ -125,7 +125,7 @@ namespace cerb
 
         CERBLIB_DECL auto findByKey(KeyForFlatMap key) const -> const_iterator
         {
-            return std::find(begin(), end(), key);
+            return cerb::find(storage, key);
         }
 
         constexpr auto throwWhenFull() const -> void

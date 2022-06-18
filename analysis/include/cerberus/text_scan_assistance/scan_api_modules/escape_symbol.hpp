@@ -76,7 +76,7 @@ namespace cerb::text
     private:
         CERBLIB_DECL auto searchForSpecialUserSymbol(CharT chr) const -> CharT
         {
-            auto location = std::find(special_symbols.begin(), special_symbols.end(), chr);
+            auto location = cerb::find(special_symbols, chr);
 
             if (location == special_symbols.end()) {
                 scan_api.throwException("Unable to match any escape sequence!");

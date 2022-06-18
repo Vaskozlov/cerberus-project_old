@@ -1,6 +1,12 @@
 #ifndef CERBERUS_MEMORY_HPP
 #define CERBERUS_MEMORY_HPP
 
+#if defined(__GNUC__) && __GNUC__ <= 11
+#    define GCC_CONSTEXPR_RANGES_FILLABLE(CharT) (not std::is_same_v<char, ValueT>)
+#else
+#    define GCC_CONSTEXPR_RANGES_FILLABLE(CharT) true
+#endif
+
 #include <cerberus/bit.hpp>
 #include <cerberus/type.hpp>
 #include <iterator>
@@ -125,6 +131,28 @@ namespace cerb
             auto terminator_iterator = find(str, static_cast<CharT>(0), max_length);
             return ptrdiff(str, terminator_iterator);
         }
+
+        template<typename T>
+        concept FastFillable = Iterable<T> && CERBLIB_AMD64 && RawAccessible<T> &&
+                               ClassValueFastCopiable<T> && CanBeStoredAsIntegral<GetValueType<T>>;
+
+        template<typename T>
+        concept FastFindable =
+            Iterable<T> && CERBLIB_AMD64 && RawAccessible<T> &&
+            CanBeStoredAsIntegral<GetValueType<T>> && std::is_trivial_v<GetValueType<T>> &&
+            std::is_pointer_v<GetIteratorType<T>>;
+
+        template<typename T>
+        concept RangeFillable =
+            Iterable<T> && requires(T &dest, AutoCopyType<GetValueType<T>> value) {
+                               std::ranges::fill(dest, value);
+                           };
+
+        template<typename T, typename ValueT>
+        concept RangeCapableOfFinding =
+            Iterable<T> && requires(T const &iterable_class, ValueT value) {
+                               std::ranges::find(iterable_class, value);
+                           };
     }// namespace private_
 
     template<typename T>
@@ -146,25 +174,20 @@ namespace cerb
     template<Iterable T>
     constexpr auto fill(T &dest, AutoCopyType<GetValueType<T>> value) -> void
     {
-#if CERBLIB_AMD64
-        constexpr bool is_suitable_for_fast_fill =
-            RawAccessible<T> && ClassValueFastCopiable<T> && CanBeStoredAsIntegral<GetValueType<T>>;
+        using ValueT = AutoCopyType<GetValueType<T>>;
 
-        if constexpr (is_suitable_for_fast_fill) {
+#if CERBLIB_AMD64
+        if constexpr (private_::FastFillable<T>) {
             if CERBLIB_RUNTIME {
                 return amd64::fill(std::data(dest), value, std::size(dest));
             }
         }
 #endif
-
-#if defined(__GNUC__) && __GNUC__ <= 11
-        if constexpr (IsAnyOfV<GetValueType<T>, u8, i8>) {
-            // stdlibc++ uses __builtin_memset for chars, so
-            // std::ranges::fill does not work at compile time.
-            return std::fill(dest.begin(), dest.end(), value);
+        if constexpr (private_::RangeFillable<T> || GCC_CONSTEXPR_RANGES_FILLABLE(ValueT)) {
+            std::ranges::fill(dest, value);
+        } else {
+            std::fill(dest.begin(), dest.end(), value);
         }
-#endif
-        std::ranges::fill(dest, value);
     }
 
     template<typename T>
@@ -217,21 +240,21 @@ namespace cerb
         return std::find(location, location + limit, value);
     }
 
-    template<Iterable T>
-    CERBLIB_DECL auto find(T const &iterable_class, GetValueType<T> value_to_find) -> decltype(auto)
+    template<Iterable T, typename ValueT = AutoCopyType<GetValueType<T>>>
+    CERBLIB_DECL auto find(T const &iterable_class, ValueT value) -> typename T::const_iterator
     {
 #if CERBLIB_AMD64
-        [[maybe_unused]] constexpr bool suitable_for_fast_search =
-            RawAccessible<T> && CanBeStoredAsIntegral<GetValueType<T>> &&
-            std::is_trivial_v<GetValueType<T>> && std::is_pointer_v<GetIteratorType<T>>;
-
-        if constexpr (suitable_for_fast_search) {
+        if constexpr (private_::FastFindable<T>) {
             if CERBLIB_RUNTIME {
-                return find(std::data(iterable_class), value_to_find, std::size(iterable_class));
+                return find(std::data(iterable_class), value, std::size(iterable_class));
             }
         }
 #endif
-        return std::ranges::find(iterable_class, value_to_find);
+        if constexpr (private_::RangeCapableOfFinding<T, ValueT>) {
+            return std::ranges::find(iterable_class, value);
+        } else {
+            return std::find(iterable_class.begin(), iterable_class.end(), value);
+        }
     }
 
     template<Iterable T>
@@ -306,5 +329,7 @@ namespace cerb
         }
     }
 }// namespace cerb
+
+#undef GCC_NONCONSTEXPR_RANGES_FILL
 
 #endif /* CERBERUS_MEMORY_HPP */
