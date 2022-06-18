@@ -3,7 +3,6 @@
 
 #include <cerberus/analysis/analysis_basic_exception.hpp>
 #include <cerberus/format/format.hpp>
-#include <cerberus/reference_wrapper.hpp>
 #include <cerberus/text_scan_assistance/generator_for_text.hpp>
 #include <cerberus/text_scan_assistance/string_reducer.hpp>
 

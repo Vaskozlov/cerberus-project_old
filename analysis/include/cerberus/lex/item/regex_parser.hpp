@@ -5,7 +5,6 @@
 #include <cerberus/lex/item/errros/regex_parsing_errors.hpp>
 #include <cerberus/lex/lexical_analysis_exception.hpp>
 #include <cerberus/number.hpp>
-#include <cerberus/reference_wrapper.hpp>
 #include <cerberus/text_scan_assistance/scan_api.hpp>
 
 namespace cerb::lex::regex
