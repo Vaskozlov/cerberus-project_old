@@ -27,16 +27,20 @@ namespace cerb::debug
     {
         constexpr auto last_bracket = TestInputU16.rfind(u')');
 
-        return findBracket(u'(', u')', GeneratorForText(TestInputU16)) == last_bracket and
-               findBracket(u'(', u')', GeneratorForText(EmptyTestInputU16)) == 1;
+        ASSERT_EQUAL(findBracket(u'(', u')', GeneratorForText(TestInputU16)), last_bracket);
+        ASSERT_EQUAL(findBracket(u'(', u')', GeneratorForText(EmptyTestInputU16)), 1);
+
+        return true;
     }
 
     auto testBracketFinderOnErrorCase() -> bool
     {
         ERROR_EXPECTED(
             CERBLIB_UNUSED(auto) = findBracket('(', ')', GeneratorForText(ErroneousTestInput)),
-            BracketFinderError,
-            "Unexpected EoF!")
+            BasicBracketFinderError,
+            "Analysis error occurred: Unexpected EoF! File: , line: 1, char: 19\n"
+            "((Hello, World())!\n"
+            "                  ^")
 
         return true;
     }
@@ -45,8 +49,12 @@ namespace cerb::debug
     {
         ERROR_EXPECTED(
             CERBLIB_UNUSED(auto) = findBracket(u'(', u')', GeneratorForText(ErroneousTestInputU16)),
-            BracketFinderError,
-            "Unexpected EoF!")
+            BasicBracketFinderError,
+            "Analysis error occurred: Unexpected EoF! File: , line: 1, char: 19\n"
+            "((Hello, World())!\n"
+            "                  ^\n"
+            "Warning! Character type is Ds instead of c, so error message might have some defects. "
+            "Please use getMessage() instead.")
 
         return true;
     }

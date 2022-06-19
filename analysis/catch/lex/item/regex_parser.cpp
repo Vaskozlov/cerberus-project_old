@@ -7,7 +7,7 @@ namespace cerb::debug
     using namespace regex;
     using namespace text;
 
-    static constexpr cerb::string_view TestInput = "[\\t\\-_0-9A-Za-z]";
+    static constexpr string_view TestInput = "[\\t\\-_0-9A-Za-z]";
 
     auto testRegexParserOnBasicString() -> bool
     {

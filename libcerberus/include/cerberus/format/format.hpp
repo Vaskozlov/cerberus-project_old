@@ -9,7 +9,7 @@
 
 namespace cerb::fmt
 {
-    CERBERUS_EXCEPTION(FmtConverterError, cerb::CerberusException);
+    CERBERUS_EXCEPTION(FmtConverterError, CerberusException);
 
     namespace private_
     {
@@ -32,6 +32,11 @@ namespace cerb::fmt
             constexpr explicit Converter(string_view const &string_to_format, Ts &&...args)
               : formatter(string_to_format)
             {
+                constexpr auto arg_count = sizeof...(Ts);
+                constexpr auto average_arg_size = 16;
+                constexpr auto extra_string_size = arg_count * average_arg_size;
+
+                formatted_string.reserve(string_to_format.size() + extra_string_size);
                 formatString(std::forward<Ts>(args)...);
             }
 

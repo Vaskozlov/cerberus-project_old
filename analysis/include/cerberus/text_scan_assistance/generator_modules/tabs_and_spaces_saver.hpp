@@ -7,10 +7,12 @@
 namespace cerb::text::gen
 {
     template<CharacterLiteral CharT>
-    struct TabsAndSpacesSaver
+    class TabsAndSpacesSaver
     {
+    private:
         using char_enum = lex::CharEnum<CharT>;
 
+    public:
         CERBLIB_DECL auto get() const -> std::basic_string<CharT> const &
         {
             return tabs_and_spaces;
@@ -62,11 +64,11 @@ namespace cerb::text::gen
     };
 
 #ifndef CERBERUS_HEADER_ONLY
-    extern template struct TabsAndSpacesSaver<char>;
-    extern template struct TabsAndSpacesSaver<char8_t>;
-    extern template struct TabsAndSpacesSaver<char16_t>;
-    extern template struct TabsAndSpacesSaver<char32_t>;
-    extern template struct TabsAndSpacesSaver<wchar_t>;
+    extern template class TabsAndSpacesSaver<char>;
+    extern template class TabsAndSpacesSaver<char8_t>;
+    extern template class TabsAndSpacesSaver<char16_t>;
+    extern template class TabsAndSpacesSaver<char32_t>;
+    extern template class TabsAndSpacesSaver<wchar_t>;
 #endif /* CERBERUS_HEADER_ONLY */
 }// namespace cerb::text::gen
 

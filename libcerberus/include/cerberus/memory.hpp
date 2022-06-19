@@ -4,7 +4,7 @@
 #if defined(__GNUC__) && __GNUC__ <= 11
 #    define GCC_CONSTEXPR_RANGES_FILLABLE(CharT) (not std::is_same_v<char, ValueT>)
 #else
-#    define GCC_CONSTEXPR_RANGES_FILLABLE(CharT) true
+#    define GCC_CONSTEXPR_RANGES_FILLABLE(CharT) (std::is_same_v<ValueT, ValueT>)
 #endif
 
 #include <cerberus/bit.hpp>
@@ -53,7 +53,7 @@ namespace cerb
         }
 
         template<CanBeStoredAsIntegral T>
-        constexpr auto find(T const *location, T value, size_t limit) -> const T *
+        constexpr auto find(T *location, T value, size_t limit) -> T *
         {
             ++limit;
 
@@ -183,7 +183,7 @@ namespace cerb
             }
         }
 #endif
-        if constexpr (private_::RangeFillable<T> || GCC_CONSTEXPR_RANGES_FILLABLE(ValueT)) {
+        if constexpr (private_::RangeFillable<T> && GCC_CONSTEXPR_RANGES_FILLABLE(ValueT)) {
             std::ranges::fill(dest, value);
         } else {
             std::fill(dest.begin(), dest.end(), value);
@@ -226,14 +226,14 @@ namespace cerb
     }
 
     template<typename T>
-    CERBLIB_DECL auto find(T const *location, AutoCopyType<T> value, size_t limit) -> T const *
+    CERBLIB_DECL auto find(T *location, AutoCopyType<T> value, size_t limit) -> T *
     {
 #if CERBLIB_AMD64
         constexpr bool suitable_for_fast_search = CanBeStoredAsIntegral<T> && std::is_trivial_v<T>;
 
         if constexpr (suitable_for_fast_search) {
             if CERBLIB_RUNTIME {
-                return amd64::find(location, value, limit);
+                return amd64::find<T>(location, value, limit);
             }
         }
 #endif
@@ -241,7 +241,7 @@ namespace cerb
     }
 
     template<Iterable T, typename ValueT = AutoCopyType<GetValueType<T>>>
-    CERBLIB_DECL auto find(T const &iterable_class, ValueT value) -> typename T::const_iterator
+    CERBLIB_DECL auto find(T &iterable_class, ValueT value) -> GetIteratorType<T>
     {
 #if CERBLIB_AMD64
         if constexpr (private_::FastFindable<T>) {
@@ -258,17 +258,10 @@ namespace cerb
     }
 
     template<Iterable T>
-    CERBLIB_DECL auto rfind(T &iterable_class, GetValueType<T> value_to_find) ->
-        typename T::reverse_iterator
+    CERBLIB_DECL auto rfind(T &iterable_class, GetValueType<T> value_to_find)
+        -> GetReverseIteratorType<T>
     {
         return std::find(std::rbegin(iterable_class), std::rend(iterable_class), value_to_find);
-    }
-
-    template<Iterable T>
-    CERBLIB_DECL auto rfind(T const &iterable_class, GetValueType<T> value_to_find) ->
-        typename T::const_reverse_iterator
-    {
-        return std::find(std::crbegin(iterable_class), std::crend(iterable_class), value_to_find);
     }
 
     template<Iterable T1, Iterable T2>

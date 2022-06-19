@@ -21,7 +21,6 @@ namespace cerb::debug
         }
 
         ASSERT_EQUAL(text_generator.getRawChar(), '\0');
-        ASSERT_EQUAL(text_generator.getRawChar(), '\0');
         ASSERT_EQUAL(text_generator.getCurrentChar(1), '\0');
 
         return true;
@@ -71,7 +70,6 @@ namespace cerb::debug
             ASSERT_EQUAL(text_generator.getTabsAndSpaces(), expected_tabs_and_spaces.at(i));
         }
 
-        ASSERT_EQUAL(text_generator.getCleanChar(), '\0');
         ASSERT_EQUAL(text_generator.getCleanChar(), '\0');
         ASSERT_EQUAL(text_generator.getCurrentChar(1), '\0');
 

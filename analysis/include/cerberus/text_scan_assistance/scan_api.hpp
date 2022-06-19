@@ -33,14 +33,16 @@ namespace cerb::text
     CERBERUS_ANALYSIS_EXCEPTION(ScanApiError, CharT, BasicScanApiError);
 
     template<CharacterLiteral CharT>
-    struct ScanApi
+    class ScanApi
     {
+    private:
         friend CommentSkipper<CharT>;
         friend EscapeSymbol<CharT>;
         friend NotationEscapeSymbol<CharT>;
 
-        using symbol_pair = Pair<CharT, CharT, PairComparison::BY_FIRST_VALUE>;
+        using escape_symbol_pair = Pair<CharT, CharT, PairComparison::BY_FIRST_VALUE>;
 
+    public:
         template<std::integral Int>
         CERBLIB_DECL static auto cast(Int value) -> CharT
         {
@@ -54,20 +56,17 @@ namespace cerb::text
 
         CERBLIB_DECL auto getLine() const -> size_t
         {
-            auto const &generator = getGenerator();
-            return generator.getLine();
+            return text_generator.getLine();
         }
 
         CERBLIB_DECL auto getCharPosition() const -> size_t
         {
-            auto const &generator = getGenerator();
-            return generator.getColumn();
+            return text_generator.getColumn();
         }
 
         CERBLIB_DECL auto getFilename() const -> BasicStringView<char> const &
         {
-            auto const &generator = getGenerator();
-            return generator.getFilename();
+            return text_generator.getFilename();
         }
 
         CERBLIB_DECL auto getChar() const -> CharT
@@ -155,7 +154,8 @@ namespace cerb::text
         }
 
         CERBLIB_DECL auto
-            parseEscapeSequence(std::initializer_list<symbol_pair> const &special_symbols) -> CharT
+            parseEscapeSequence(std::initializer_list<escape_symbol_pair> const &special_symbols)
+                -> CharT
         {
             return processCharEscape(*this, special_symbols);
         }
@@ -210,7 +210,9 @@ namespace cerb::text
     private:
         CERBLIB_DECL auto returnCharIfNotEoF(CharT chr) const -> CharT
         {
-            if (lex::isEoF(chr)) {
+            using namespace lex;
+
+            if (isEoF(chr)) {
                 throwException("Unexpected EoF!");
             }
 
@@ -234,11 +236,11 @@ namespace cerb::text
     extern template struct ScanApiError<char32_t>;
     extern template struct ScanApiError<wchar_t>;
 
-    extern template struct ScanApi<char>;
-    extern template struct ScanApi<char8_t>;
-    extern template struct ScanApi<char16_t>;
-    extern template struct ScanApi<char32_t>;
-    extern template struct ScanApi<wchar_t>;
+    extern template class ScanApi<char>;
+    extern template class ScanApi<char8_t>;
+    extern template class ScanApi<char16_t>;
+    extern template class ScanApi<char32_t>;
+    extern template class ScanApi<wchar_t>;
 #endif /* CERBERUS_HEADER_ONLY */
 
 }// namespace cerb::text

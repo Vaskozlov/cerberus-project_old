@@ -2,9 +2,9 @@
 
 namespace cerb::text::gen
 {
-    template struct TabsAndSpacesSaver<char>;
-    template struct TabsAndSpacesSaver<char8_t>;
-    template struct TabsAndSpacesSaver<char16_t>;
-    template struct TabsAndSpacesSaver<char32_t>;
-    template struct TabsAndSpacesSaver<wchar_t>;
+    template class TabsAndSpacesSaver<char>;
+    template class TabsAndSpacesSaver<char8_t>;
+    template class TabsAndSpacesSaver<char16_t>;
+    template class TabsAndSpacesSaver<char32_t>;
+    template class TabsAndSpacesSaver<wchar_t>;
 }// namespace cerb::text::gen

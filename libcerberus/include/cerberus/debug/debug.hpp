@@ -71,8 +71,8 @@
 
 namespace cerb::debug
 {
-    CERBERUS_EXCEPTION(RuntimeError, cerb::CerberusException);
-    CERBERUS_EXCEPTION(CompileTimeError, cerb::CerberusException);
+    CERBERUS_EXCEPTION(RuntimeError, CerberusException);
+    CERBERUS_EXCEPTION(CompileTimeError, CerberusException);
 
     template<typename T>
     concept Printable = std::is_constructible_v<fmt::formatter<T>>;

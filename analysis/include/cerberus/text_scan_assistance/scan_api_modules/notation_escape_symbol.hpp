@@ -7,7 +7,7 @@
 namespace cerb::text
 {
     template<CharacterLiteral CharT>
-    struct ScanApi;
+    class ScanApi;
 
     template<CharacterLiteral CharT>
     struct NotationEscapeSymbol
@@ -30,7 +30,7 @@ namespace cerb::text
             return final_char;
         }
 
-        CERBELIB_DEFAULT_NO_COPIABLE(NotationEscapeSymbol);
+        CERBLIB_DEFAULT_NO_COPIABLE(NotationEscapeSymbol);
 
         constexpr NotationEscapeSymbol(
             scan_api_t &api_for_scan, u32 escape_notation, u32 escape_length)

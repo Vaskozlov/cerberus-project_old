@@ -94,7 +94,7 @@ namespace cerb::analysis
                 static const std::string temporary_message = fmt::format<char>(
                     "{}\n"
                     "Warning! Character type is {} instead of {}, so error message might have some "
-                    "defects. Please use getMessage() instead.\n"_sv,
+                    "defects. Please use getMessage() instead."_sv,
                     getErrorMessage(exception_message), typeid(CharT).name(), typeid(char).name());
                 return temporary_message;
             } else {
@@ -114,7 +114,7 @@ namespace cerb::analysis
                 exception_message, getFilename(), getLine(), getCharPosition(),
                 reducer.getReducedString());
 
-            addArrowToTheMessage(result, reducer.getErrorPositionAfterReducing());
+            addArrowToTheMessage(result, reducer.getBeginPosition());
 
             return result;
         }

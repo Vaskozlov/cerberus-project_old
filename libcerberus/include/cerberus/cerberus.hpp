@@ -182,14 +182,14 @@
 #    define CERBLIB_UNUSED(x) [[maybe_unused]] x CERBLIB_UNIQUE_IDENT
 #endif /* CERBLIB_UNUSED */
 
-#ifndef CERBELIB_DEFAULT_NO_COPIABLE
-#    define CERBELIB_DEFAULT_NO_COPIABLE(T)                                                        \
+#ifndef CERBLIB_DEFAULT_NO_COPIABLE
+#    define CERBLIB_DEFAULT_NO_COPIABLE(T)                                                         \
         ~T() = default;                                                                            \
         T(T const &) = delete;                                                                     \
         T(T &&) noexcept = default;                                                                \
         auto operator=(T const &)->void = delete;                                                  \
         auto operator=(T &&) noexcept -> T & = default
-#endif /* CERBELIB_DEFAULT_NO_COPIABLE*/
+#endif /* CERBLIB_DEFAULT_NO_COPIABLE*/
 
 namespace cerb
 {

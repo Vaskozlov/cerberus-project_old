@@ -7,10 +7,11 @@
 namespace cerb::text
 {
     template<CharacterLiteral CharT>
-    struct EscapeSymbol
+    class EscapeSymbol
     {
+    private:
         using scan_api_t = ScanApi<CharT>;
-        using symbol_pair = Pair<CharT, CharT, PairComparison::BY_FIRST_VALUE>;
+        using escape_symbol_pair = Pair<CharT, CharT, PairComparison::BY_FIRST_VALUE>;
 
         template<std::integral Int>
         CERBLIB_DECL static auto cast(Int value) -> CharT
@@ -18,6 +19,7 @@ namespace cerb::text
             return static_cast<CharT>(value);
         }
 
+    public:
         constexpr auto parseEscapeSequence() -> CharT
         {
             CharT chr = scan_api.nextRawCharWithEoFCheck();
@@ -65,11 +67,11 @@ namespace cerb::text
             return searchForSpecialUserSymbol(chr);
         }
 
-        CERBELIB_DEFAULT_NO_COPIABLE(EscapeSymbol);
+        CERBLIB_DEFAULT_NO_COPIABLE(EscapeSymbol);
 
         constexpr EscapeSymbol(
             scan_api_t &api_for_scan,
-            std::initializer_list<symbol_pair> const &other_symbols)
+            std::initializer_list<escape_symbol_pair> const &other_symbols)
           : scan_api(api_for_scan), special_symbols(other_symbols)
         {}
 
@@ -86,7 +88,7 @@ namespace cerb::text
         }
 
         scan_api_t &scan_api;
-        std::initializer_list<symbol_pair> const &special_symbols;
+        std::initializer_list<escape_symbol_pair> const &special_symbols;
     };
 
     template<CharacterLiteral CharT>
@@ -100,11 +102,11 @@ namespace cerb::text
     }
 
 #ifndef CERBERUS_HEADER_ONLY
-    extern template struct EscapeSymbol<char>;
-    extern template struct EscapeSymbol<char8_t>;
-    extern template struct EscapeSymbol<char16_t>;
-    extern template struct EscapeSymbol<char32_t>;
-    extern template struct EscapeSymbol<wchar_t>;
+    extern template class EscapeSymbol<char>;
+    extern template class EscapeSymbol<char8_t>;
+    extern template class EscapeSymbol<char16_t>;
+    extern template class EscapeSymbol<char32_t>;
+    extern template class EscapeSymbol<wchar_t>;
 #endif /* CERBERUS_HEADER_ONLY */
 
 }// namespace cerb::text

@@ -15,6 +15,7 @@ namespace cerb::text::gen
     template<CharacterLiteral CharT, CharacterLiteral FileNameT = char>
     class LineWatcher
     {
+    private:
         using char_enum = lex::CharEnum<CharT>;
         using generator_t = GeneratorForText<CharT, FileNameT>;
 

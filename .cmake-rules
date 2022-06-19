@@ -11,7 +11,7 @@ if (MSVC)
     endif ()
 else ()
     add_compile_options(
-            -std=c++20
+            -std=c++2b
             -Wall -Wextra -Wpedantic -Wshadow -pedantic
             -Wold-style-cast -Wnon-virtual-dtor -Woverloaded-virtual
             -Wconversion -Wsign-conversion -Wformat=2 -Wredundant-decls

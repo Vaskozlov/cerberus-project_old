@@ -41,11 +41,6 @@ namespace cerb::text
             return initialized;
         }
 
-        CERBLIB_DECL auto getTabsAndSpaces() const -> std::basic_string<CharT> const &
-        {
-            return tabs_and_spaces.get();
-        }
-
         CERBLIB_DECL auto getText() const -> BasicStringView<CharT> const &
         {
             return text;
@@ -54,6 +49,11 @@ namespace cerb::text
         CERBLIB_DECL auto getCurrentLine() const -> BasicStringView<CharT> const &
         {
             return line_watcher.get();
+        }
+
+        CERBLIB_DECL auto getTabsAndSpaces() const -> std::basic_string<CharT> const &
+        {
+            return tabs_and_spaces.get();
         }
 
         CERBLIB_DECL auto getRestOfTheText() const -> BasicStringView<CharT>
@@ -88,7 +88,9 @@ namespace cerb::text
 
         constexpr auto getCleanChar() -> CharT
         {
-            while (lex::isLayout(getRawChar())) {
+            using namespace lex;
+
+            while (isLayout(getRawChar())) {
                 // empty loop
             }
 
@@ -175,10 +177,10 @@ namespace cerb::text
 
         CERBLIB_DECL auto calculateRealOffset(ssize_t offset) const -> size_t
         {
-            auto real_offset = static_cast<ssize_t>(getOffset()) + offset;
-            checkOffset(real_offset);
+            constexpr size_t high_offset = std::numeric_limits<ssize_t>::max();
 
-            return static_cast<size_t>(real_offset);
+            auto real_offset = static_cast<ssize_t>(getOffset()) + offset;
+            return real_offset < 0 ? high_offset : static_cast<size_t>(real_offset);
         }
 
         CERBLIB_DECL auto isCurrentCharEoF() const -> bool
@@ -187,18 +189,15 @@ namespace cerb::text
             return lex::isEoF(chr);
         }
 
-        constexpr static auto checkOffset(ssize_t offset) -> void
-        {
-            if (offset < 0) {
-                throw TextGeneratorError("Unable to access char at given getOffset!");
-            }
-        }
-
         constexpr auto checkForkingBorders(size_t from, size_t to) const -> void
         {
             auto offset = getOffset();
 
-            if (logicalOr(from + offset >= text.size(), to + offset >= text.size(), from > to)) {
+            auto is_from_greater_than_to = from > to;
+            auto is_begin_out_of_range = from + offset >= text.size();
+            auto is_end_out_of_range = to + offset >= text.size();
+
+            if (logicalOr(is_begin_out_of_range, is_end_out_of_range, is_from_greater_than_to)) {
                 throw TextGeneratorError("Unable to fork generator with given borders");
             }
         }

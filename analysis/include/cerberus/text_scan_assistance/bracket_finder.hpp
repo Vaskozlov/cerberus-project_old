@@ -1,11 +1,15 @@
 #ifndef CERBERUS_BRACKET_FINDER_HPP
 #define CERBERUS_BRACKET_FINDER_HPP
 
+#include <cerberus/analysis/analysis_exception.hpp>
 #include <cerberus/text_scan_assistance/generator_for_text.hpp>
 
 namespace cerb::text
 {
-    CERBERUS_EXCEPTION(BracketFinderError, BasicTextScanningException);
+    CERBERUS_EXCEPTION(BasicBracketFinderError, BasicTextScanningException);
+
+    template<CharacterLiteral CharT>
+    CERBERUS_ANALYSIS_EXCEPTION(BracketFinderError, CharT, BasicBracketFinderError);
 
     template<CharacterLiteral CharT>
     class BracketFinder
@@ -19,14 +23,14 @@ namespace cerb::text
     public:
         CERBLIB_DECL auto getPosition() const -> ssize_t
         {
-            return getChar() == close_bracket ? static_cast<ssize_t>(text.getOffset()) : -1;
+            return getChar() == close_bracket ? static_cast<ssize_t>(generator.getOffset()) : -1;
         }
 
         BracketFinder() = default;
 
         constexpr BracketFinder(
             CharT opening_bracket, CharT closing_bracket, GeneratorForText<CharT> const &gen)
-          : text(gen), open_bracket(opening_bracket), close_bracket(closing_bracket)
+          : generator(gen), open_bracket(opening_bracket), close_bracket(closing_bracket)
         {}
 
         CERBLIB_DECL auto findBracketPosition() -> size_t
@@ -36,18 +40,18 @@ namespace cerb::text
             passed_brackets = 1;
 
             while (canContinueSearching()) {
-                CharT chr = getChar();
+                CharT chr = nextChar();
                 processChar(chr);
             }
 
-            return text.getOffset() - 1;
+            return generator.getOffset();
         }
 
     private:
         constexpr auto initialize() -> void
         {
-            if (not text.isInitialized()) {
-                text.getRawChar();
+            if (not generator.isInitialized()) {
+                generator.getRawChar();
             }
         }
 
@@ -62,21 +66,20 @@ namespace cerb::text
 
         CERBLIB_DECL auto getChar() const -> CharT
         {
-            return text.getCurrentChar();
+            return generator.getCurrentChar();
         }
 
         constexpr auto nextChar() -> CharT
         {
-            return text.getRawChar();
+            return generator.getRawChar();
         }
 
-        CERBLIB_DECL auto canContinueSearching() -> bool
+        CERBLIB_DECL auto canContinueSearching() const -> bool
         {
             if (isCurrentCharEoF()) {
-                throw BracketFinderError("Unexpected EoF!");
+                throw BracketFinderError("Unexpected EoF!", generator);
             }
 
-            nextChar();
             return passed_brackets != 0;
         }
 
@@ -88,11 +91,11 @@ namespace cerb::text
         constexpr auto isBeginBracket() const -> void
         {
             if (getChar() != open_bracket) {
-                throw BracketFinderError("Unable to find starting bracket!");
+                throw BracketFinderError("Unable to find starting bracket!", generator);
             }
         }
 
-        GeneratorForText<CharT> text{};
+        GeneratorForText<CharT> generator{};
         size_t passed_brackets{};
         CharT open_bracket{};
         CharT close_bracket{};

@@ -22,14 +22,14 @@ namespace cerb::text
         {
             auto const &text = text_generator.getRestOfTheText();
 
-            if (not single_line.empty() && isSingleLineComment(text)) {
+            if (isSingleLineComment(text)) {
                 skipSingleLine();
-            } else if (not multiline_begin.empty() && isMultilineComment(text)) {
+            } else if (isMultilineComment(text)) {
                 skipMultiline(text);
             }
         }
 
-        CERBELIB_DEFAULT_NO_COPIABLE(CommentSkipper);
+        CERBLIB_DEFAULT_NO_COPIABLE(CommentSkipper);
 
         constexpr explicit CommentSkipper(
             GeneratorForText<CharT> &generator_for_text,
@@ -43,12 +43,12 @@ namespace cerb::text
     private:
         CERBLIB_DECL auto isSingleLineComment(BasicStringView<CharT> const &text) const -> bool
         {
-            return text.containsAt(0, single_line);
+            return not single_line.empty() && text.containsAt(0, single_line);
         }
 
         CERBLIB_DECL auto isMultilineComment(BasicStringView<CharT> const &text) const -> bool
         {
-            return text.containsAt(0, multiline_begin);
+            return not multiline_begin.empty() && text.containsAt(0, multiline_begin);
         }
 
         constexpr auto skipSingleLine() -> void
@@ -63,20 +63,33 @@ namespace cerb::text
         constexpr auto skipMultiline(BasicStringView<CharT> const &text) -> void
         {
             size_t offset = multiline_begin.size();
-            GeneratorForText<CharT> comment_begin = text_generator;
+            GeneratorForText<CharT> comment_begin_state = text_generator;
 
-            while (offset + multiline_end.size() < text.size() &&
-                   not text.containsAt(offset, multiline_end)) {
+            while (stillMultilineComment(offset, text)) {
                 ++offset;
             }
 
             text_generator.skip(offset);
 
-            if (not text.containsAt(offset, multiline_end)) {
-                throw CommentSkipperException<CharT>("Unterminated comment.", comment_begin);
+            if (isCommentUnterminated(offset, text)) {
+                throw CommentSkipperException<CharT>(
+                    "Unterminated multiline comment.", comment_begin_state);
             }
 
             text_generator.skip(multiline_end.size());
+        }
+
+        CERBLIB_DECL auto
+            stillMultilineComment(size_t offset, BasicStringView<CharT> const &text) const -> bool
+        {
+            auto is_in_bound = offset + multiline_end.size() < text.size();
+            return is_in_bound && not text.containsAt(offset, multiline_end);
+        }
+
+        CERBLIB_DECL auto
+            isCommentUnterminated(size_t offset, BasicStringView<CharT> const &text) const -> bool
+        {
+            return not text.containsAt(offset, multiline_end);
         }
 
         CERBLIB_DECL static auto isNewLineOrEoF(CharT chr) -> bool

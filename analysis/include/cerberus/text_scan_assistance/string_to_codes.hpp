@@ -15,6 +15,7 @@ namespace cerb::text
     template<CharacterLiteral CharT>
     class StringToCodes : private ScanApi<CharT>
     {
+    private:
         CERBLIB_SCAN_API_ACCESS(CharT);
 
     public:

@@ -122,11 +122,6 @@ namespace cerb
             return ptrdiff(cerb::rfind(*this, chr), rend()) - 1;
         }
 
-        CERBLIB_DECL auto rfind2(CharT chr) const
-        {
-            return cerb::rfind(*this, chr);
-        }
-
         CERBLIB_DECL auto strView() const -> std::basic_string_view<CharT>
         {
             return { string, length };

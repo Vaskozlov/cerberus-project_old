@@ -96,7 +96,7 @@ namespace cerb
 
     template<typename CharT>
     concept CharacterLiteral =
-        cerb::IsAnyOfV<CharT, char, unsigned char, char8_t, char16_t, char32_t, wchar_t>;
+        IsAnyOfV<CharT, char, unsigned char, char8_t, char16_t, char32_t, wchar_t>;
 
     template<typename T>
     using AutoCopyType = std::conditional_t<Trivial<T>, T const, T const &>;
@@ -108,7 +108,14 @@ namespace cerb
     using GetElementType = typename T::element_type;
 
     template<Iterable T>
-    using GetIteratorType = typename T::iterator;
+    using GetIteratorType =
+        std::conditional_t<std::is_const_v<T>, typename T::const_iterator, typename T::iterator>;
+
+    template<Iterable T>
+    using GetReverseIteratorType = std::conditional_t<
+        std::is_const_v<T>,
+        typename T::const_reverse_iterator,
+        typename T::reverse_iterator>;
 
     template<HasSizeType T>
     using GetSizeType = typename T::size_type;
